@@ -5,7 +5,7 @@ import type { APIBody } from "@/types/api"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<APIBody<string>>
+  res: NextApiResponse<APIBody<{ userId: string }>>
 ) {
   try {
     if (req.method == "POST") {
@@ -44,7 +44,7 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        data: userId,
+        data: { userId },
         message: "Account created successfully",
       })
     }
