@@ -3,5 +3,5 @@ export type User = {
   email: string, 
   fullName: string, 
   role: "tenant" | "admin",
-  year_of_birth: number
+  yearOfBirth: number
 }

@@ -4,7 +4,7 @@ const mockUser = {
   userId: "123",
   email: "test@example.com",
   fullName: "Jane Doe",
-  year_of_birth: 1995,
+  yearBfbirth: 1995,
   role: "admin",
 }
 

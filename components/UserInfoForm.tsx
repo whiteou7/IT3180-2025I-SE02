@@ -13,7 +13,7 @@ export function UserInfoForm({ user }: UserInfoFormProps) {
   const [formData, setFormData] = useState({
     email: user.email,
     fullName: user.fullName,
-    year_of_birth: user.year_of_birth,
+    yearOfBirth: user.yearOfBirth,
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +59,7 @@ export function UserInfoForm({ user }: UserInfoFormProps) {
             <Input
               id="year_of_birth"
               type="number"
-              value={formData.year_of_birth}
+              value={formData.yearOfBirth}
               onChange={handleChange}
             />
           </div>
