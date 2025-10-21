@@ -1,0 +1,133 @@
+//////////////////////////////////////////////////////////
+// Residential Properties Management System
+//////////////////////////////////////////////////////////
+
+Table Users {
+  UserID serial [pk]
+  Username varchar(100)
+  CCCD varchar(20)
+  Email varchar(100) [unique]
+  Password varchar(255)
+  Role varchar(30)  
+  Phone varchar(20)
+  Gender varchar(10)
+  DateOfBirth date
+}
+
+Table Records {
+  RecordID serial [pk]
+  UserID int
+  Type varchar(20)
+}
+
+Table Residents {
+  ResidentID serial [pk]
+  UserID int [not null, unique] // inherits from Users
+  ApartmentID int
+  Status varchar(20)
+  MoveInDate date 
+}
+
+Table Buildings {
+  BuildingID serial [pk]
+  BuildingName varchar(20)
+}
+
+Table Apartments {
+  ApartmentID serial [pk]
+  BuildingID int
+  Floor int
+  RoomNumber varchar(20)
+  Area decimal(10,2)
+  OwnerID int
+  Status varchar(20)
+}
+
+Table Services{
+  ServiceID serial [pk]
+  ServiceName varchar(20)
+  Price float
+}
+
+Table ServiceApartments {
+  SerApID serial [pk]
+  ServiceID int
+  ApartmentID int
+  UseTime datetime
+}
+
+Table Vehicles {
+  VehicleID serial [pk]
+  ResidentID int
+  LicensePlate varchar(20)
+  Type varchar(50)
+  RegisteredAt timestamp
+  Status varchar(20)
+}
+
+Table VehicleLogs{
+  VLogID serial [pk]
+  VehicleID int
+  EnterTime datetime
+  LeaveTime datetime
+  BuildingID int
+}
+
+Table Infrastructure{
+  InfraID serial [pk]
+  ApartmentID int
+  InfraName varchar(50)
+  Status varchar(20)
+}
+
+Table Maintenances{
+  MaintenanceID serial [pk]
+  InfraID int
+  Status varchar(20)
+  MTime datetime
+}
+
+Table MaintenanceReceipts {
+  MReceiptID serial [pk]
+  MaintenanceID int
+  Status varchar(20)
+  Cost float
+}
+
+Table Properties{
+  PropertyID serial [pk]
+  ResidentID int
+  PropertyName varchar(50)
+}
+
+Table LostItems {
+  LostID serial [pk]
+  PropertyID int
+  LastSeenTime datetime
+  LastSeenPlace varchar(50)
+  Status varchar(20)
+}
+
+//////////////////////////////////////////////////////////
+// Relationships
+/////////////////////////////////////////////////////////
+
+Ref: Records.UserID > Users.UserID
+Ref: Residents.UserID > Users.UserID
+Ref: Residents.ApartmentID > Apartments.ApartmentID
+Ref: Apartments.BuildingID > Buildings.BuildingID
+Ref: Vehicles.ResidentID > Residents.ResidentID
+Ref: Apartments.OwnerID > Residents.ResidentID
+Ref: Infrastructure.ApartmentID > Apartments.ApartmentID
+Ref: Maintenances.InfraID > Infrastructure.InfraID
+Ref: MaintenanceReceipts.MaintenanceID > Maintenances.MaintenanceID
+
+Ref: "Vehicles"."VehicleID" < "VehicleLogs"."VehicleID"
+
+Ref: "Residents"."ResidentID" < "Properties"."ResidentID"
+
+Ref: "Properties"."PropertyID" < "LostItems"."PropertyID"
+
+Ref: "Services"."ServiceID" < "ServiceApartments"."ServiceID"
+
+Ref: "Apartments"."ApartmentID" < "ServiceApartments"."ApartmentID"
