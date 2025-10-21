@@ -10,8 +10,8 @@ export default async function handler(
 ) {
   try {
     const { id: userId } = req.query
-    if (req.method === "PATCH") {
-      const { email, fullName, role, yearOfBirth } = req.body
+    if (req.method === "PUT") {
+      const { email, fullName, role, yearOfBirth, gender } = req.body
 
       if (!userId) {
         return res.status(400).json({
@@ -25,13 +25,15 @@ export default async function handler(
             email = ${email},
             full_name = ${fullName},
             role = ${role},
-            year_of_birth = ${yearOfBirth}
+            year_of_birth = ${yearOfBirth},
+            gender = ${gender}
           WHERE user_id = ${userId}
           RETURNING 
             email,
             full_name,
             role,
-            year_of_birth;
+            year_of_birth,
+            gender;
         `
 
       if (updatedUser.length === 0) {

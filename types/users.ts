@@ -4,4 +4,5 @@ export type User = {
   fullName: string, 
   role: "tenant" | "admin",
   yearOfBirth: number
+  gender: "male" | "female"
 }
