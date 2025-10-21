@@ -9,8 +9,8 @@ export default async function handler(
   res: NextApiResponse<APIBody<User>>
 ) {
   try {
+    const { id: userId } = req.query
     if (req.method === "PATCH") {
-      const { id: userId } = req.query
       const { email, fullName, role, yearOfBirth } = req.body
 
       if (!userId) {
