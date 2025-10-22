@@ -48,6 +48,7 @@ export default async function handler(
     else if (req.method === "GET") {
       const [apartment] = await db<Apartment[]>`
         SELECT
+          apartment_id,
           building_id,
           floor,
           apartment_number,
