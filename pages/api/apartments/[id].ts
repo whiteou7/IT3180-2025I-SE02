@@ -45,6 +45,31 @@ export default async function handler(
       })
     }
 
+    else if (req.method === "GET") {
+      const [apartment] = await db<Apartment[]>`
+        SELECT
+          building_id,
+          floor,
+          apartment_number,
+          monthly_fee
+        FROM apartments
+        WHERE apartment_id = ${id as string}
+      ` 
+
+      if (!apartment) {
+        return res.status(404).json({
+          success: false,
+          message: "Apartment not found.",
+        })
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Fetched apartment",
+        data: apartment,
+      })
+    }
+
     else if (req.method === "DELETE") {
       const [deletedApartment] = await db<Apartment[]>`
         DELETE FROM apartments
@@ -65,6 +90,7 @@ export default async function handler(
         data: null,
       })
     }
+
     else {
       res.setHeader("Allow", ["PUT", "DELETE"])
       return res.status(405).json({
