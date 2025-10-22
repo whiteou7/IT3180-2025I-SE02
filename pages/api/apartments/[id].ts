@@ -1,43 +1,48 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "@/db";
-import type { APIBody } from "@/types/api";
-import type { Apartment } from "@/types/apartments"; 
+import type { NextApiRequest, NextApiResponse } from "next"
+import { db } from "@/db"
+import type { APIBody } from "@/types/api"
+import type { Apartment } from "@/types/apartments" 
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Apartment | null>> 
 ) {
-  const { id } = req.query;
+  const { id } = req.query
 
   try {
     if (req.method === "PUT") {
-      const { buildingId, floor } = req.body;
+      const { buildingId, floor, apartmentNumber, monthlyFee } = req.body
 
-      if (buildingId === undefined || floor === undefined) {
+      if (buildingId == undefined 
+        || floor == undefined 
+        || apartmentNumber == undefined 
+        || monthlyFee == undefined 
+      ) {
         return res.status(400).json({
           success: false,
-          message: "Missing required fields: buildingId and floor.",
-        });
+          message: "Missing required body keys",
+        })
       }
+
       const [updatedApartment] = await db<Apartment[]>`
         UPDATE apartments
-        SET building_id = ${buildingId}, floor = ${floor}
+        SET building_id = ${buildingId}, floor = ${floor}, apartment_number=${apartmentNumber}, monthly_fee=${monthlyFee}
         WHERE apartment_id = ${id as string}
         RETURNING *; 
-      `; 
+      ` 
 
       if (!updatedApartment) {
         return res.status(404).json({
           success: false,
           message: "Apartment not found.",
-        });
+        })
       }
 
       return res.status(200).json({
         success: true,
         message: "Apartment updated successfully.",
         data: updatedApartment,
-      });
+      })
     }
 
     else if (req.method === "DELETE") {
@@ -45,34 +50,34 @@ export default async function handler(
         DELETE FROM apartments
         WHERE apartment_id = ${id as string}
         RETURNING apartment_id;
-      `; 
+      ` 
 
       if (!deletedApartment) {
         return res.status(404).json({
           success: false,
           message: "Apartment not found.",
-        });
+        })
       }
 
       return res.status(200).json({
         success: true,
         message: "Apartment deleted successfully.",
         data: null,
-      });
+      })
     }
     else {
-      res.setHeader("Allow", ["PUT", "DELETE"]);
+      res.setHeader("Allow", ["PUT", "DELETE"])
       return res.status(405).json({
         success: false,
         message: `Method ${req.method} Not Allowed`,
-      });
+      })
     }
 
   } catch (error) {
-    console.error(`Error processing apartment ${id}:`, error);
+    console.error(`Error processing apartment ${id}:`, error)
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
-    });
+    })
   }
 }
