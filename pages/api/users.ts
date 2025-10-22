@@ -29,7 +29,7 @@ export default async function handler(
         SELECT user_id FROM users WHERE email = ${email};
       `
 
-      if (existingUser?.user_id) {
+      if (existingUser) {
         return res.status(409).json({
           success: false,
           message: "Email already registered.",
