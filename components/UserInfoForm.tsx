@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { ofetch } from "ofetch"
+import { APIBody } from "@/types/api"
 
 type UserInfoFormProps = {
   user: User
@@ -14,6 +17,8 @@ export function UserInfoForm({ user }: UserInfoFormProps) {
     email: user.email,
     fullName: user.fullName,
     yearOfBirth: user.yearOfBirth,
+    role: user.role,
+    gender: user.gender
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,9 +26,18 @@ export function UserInfoForm({ user }: UserInfoFormProps) {
     setFormData(prev => ({ ...prev, [id]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+    const res = await ofetch<APIBody<User>>(`/api/users/${user.userId}`, {
+      method: "PUT",
+      body: formData,
+      ignoreResponseError: true
+    })
+    if (!res.success) {
+      toast.error(res.message)
+    } else {
+      toast.success(res.message)
+    }
   }
 
   return (
@@ -66,6 +80,10 @@ export function UserInfoForm({ user }: UserInfoFormProps) {
           <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
             <Input id="role" value={user.role} readOnly />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="gender">Gender</Label>
+            <Input id="gender" value={user.gender} onChange={handleChange}/>
           </div>
           <Button type="submit">Save Changes</Button>
         </form>
