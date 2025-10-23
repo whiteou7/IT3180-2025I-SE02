@@ -22,7 +22,9 @@ CREATE TABLE buildings (
 CREATE TABLE apartments (
     apartment_id SERIAL PRIMARY KEY,
     building_id INT NOT NULL REFERENCES buildings(building_id) ON DELETE CASCADE,
-    floor INT NOT NULL
+    floor INT NOT NULL,
+    apartment_number INT NOT NULL,
+    monthly_fee INT NOT NULL
 );
 
 -- =========================================
