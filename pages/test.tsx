@@ -22,7 +22,6 @@ export default function Home() {
     floor: null,
     monthlyFee: null,
     apartmentNumber: null,
-
   })
 
   useEffect(() => {

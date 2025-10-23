@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { User } from "@/types/users"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,13 +13,27 @@ type UserInfoFormProps = {
 }
 
 export function UserInfoForm({ user }: UserInfoFormProps) {
-  const [formData, setFormData] = useState({
-    email: user.email,
-    fullName: user.fullName,
-    yearOfBirth: user.yearOfBirth,
-    role: user.role,
-    gender: user.gender
+  const [formData, setFormData] = useState<User>({
+    userId: "",
+    email: "",
+    fullName: "",
+    yearOfBirth: 0,
+    role: "tenant",
+    gender: "male"
   })
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        userId: user.userId,
+        email: user.email,
+        fullName: user.fullName,
+        yearOfBirth: user.yearOfBirth,
+        role: user.role,
+        gender: user.gender
+      })
+    }
+  }, [user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target

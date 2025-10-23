@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Apartment } from "@/types/apartments"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,14 +13,25 @@ type ApartmentInfoFormProps = {
 }
 
 export function ApartmentInfoForm({ apartment }: ApartmentInfoFormProps) {
-  const [formData, setFormData] = useState({
-    apartmentId: apartment.apartmentId,
-    buildingId: apartment.buildingId,
-    floor: apartment.floor,
-    apartmentNumber: apartment.apartmentNumber,
-    monthlyFee: apartment.monthlyFee,
+  const [formData, setFormData] = useState<Apartment>({
+    apartmentId: 0,
+    buildingId: 0,
+    floor: 0,
+    apartmentNumber: 0,
+    monthlyFee: 0,
   })
-  console.log(formData)
+
+  useEffect(() => {
+    if (apartment) {
+      setFormData({
+        apartmentId: apartment.apartmentId,
+        buildingId: apartment.buildingId,
+        floor: apartment.floor,
+        apartmentNumber: apartment.apartmentNumber,
+        monthlyFee: apartment.monthlyFee,
+      })
+    }
+  }, [apartment])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, type } = e.target
