@@ -1,4 +1,5 @@
 import { ApartmentInfoForm } from "@/components/ApartmentInfoForm"
+import { Feed } from "@/components/Feed"
 import { Button } from "@/components/ui/button"
 import { UserInfoForm } from "@/components/UserInfoForm"
 import { ofetch } from "ofetch"
@@ -47,6 +48,7 @@ export default function Home() {
       >
         Info
       </Button>
+      <Feed />
     </div>
   )
 }
