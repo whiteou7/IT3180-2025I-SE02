@@ -2,11 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 
-type CheckInResponse = {
-  message: "Vehicle entered" | "Vehicle exited"
-  data: { time: string }
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ time: string }>>
