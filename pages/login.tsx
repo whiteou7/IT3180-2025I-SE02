@@ -9,11 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 import { Label } from "@/components/ui/label"
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex items-center justify-center bg-background pt-16">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -24,15 +25,17 @@ export default function LoginPage() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required />
+            <Input id="email" type="email" placeholder="m@example.com" value="admin@gmail.com" required />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required />
+            <Input id="password" type="password" value="ngoctung2601" required />
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">Sign in</Button>
+          <Button className="w-full">
+            <Link href="/">Sign In</Link>
+          </Button>
         </CardFooter>
       </Card>
     </div>
