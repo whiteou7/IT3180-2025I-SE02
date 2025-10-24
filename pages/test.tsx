@@ -11,8 +11,8 @@ const mockUser = {
   email: "test@example.com",
   fullName: "Jane Doe",
   yearOfBirth: 1995,
-  role: "admin",
-  gender: "male"
+  role: "admin" as const,
+  gender: "male" as const
 }
 
 export default function Home() {
