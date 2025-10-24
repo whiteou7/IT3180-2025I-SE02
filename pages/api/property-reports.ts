@@ -20,7 +20,8 @@ export default async function handler(
           u1.full_name AS user_full_name,        -- Full name of the user
           u2.full_name AS issuer_full_name,      -- Full name of the issuer
           pr.updated_at,
-          p.property_name
+          p.property_name,
+          pr.content
         FROM 
           property_reports pr
         JOIN
