@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import type { Post } from "@/types/posts"
+import ReactMarkdown from "react-markdown"
 
 export function Post({ postId, userId, fullName, content, createdAt }: Post) {
   return (
@@ -27,8 +28,10 @@ export function Post({ postId, userId, fullName, content, createdAt }: Post) {
         </div>
       </CardHeader>
 
-      <CardContent>
-        <div className="whitespace-pre-wrap">{content}</div>
+      <CardContent className="prose prose-sm dark:prose-invert max-w-none">
+        <ReactMarkdown>
+          {content}
+        </ReactMarkdown>
       </CardContent>
 
       <CardFooter>
