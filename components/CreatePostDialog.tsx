@@ -21,7 +21,6 @@ export function CreatePostDialog() {
   const [open, setOpen] = useState(false)
   const [content, setContent] = useState("")
   const [loading, setLoading] = useState(false)
-  const HARDCODED_USER_ID = "7ade6518-e951-417d-ab39-72868530ab44"
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -31,7 +30,7 @@ export function CreatePostDialog() {
       setLoading(true)
       const res = await ofetch("/api/posts", {
         method: "POST",
-        body: { content: content.trim(), userId: HARDCODED_USER_ID },
+        body: { content: content.trim(), userId: localStorage.getItem("userId") },
         ignoreResponseError: true,
       })
 

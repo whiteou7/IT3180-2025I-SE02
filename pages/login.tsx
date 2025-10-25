@@ -13,6 +13,10 @@ import Link from "next/link"
 import { Label } from "@/components/ui/label"
 
 export default function LoginPage() {
+  const handleLogin = () => {
+    localStorage.setItem("userId", "7ade6518-e951-417d-ab39-72868530ab44")
+    localStorage.setItem("role", "admin")
+  }
   return (
     <div className="flex items-center justify-center bg-background pt-16">
       <Card className="w-full max-w-sm">
@@ -33,7 +37,7 @@ export default function LoginPage() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full">
+          <Button onClick={handleLogin} className="w-full">
             <Link href="/">Sign In</Link>
           </Button>
         </CardFooter>
