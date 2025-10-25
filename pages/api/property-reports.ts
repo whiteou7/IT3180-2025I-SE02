@@ -21,7 +21,9 @@ export default async function handler(
           u2.full_name AS issuer_full_name,      -- Full name of the issuer
           pr.updated_at,
           p.property_name,
-          pr.content
+          pr.content,
+          pr.issued_status,
+          pr.approved
         FROM 
           property_reports pr
         JOIN
