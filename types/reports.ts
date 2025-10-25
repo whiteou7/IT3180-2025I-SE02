@@ -10,4 +10,6 @@ export type PropertyReport = {
   issuerFullName: string | null
   propertyName: string
   content: string | null
+  issuedStatus: string | null
+  approved: boolean
 }
