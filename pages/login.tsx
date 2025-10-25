@@ -38,7 +38,7 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter>
           <Button onClick={handleLogin} className="w-full">
-            <Link href="/">Sign In</Link>
+            <Link href="/">Sign In as Demo Admin Account</Link>
           </Button>
         </CardFooter>
       </Card>
