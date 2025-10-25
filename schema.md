@@ -113,7 +113,9 @@ CREATE TABLE property_reports (
     status property_status DEFAULT 'not found',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     issuer_id TEXT REFERENCES users(user_id) ON DELETE CASCADE,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    issued_status property_status,
+    approved BOOLEAN DEFAULT FALSE
 );
 
 -- =========================================
