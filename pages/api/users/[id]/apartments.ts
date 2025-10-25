@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db" 
 import { APIBody } from "@/types/api"
+import type { Apartment } from "@/types/apartments"
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<APIBody<{ apartmentId: number } | null>>
+  res: NextApiResponse<APIBody<Apartment | { apartmentId: number } | null>>
 ) {
   const { id: userId } = req.query
 
@@ -74,8 +75,43 @@ export default async function handler(
       })
     }
 
+    else if (req.method === "GET") {
+      // Get apartment info for the user
+      // First check user exists and get their apartment_id
+      const [user] = await db`
+        SELECT apartment_id FROM users WHERE user_id = ${userId};
+      `
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        })
+      }
+
+      if (!user.apartmentId) {
+        return res.status(200).json({
+          success: true,
+          message: "User is not assigned to an apartment",
+          data: null,
+        })
+      }
+
+      const [apartment] = await db<Apartment[]>`
+        SELECT apartment_id, building_id, floor, apartment_number, monthly_fee
+        FROM apartments
+        WHERE apartment_id = ${user.apartmentId};
+      `
+
+      return res.status(200).json({
+        success: true,
+        message: "Apartment fetched successfully",
+        data: apartment,
+      })
+    }
+
     else {
-      res.setHeader("Allow", ["PUT", "DELETE"])
+      res.setHeader("Allow", ["PUT", "DELETE", "GET"])
       return res.status(405).json({
         success: false,
         message: `Method ${req.method} Not Allowed`,
