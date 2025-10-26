@@ -5,6 +5,10 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { User } from "@/types/users"
 
+/**
+ * POST /api/users - Create a new user account
+ * GET /api/users - Retrieve all users (admin only)
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
@@ -14,7 +18,11 @@ export default async function handler(
 ) {
   try {
     if (req.method === "POST") {
-      const { email, fullName, password } = req.body
+      const { email, fullName, password } = req.body as {
+        email: string;
+        fullName: string;
+        password: string;
+      }
 
       // Validate required fields
       if (!email || !password || !fullName) {

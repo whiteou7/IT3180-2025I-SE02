@@ -3,6 +3,10 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import { Post } from "@/types/posts"
 
+/**
+ * GET /api/posts - Retrieve all posts with user information
+ * POST /api/posts - Create a new post
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Post[]>>
@@ -22,8 +26,10 @@ export default async function handler(
 
       return res.status(200).json({ success: true, message: "Posts fetched successfully", data: posts })
     } else if (req.method === "POST") {
-      // create a new post
-      const { content, userId } = req.body as { content?: string; userId?: string }
+      const { content, userId } = req.body as {
+        content: string;
+        userId: string;
+      }
 
       if (!content || typeof content !== "string") {
         return res.status(400).json({ success: false, message: "`content` is required and must be a string" })

@@ -3,6 +3,9 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import { Vehicle } from "@/types/properties"
 
+/**
+ * POST /api/users/[id]/vehicle - Create a new vehicle for the user
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Vehicle | null>>
@@ -15,7 +18,9 @@ export default async function handler(
 
   try {
     if (req.method === "POST") {
-      const { licensePlate } = req.body
+      const { licensePlate } = req.body as {
+        licensePlate: string;
+      }
 
       if (!licensePlate) {
         return res.status(400).json({

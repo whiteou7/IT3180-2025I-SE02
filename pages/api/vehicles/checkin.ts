@@ -3,11 +3,14 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api" 
 import type { VehicleLog } from "@/types/vehicles" 
 
+/**
+ * GET /api/vehicles/checkin - Retrieve vehicle logs with filtering options
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ logs: VehicleLog[] }>> 
 ) {
-  // 2. Chỉ chấp nhận GET
+  // Only accept GET method
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
@@ -17,7 +20,10 @@ export default async function handler(
   }
 
   try {
-    const { userId, filter } = req.query
+    const { userId, filter } = req.query as {
+      userId?: string;
+      filter?: "week" | "month" | "year";
+    }
     const baseQuery = db<VehicleLog[]>`
       SELECT 
         u.user_id, 

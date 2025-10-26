@@ -3,6 +3,11 @@ import { db } from "@/db"
 import { APIBody } from "@/types/api"
 import type { Apartment } from "@/types/apartments"
 
+/**
+ * - GET /api/users/[id]/apartments - Get user's apartment information
+ * - PUT /api/users/[id]/apartments - Assign user to an apartment
+ * - DELETE /api/users/[id]/apartments - Remove user from apartment
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Apartment | { apartmentId: number } | null>>
@@ -18,7 +23,9 @@ export default async function handler(
 
   try {
     if (req.method === "PUT") {
-      const { apartmentId } = req.body
+      const { apartmentId } = req.body as {
+        apartmentId: number;
+      }
 
       if (!apartmentId) {
         return res.status(400).json({
@@ -76,8 +83,6 @@ export default async function handler(
     }
 
     else if (req.method === "GET") {
-      // Get apartment info for the user
-      // First check user exists and get their apartment_id
       const [user] = await db`
         SELECT apartment_id FROM users WHERE user_id = ${userId};
       `

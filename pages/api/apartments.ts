@@ -2,13 +2,21 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 
+/**
+ * POST /api/apartments - Create a new apartment
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ apartmentId: number }>>
 ) {
   if (req.method === "POST") {
     try {
-      const { buildingId, floor, apartmentNumber, monthlyFee } = req.body
+      const { buildingId, floor, apartmentNumber, monthlyFee } = req.body as {
+        buildingId: number;
+        floor: number;
+        apartmentNumber: number;
+        monthlyFee: number;
+      }
 
       if (buildingId == undefined 
         || floor == undefined 

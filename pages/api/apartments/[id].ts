@@ -3,6 +3,11 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Apartment } from "@/types/apartments" 
 
+/**
+ * GET /api/apartments/[id] - Get apartment information
+ * PUT /api/apartments/[id] - Update apartment information
+ * DELETE /api/apartments/[id] - Delete apartment
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Apartment | null>> 
@@ -11,7 +16,12 @@ export default async function handler(
 
   try {
     if (req.method === "PUT") {
-      const { buildingId, floor, apartmentNumber, monthlyFee } = req.body
+      const { buildingId, floor, apartmentNumber, monthlyFee } = req.body as {
+        buildingId: number;
+        floor: number;
+        apartmentNumber: number;
+        monthlyFee: number;
+      }
 
       if (buildingId == undefined 
         || floor == undefined 
@@ -93,7 +103,7 @@ export default async function handler(
     }
 
     else {
-      res.setHeader("Allow", ["PUT", "DELETE"])
+      res.setHeader("Allow", ["PUT", "GET", "DELETE"])
       return res.status(405).json({
         success: false,
         message: `Method ${req.method} Not Allowed`,

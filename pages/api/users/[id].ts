@@ -4,6 +4,9 @@ import { db } from "@/db"
 import { User } from "@/types/users"
 import { APIBody } from "@/types/api"
 
+/**
+ * PUT /api/users/[id] - Update user information
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<User>>
@@ -11,7 +14,13 @@ export default async function handler(
   try {
     const { id: userId } = req.query
     if (req.method === "PUT") {
-      const { email, fullName, role, yearOfBirth, gender } = req.body
+      const { email, fullName, role, yearOfBirth, gender } = req.body as {
+        email: string;
+        fullName: string;
+        role: "tenant" | "admin";
+        yearOfBirth: number;
+        gender: "male" | "female";
+      }
 
       if (!userId) {
         return res.status(400).json({
@@ -47,6 +56,12 @@ export default async function handler(
         success: true,
         message: "Updated user info",
         data: updatedUser[0]
+      })
+    } else {
+      res.setHeader("Allow", ["PUT"])
+      return res.status(405).json({
+        success: false,
+        message: `Method ${req.method} Not Allowed`,
       })
     }
   } catch (error) {

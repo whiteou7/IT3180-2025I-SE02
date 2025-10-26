@@ -3,6 +3,9 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import { PropertyReport } from "@/types/reports"
 
+/**
+ * GET /api/property-reports - Retrieve all property reports with user and issuer information
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<PropertyReport[]>>
