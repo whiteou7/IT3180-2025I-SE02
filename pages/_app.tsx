@@ -5,14 +5,14 @@ import { useRouter } from "next/router"
 import "../styles/globals.css"
 import { Toaster } from "sonner"
 import Header from "../components/Header"
+import { useUserStore } from "@/store/userStore"
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId")
-
-    if (userId && router.pathname === "/") {
+    const { userId, role } = useUserStore.getState()
+    if (userId && role && router.pathname === "/") {
       router.push("/feed")
     }
   }, [router])

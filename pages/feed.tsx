@@ -11,14 +11,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ApartmentInfoForm } from "@/components/ApartmentInfoForm"
+import { useUserStore } from "@/store/userStore"
 
 export default function Home() {
-  const [userId, setUserId] = useState<string>("")
-    
-  useEffect(() => {
-    const uid = localStorage.getItem("userId") ?? ""
-    setUserId(uid)
-  }, [])
+  const userId = useUserStore(s => s.userId)
   return (
     <main className="bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">

@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown"
 import { ChevronsUpDown } from "lucide-react"
 import { ofetch } from "ofetch"
 import { toast } from "sonner"
+import { useUserStore } from "@/store/userStore"
 
 export function Report({
   propertyReportId,
@@ -25,12 +26,7 @@ export function Report({
   issuerId,
 }: PropertyReport) {
   const [loading, setLoading] = React.useState(false)
-  const [currentUserId, setCurrentUserId] = React.useState<string | null>(null)
-
-  React.useEffect(() => {
-    const uid = localStorage.getItem("userId")
-    setCurrentUserId(uid)
-  }, [])
+  const currentUserId = useUserStore(s => s.userId)
 
   const handleApprove = async () => {
     if (!propertyReportId) return

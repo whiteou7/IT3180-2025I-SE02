@@ -11,11 +11,12 @@ import {
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { Label } from "@/components/ui/label"
+import { useUserStore } from "@/store/userStore"
 
 export default function LoginPage() {
-  const handleLogin = () => {
-    localStorage.setItem("userId", "7ade6518-e951-417d-ab39-72868530ab44")
-    localStorage.setItem("role", "admin")
+  const setUser = useUserStore(s => s.setUser)
+  const handleDemoAdminLogin = () => {
+    setUser("7ade6518-e951-417d-ab39-72868530ab44", "admin")
   }
   return (
     <div className="flex items-center justify-center bg-background pt-16">
@@ -37,7 +38,7 @@ export default function LoginPage() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleLogin} className="w-full">
+          <Button onClick={handleDemoAdminLogin} className="w-full">
             <Link href="/">Sign In as Demo Admin Account</Link>
           </Button>
         </CardFooter>

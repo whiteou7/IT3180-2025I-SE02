@@ -16,11 +16,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { PenTool } from "lucide-react"
 import { ofetch } from "ofetch"
+import { useUserStore } from "@/store/userStore"
 
 export function CreatePostDialog() {
   const [open, setOpen] = useState(false)
   const [content, setContent] = useState("")
   const [loading, setLoading] = useState(false)
+  const userId = useUserStore(s => s.userId)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -30,7 +32,7 @@ export function CreatePostDialog() {
       setLoading(true)
       const res = await ofetch("/api/posts", {
         method: "POST",
-        body: { content: content.trim(), userId: localStorage.getItem("userId") },
+        body: { content: content.trim(), userId },
         ignoreResponseError: true,
       })
 

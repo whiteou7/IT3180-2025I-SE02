@@ -1,19 +1,15 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { Button } from "./ui/button"
-import { useEffect, useState } from "react"
+import { useUserStore } from "@/store/userStore"
 
 export default function Header() {
   const router = useRouter()
-  const [userId, setUserId] = useState<string | null>(null)
-  
-  useEffect(() => {
-    const uid = localStorage.getItem("userId")
-    setUserId(uid)
-  }, [router])
+  const userId = useUserStore(s => s.userId)
+  const clearUser = useUserStore(s => s.clearUser)
 
   const handleSignout = () => {
-    localStorage.removeItem("userId")
+    clearUser()
     router.push("/")
   }
 
