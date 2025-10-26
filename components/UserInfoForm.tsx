@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { User } from "@/types/users"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -8,100 +7,118 @@ import { toast } from "sonner"
 import { ofetch } from "ofetch"
 import { APIBody } from "@/types/api"
 
-type UserInfoFormProps = {
-  user: User
-}
-
-export function UserInfoForm({ user }: UserInfoFormProps) {
+export function UserInfoForm({ userId }: { userId: string }) {
   const [formData, setFormData] = useState<User>({
     userId: "",
     email: "",
     fullName: "",
     yearOfBirth: 0,
     role: "tenant",
-    gender: "male"
+    gender: "male",
   })
 
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        userId: user.userId,
-        email: user.email,
-        fullName: user.fullName,
-        yearOfBirth: user.yearOfBirth,
-        role: user.role,
-        gender: user.gender
-      })
-    }
-  }, [user])
+  const [loading, setLoading] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
-    setFormData(prev => ({ ...prev, [id]: value }))
+  // Fetch user info
+  useEffect(() => {
+    async function fetchUser() {
+      if (!userId) return
+      setLoading(true)
+      try {
+        const res = await ofetch<APIBody<User>>(`/api/users/${userId}`, {
+          ignoreResponseError: true,
+        })
+
+        if (res.success && res.data) {
+          setFormData(res.data)
+        } else {
+          toast.error(res.message ?? "Failed to load user info")
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error("An error occurred while fetching user data.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUser()
+  }, [userId])
+
+  // Handle form field changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value, type } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [id]: type === "number" ? Number(value) || 0 : value,
+    }))
   }
 
+  // Submit updates
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const res = await ofetch<APIBody<User>>(`/api/users/${user.userId}`, {
-      method: "PUT",
-      body: formData,
-      ignoreResponseError: true
-    })
-    if (!res.success) {
-      toast.error(res.message)
-    } else {
-      toast.success(res.message)
+    try {
+      const res = await ofetch<APIBody<User>>(`/api/users/${formData.userId}`, {
+        method: "PUT",
+        body: formData,
+        ignoreResponseError: true,
+      })
+
+      if (res.success) {
+        toast.success(res.message ?? "User updated successfully")
+      } else {
+        toast.error(res.message ?? "Failed to update user")
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error("An error occurred while updating.")
     }
   }
 
+  if (loading) return <p>Loading user data...</p>
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>User Information</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="userId">User ID</Label>
-            <Input id="userId" value={user.userId} readOnly />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input
-              id="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="year_of_birth">Year of Birth</Label>
-            <Input
-              id="year_of_birth"
-              type="number"
-              value={formData.yearOfBirth}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
-            <Input id="role" value={user.role} readOnly />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="gender">Gender</Label>
-            <Input id="gender" value={user.gender} onChange={handleChange}/>
-          </div>
-          <Button type="submit">Save Changes</Button>
-        </form>
-      </CardContent>
-    </Card>
+    <div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="userId">User ID</Label>
+          <Input id="userId" value={userId} readOnly />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="fullName">Full Name</Label>
+          <Input
+            id="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="yearOfBirth">Year of Birth</Label>
+          <Input
+            id="yearOfBirth"
+            type="number"
+            value={formData.yearOfBirth}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="role">Role</Label>
+          <Input id="role" value={formData.role} readOnly />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="gender">Gender</Label>
+          <Input id="gender" value={formData.gender} onChange={handleChange}/>
+        </div>
+        <Button type="submit">Save Changes</Button>
+      </form>
+    </div>
   )
 }
