@@ -29,7 +29,7 @@ export default async function handler(
       let updated: PropertyReport | null = null
 
       if (approved !== undefined) {
-        const [row] = await db`
+        const [row] = await db<PropertyReport[]>`
           UPDATE property_reports
           SET approved = ${approved}, updated_at = CURRENT_TIMESTAMP
           WHERE property_report_id = ${id as string}
@@ -39,7 +39,7 @@ export default async function handler(
       }
 
       if (issuedStatus !== undefined) {
-        const [row] = await db`
+        const [row] = await db<PropertyReport[]>`
           UPDATE property_reports
           SET issued_status = ${issuedStatus}, updated_at = CURRENT_TIMESTAMP
           WHERE property_report_id = ${id as string}
@@ -49,7 +49,7 @@ export default async function handler(
       }
 
       if (status !== undefined) {
-        const [row] = await db`
+        const [row] = await db<PropertyReport[]>`
           UPDATE property_reports
           SET status = ${status}, updated_at = CURRENT_TIMESTAMP
           WHERE property_report_id = ${id as string}
@@ -59,7 +59,7 @@ export default async function handler(
       }
 
       if (issuerId !== undefined) {
-        const [row] = await db`
+        const [row] = await db<PropertyReport[]>`
           UPDATE property_reports
           SET issuer_id = ${issuerId}, updated_at = CURRENT_TIMESTAMP
           WHERE property_report_id = ${id as string}
