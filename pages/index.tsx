@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { AuroraBackground } from "@/components/ui/shadcn-io/aurora-background"
 import Link from "next/link"
 const Index = () => (

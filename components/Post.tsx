@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import type { Post } from "@/types/posts"
 import ReactMarkdown from "react-markdown"
 
-export function Post({ postId, userId, fullName, content, createdAt }: Post) {
+export function Post({ postId, fullName, content, createdAt }: Post) {
   return (
     <Card className="w-full">
       <CardHeader>

@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react"
 import { Feed } from "@/components/Feed"
 import { Button } from "@/components/ui/button"
 import { House, ScrollText } from "lucide-react"
