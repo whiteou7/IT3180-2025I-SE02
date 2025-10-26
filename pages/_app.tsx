@@ -1,6 +1,6 @@
 // pages/_app.tsx
 import type { AppProps } from "next/app"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import "../styles/globals.css"
 import { Toaster } from "sonner"
@@ -9,6 +9,7 @@ import { useUserStore } from "@/store/userStore"
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
+  const [isSmallScreen, setIsSmallScreen] = useState(false)
 
   useEffect(() => {
     const { userId, role } = useUserStore.getState()
@@ -16,6 +17,24 @@ function MyApp({ Component, pageProps }: AppProps) {
       router.push("/feed")
     }
   }, [router])
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth < 768)
+    }
+
+    checkScreenSize()
+    window.addEventListener("resize", checkScreenSize)
+    return () => window.removeEventListener("resize", checkScreenSize)
+  }, [])
+
+  if (isSmallScreen) {
+    return (
+      <div className="flex items-center justify-center h-screen text-center p-6">
+        <p>Please view the app on desktop screen thanks:3</p>
+      </div>
+    )
+  }
 
   return (
     <>
