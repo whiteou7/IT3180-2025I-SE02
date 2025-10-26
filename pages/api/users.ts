@@ -64,11 +64,12 @@ export default async function handler(
     if (req.method === "GET") {
       const users = await db<User[]>`
         SELECT 
-          user_id, 
+          user_id,
           email, 
           full_name, 
           role,
-          year_of_birth
+          year_of_birth,
+          gender
         FROM users;
       `
 

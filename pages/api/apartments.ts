@@ -1,13 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
+import type { Apartment } from "@/types/apartments"
 
 /**
  * POST /api/apartments - Create a new apartment
+ * GET /api/apartments - Get all apartments
  */
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<APIBody<{ apartmentId: number }>>
+  res: NextApiResponse<
+    | APIBody<{ apartmentId: number }>
+    | APIBody<Apartment[]>
+  >
 ) {
   if (req.method === "POST") {
     try {
@@ -49,11 +54,37 @@ export default async function handler(
       })
     }
   }
-  else {
-    res.setHeader("Allow", ["POST"])
-    return res.status(405).json({
-      success: false,
-      message: `Method ${req.method} Not Allowed`,
-    })
+
+  if (req.method === "GET") {
+    try {
+      const apartments = await db<Apartment[]>`
+        SELECT 
+          apartment_id,
+          building_id,
+          floor,
+          apartment_number,
+          monthly_fee
+        FROM apartments
+        ORDER BY building_id, apartment_number;
+      `
+
+      return res.status(200).json({
+        success: true,
+        message: "Apartments fetched successfully.",
+        data: apartments,
+      })
+    } catch (error) {
+      console.error("Error fetching apartments:", error)
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+      })
+    }
   }
+
+  res.setHeader("Allow", ["POST", "GET"])
+  return res.status(405).json({
+    success: false,
+    message: `Method ${req.method} Not Allowed`,
+  })
 }

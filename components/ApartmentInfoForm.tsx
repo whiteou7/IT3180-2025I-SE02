@@ -10,9 +10,10 @@ import { APIBody } from "@/types/api"
 type ApartmentInfoFormProps = {
   userId?: string
   apartmentId?: number
+  onSubmit?: () => void
 }
 
-export function ApartmentInfoForm({ userId, apartmentId }: ApartmentInfoFormProps) {
+export function ApartmentInfoForm({ userId, apartmentId, onSubmit }: ApartmentInfoFormProps) {
   const [formData, setFormData] = useState<Apartment>({
     apartmentId: 0,
     buildingId: 0,
@@ -81,6 +82,7 @@ export function ApartmentInfoForm({ userId, apartmentId }: ApartmentInfoFormProp
       console.error(err)
       toast.error("An error occurred while updating.")
     }
+    onSubmit?.()
   }
 
   return (

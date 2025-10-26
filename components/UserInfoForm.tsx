@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { ofetch } from "ofetch"
 import { APIBody } from "@/types/api"
 
-export function UserInfoForm({ userId }: { userId: string }) {
+export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: () => void }) {
   const [formData, setFormData] = useState<User>({
     userId: "",
     email: "",
@@ -73,6 +73,7 @@ export function UserInfoForm({ userId }: { userId: string }) {
       console.error(err)
       toast.error("An error occurred while updating.")
     }
+    onSubmit?.()
   }
 
   if (loading) return <p>Loading user data...</p>

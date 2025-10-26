@@ -1,6 +1,6 @@
 import { Feed } from "@/components/Feed"
 import { Button } from "@/components/ui/button"
-import { House, ScrollText } from "lucide-react"
+import { House, ScrollText, LayoutDashboard } from "lucide-react"
 import { CreatePostDialog } from "@/components/CreatePostDialog"
 import {
   Dialog,
@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/dialog"
 import { ApartmentInfoForm } from "@/components/ApartmentInfoForm"
 import { useUserStore } from "@/store/userStore"
+import Link from "next/link"
 
 export default function Home() {
   const userId = useUserStore(s => s.userId)
+  const userRole = useUserStore(s => s.role)
   return (
     <main className="bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
@@ -47,6 +49,14 @@ export default function Home() {
                     <ScrollText />View Properties
                   </Button>
                 </a>
+
+                {userRole === "admin" && (
+                  <Link href="/admin/dashboard">
+                    <Button variant="ghost" className="mt-2">
+                      <LayoutDashboard />Admin Dashboard
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </aside>
