@@ -7,6 +7,14 @@ import { toast } from "sonner"
 import { ofetch } from "ofetch"
 import { APIBody } from "@/types/api"
 import { useUserStore } from "@/store/userStore"
+import { Apartment } from "@/types/apartments"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: () => void }) {
   const [formData, setFormData] = useState<User>({
@@ -19,6 +27,9 @@ export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: 
   })
 
   const [loading, setLoading] = useState(false)
+  const [apartments, setApartments] = useState<Apartment[]>([])
+  const [currentApartmentId, setCurrentApartmentId] = useState<number | null>(null)
+  const [selectedApartmentId, setSelectedApartmentId] = useState<number | null>(null)
 
   const currentRole = useUserStore(s => s.role)
   const authorized = currentRole == "admin"
@@ -49,6 +60,45 @@ export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: 
     fetchUser()
   }, [userId])
 
+  // Fetch apartments
+  useEffect(() => {
+    async function fetchApartments() {
+      const res = await ofetch<APIBody<Apartment[]>>("/api/apartments", {
+        ignoreResponseError: true,
+      })
+
+      if (res.success) {
+        setApartments(res.data)
+      }
+    }
+
+    fetchApartments()
+  }, [])
+
+  // Fetch user's current apartment
+  useEffect(() => {
+    async function fetchCurrentApartment() {
+      if (!userId) return
+      try {
+        const res = await ofetch<APIBody<Apartment | null>>(`/api/users/${userId}/apartments`, {
+          ignoreResponseError: true,
+        })
+
+        if (res.success && res.data && res.data.apartmentId) {
+          setCurrentApartmentId(res.data.apartmentId)
+          setSelectedApartmentId(res.data.apartmentId)
+        } else {
+          setCurrentApartmentId(null)
+          setSelectedApartmentId(null)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    fetchCurrentApartment()
+  }, [userId])
+
   // Handle form field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value, type } = e.target
@@ -58,10 +108,17 @@ export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: 
     }))
   }
 
+  // Handle apartment selection change (only updates state)
+  const handleApartmentChange = (value: string) => {
+    setSelectedApartmentId(value === "none" ? null : Number(value))
+  }
+
   // Submit updates
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
     try {
+      // Update user information
       const res = await ofetch<APIBody<User>>(`/api/users/${formData.userId}`, {
         method: "PUT",
         body: formData,
@@ -76,7 +133,46 @@ export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: 
     } catch (err) {
       console.error(err)
       toast.error("An error occurred while updating.")
+      return
     }
+
+    // Update apartment assignment if it changed
+    if (selectedApartmentId !== currentApartmentId) {
+      try {
+        if (selectedApartmentId === null) {
+          // Remove user from apartment
+          const res = await ofetch<APIBody<null>>(`/api/users/${userId}/apartments`, {
+            method: "DELETE",
+            ignoreResponseError: true,
+          })
+
+          if (res.success) {
+            toast.success("User removed from apartment")
+            setCurrentApartmentId(null)
+          } else {
+            toast.error(res.message ?? "Failed to remove user from apartment")
+          }
+        } else {
+          // Assign user to apartment
+          const res = await ofetch<APIBody<{ apartmentId: number }>>(`/api/users/${userId}/apartments`, {
+            method: "PUT",
+            body: { apartmentId: selectedApartmentId },
+            ignoreResponseError: true,
+          })
+
+          if (res.success) {
+            toast.success("User assigned to apartment")
+            setCurrentApartmentId(selectedApartmentId)
+          } else {
+            toast.error(res.message ?? "Failed to assign user to apartment")
+          }
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error("An error occurred while updating apartment assignment.")
+      }
+    }
+
     onSubmit?.()
   }
 
@@ -121,6 +217,22 @@ export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: 
         <div className="space-y-2">
           <Label htmlFor="gender">Gender</Label>
           <Input id="gender" value={formData.gender} onChange={handleChange}/>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="apartment">Apartment</Label>
+          <Select value={selectedApartmentId?.toString() || "none"} onValueChange={handleApartmentChange}>
+            <SelectTrigger id="apartment">
+              <SelectValue placeholder="Select an apartment" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No apartment</SelectItem>
+              {apartments.map((apt) => (
+                <SelectItem key={apt.apartmentId} value={apt.apartmentId.toString()}>
+                  {apt.buildingId}-{apt.apartmentNumber} - {apt.members?.length ?? 0} members
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Button type="submit">Save Changes</Button>
       </form>

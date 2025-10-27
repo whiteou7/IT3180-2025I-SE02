@@ -68,10 +68,28 @@ export default async function handler(
         ORDER BY building_id, apartment_number;
       `
 
+      // Fetch members for each apartment
+      const apartmentsWithMembers = await Promise.all(
+        apartments.map(async (apartment) => {
+          const members = await db<{userId: string, fullName: string, email: string}[]>`
+            SELECT 
+              user_id,
+              full_name,
+              email
+            FROM users
+            WHERE apartment_id = ${apartment.apartmentId}
+          `
+          return {
+            ...apartment,
+            members: members
+          }
+        })
+      )
+
       return res.status(200).json({
         success: true,
         message: "Apartments fetched successfully.",
-        data: apartments,
+        data: apartmentsWithMembers,
       })
     } catch (error) {
       console.error("Error fetching apartments:", error)
