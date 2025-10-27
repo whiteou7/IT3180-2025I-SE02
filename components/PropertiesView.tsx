@@ -195,4 +195,3 @@ export function PropertiesView({ userId }: PropertiesViewProps) {
     </>
   )
 }
-
