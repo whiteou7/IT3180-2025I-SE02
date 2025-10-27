@@ -18,6 +18,12 @@ export default function LoginPage() {
   const handleDemoAdminLogin = () => {
     setUser("7ade6518-e951-417d-ab39-72868530ab44", "admin")
   }
+  const handleDemoTenant1Login = () => {
+    setUser("f87566fa-d527-43aa-9bdc-4bf83b64d3c8", "tenant")
+  }
+  const handleDemoTenant2Login = () => {
+    setUser("fae21f36-1490-40e5-b919-32a2a8edc350", "tenant")
+  }
   return (
     <div className="flex items-center justify-center bg-background pt-16">
       <Card className="w-full max-w-sm">
@@ -37,9 +43,15 @@ export default function LoginPage() {
             <Input id="password" type="password" value="ngoctung2601" required />
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col gap-2">
           <Button onClick={handleDemoAdminLogin} className="w-full">
             <Link href="/">Sign In as Demo Admin Account</Link>
+          </Button>
+          <Button variant="outline" onClick={handleDemoTenant1Login} className="w-full">
+            <Link href="/">Sign In as Demo Tenant 1 Account</Link>
+          </Button>
+          <Button variant="outline" onClick={handleDemoTenant2Login} className="w-full">
+            <Link href="/">Sign In as Demo Tenant 2 Account</Link>
           </Button>
         </CardFooter>
       </Card>
