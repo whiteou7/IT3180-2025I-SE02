@@ -5,10 +5,11 @@ import { PropertyReport } from "@/types/reports"
 
 /**
  * GET /api/property-reports - Retrieve all property reports with user and issuer information
+ * POST /api/property-reports - Create a new property report
  */
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<APIBody<PropertyReport[]>>
+  res: NextApiResponse<APIBody<PropertyReport[] | PropertyReport>>
 ) {
   try {
     if (req.method === "GET") {
@@ -45,8 +46,33 @@ export default async function handler(
       `
 
       return res.status(200).json({ success: true, message: "Property reports fetched successfully", data: reports })
+    } else if (req.method === "POST") {
+      const { userId, propertyId, content } = req.body as {
+        userId: string
+        propertyId: number
+        content: string
+      }
+
+      if (!userId || !propertyId || !content) {
+        return res.status(400).json({
+          success: false,
+          message: "userId, propertyId, and content are required",
+        })
+      }
+
+      const [newReport] = await db<PropertyReport[]>`
+        INSERT INTO property_reports (user_id, property_id, content, status)
+        VALUES (${userId}, ${propertyId}, ${content}, 'not found')
+        RETURNING *;
+      `
+
+      return res.status(201).json({
+        success: true,
+        message: "Property report created successfully",
+        data: newReport,
+      })
     } else {
-      res.setHeader("Allow", ["GET"])
+      res.setHeader("Allow", ["GET", "POST"])
       return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
     }
   } catch (error) {

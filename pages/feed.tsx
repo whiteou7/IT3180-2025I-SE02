@@ -2,6 +2,7 @@ import { Feed } from "@/components/Feed"
 import { Button } from "@/components/ui/button"
 import { House, ScrollText, LayoutDashboard, FileText } from "lucide-react"
 import { CreatePostDialog } from "@/components/CreatePostDialog"
+import { CreatePropertyReportDialog } from "@/components/CreatePropertyReportDialog"
 import {
   Dialog,
   DialogTrigger,
@@ -71,8 +72,9 @@ export default function Home() {
 
           {/* center column - Feed (full width on small screens) */}
           <div className="col-span-3 flex flex-col">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <CreatePostDialog />
+              <CreatePropertyReportDialog />
             </div>
             <Feed />
           </div>

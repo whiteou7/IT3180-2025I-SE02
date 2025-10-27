@@ -115,7 +115,8 @@ CREATE TABLE property_reports (
     issuer_id TEXT REFERENCES users(user_id) ON DELETE CASCADE,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     issued_status property_status,
-    approved BOOLEAN DEFAULT FALSE
+    approved BOOLEAN DEFAULT FALSE,
+    content TEXT
 );
 
 -- =========================================
