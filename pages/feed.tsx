@@ -44,15 +44,17 @@ export default function Home() {
                   </DialogContent>
                 </Dialog>
 
-                <a href="/properties">
+                <Link href="/properties">
                   <Button variant="ghost" className="mt-2">
                     <ScrollText />View Properties
                   </Button>
-                </a>
+                </Link>
+
+                <hr/>
 
                 {userRole === "admin" && (
                   <Link href="/admin/dashboard">
-                    <Button variant="ghost" className="mt-2">
+                    <Button variant="outline" className="mt-2">
                       <LayoutDashboard />Admin Dashboard
                     </Button>
                   </Link>
