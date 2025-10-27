@@ -18,7 +18,6 @@ export default async function handler(
     return res.status(400).json({
       success: false,
       message: "User ID and Property ID are required",
-      data: null,
     })
   }
 
@@ -39,7 +38,6 @@ export default async function handler(
         return res.status(404).json({
           success: false,
           message: "Property not found",
-          data: null,
         })
       }
 
@@ -59,7 +57,6 @@ export default async function handler(
         return res.status(400).json({
           success: false,
           message: "propertyName is required",
-          data: null,
         })
       }
 
@@ -75,7 +72,6 @@ export default async function handler(
         return res.status(404).json({
           success: false,
           message: "Property not found",
-          data: null,
         })
       }
 
@@ -98,7 +94,6 @@ export default async function handler(
         return res.status(404).json({
           success: false,
           message: "Property not found",
-          data: null,
         })
       }
 
@@ -113,14 +108,12 @@ export default async function handler(
     return res.status(405).json({
       success: false,
       message: `Method ${req.method} Not Allowed`,
-      data: null,
     })
   } catch (error) {
     console.error("Error in /api/users/[id]/properties/[propertyId]:", error)
     return res.status(500).json({
       success: false,
       message: (error as Error).message,
-      data: null,
     })
   }
 }
