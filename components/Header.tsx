@@ -33,7 +33,7 @@ export default function Header() {
 
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Apartment</DialogTitle>
+                <DialogTitle>User Profile</DialogTitle>
               </DialogHeader>
 
               <UserInfoForm userId={userId} />
