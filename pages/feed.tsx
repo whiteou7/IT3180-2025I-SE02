@@ -1,6 +1,6 @@
 import { Feed } from "@/components/Feed"
 import { Button } from "@/components/ui/button"
-import { House, ScrollText, LayoutDashboard } from "lucide-react"
+import { House, ScrollText, LayoutDashboard, FileText } from "lucide-react"
 import { CreatePostDialog } from "@/components/CreatePostDialog"
 import {
   Dialog,
@@ -47,6 +47,12 @@ export default function Home() {
                 <Link href="/properties">
                   <Button variant="ghost" className="mt-2">
                     <ScrollText />View Properties
+                  </Button>
+                </Link>
+
+                <Link href="/documents">
+                  <Button variant="ghost" className="mt-2">
+                    <FileText />Legal Documents
                   </Button>
                 </Link>
 
