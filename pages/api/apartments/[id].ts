@@ -74,10 +74,25 @@ export default async function handler(
         })
       }
 
+      // Fetch apartment members
+      const members = await db<{userId: string, fullName: string, email: string}[]>`
+        SELECT 
+          user_id,
+          full_name,
+          email
+        FROM users
+        WHERE apartment_id = ${id as string}
+      `
+
+      const apartmentWithMembers = {
+        ...apartment,
+        members: members
+      }
+
       return res.status(200).json({
         success: true,
         message: "Fetched apartment",
-        data: apartment,
+        data: apartmentWithMembers,
       })
     }
 
