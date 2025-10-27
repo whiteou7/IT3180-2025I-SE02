@@ -3,9 +3,12 @@ import { Apartment } from "@/types/apartments"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { ofetch } from "ofetch"
 import { APIBody } from "@/types/api"
+import { useUserStore } from "@/store/userStore"
 
 type ApartmentInfoFormProps = {
   userId?: string
@@ -21,6 +24,9 @@ export function ApartmentInfoForm({ userId, apartmentId, onSubmit }: ApartmentIn
     apartmentNumber: 0,
     monthlyFee: 0,
   })
+
+  const currentRole = useUserStore(s => s.role)
+  const authorized = currentRole == "admin"
 
   const [loading, setLoading] = useState(false)
 
@@ -90,59 +96,85 @@ export function ApartmentInfoForm({ userId, apartmentId, onSubmit }: ApartmentIn
       {loading ? (
         <p>Loading apartment info...</p>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="apartmentId">Apartment ID</Label>
-            <Input
-              id="apartmentId"
-              type="number"
-              value={formData.apartmentId}
-              readOnly
-            />
-          </div>
+        <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="apartmentId">Apartment ID</Label>
+              <Input
+                id="apartmentId"
+                type="number"
+                value={formData.apartmentId}
+                readOnly
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="buildingId">Building ID</Label>
-            <Input
-              id="buildingId"
-              type="number"
-              value={formData.buildingId}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="buildingId">Building ID</Label>
+              <Input
+                id="buildingId"
+                type="number"
+                value={formData.buildingId}
+                onChange={handleChange}
+                readOnly={!authorized}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="floor">Floor</Label>
-            <Input
-              id="floor"
-              type="number"
-              value={formData.floor}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="floor">Floor</Label>
+              <Input
+                id="floor"
+                type="number"
+                value={formData.floor}
+                onChange={handleChange}
+                readOnly={!authorized}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="apartmentNumber">Apartment Number</Label>
-            <Input
-              id="apartmentNumber"
-              type="number"
-              value={formData.apartmentNumber}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="apartmentNumber">Apartment Number</Label>
+              <Input
+                id="apartmentNumber"
+                type="number"
+                value={formData.apartmentNumber}
+                onChange={handleChange}
+                readOnly={!authorized}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="monthlyFee">Monthly Fee</Label>
-            <Input
-              id="monthlyFee"
-              type="number"
-              value={formData.monthlyFee}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="monthlyFee">Monthly Fee</Label>
+              <Input
+                id="monthlyFee"
+                type="number"
+                value={formData.monthlyFee}
+                onChange={handleChange}
+                readOnly={!authorized}
+              />
+            </div>
 
-          <Button type="submit">Save Changes</Button>
-        </form>
+            <Button type="submit">Save Changes</Button>
+          </form>
+
+          {formData.members && formData.members.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold">Apartment Members</h3>
+                <div className="grid gap-4">
+                  {formData.members.map((member) => (
+                    <Card key={member.userId} className="p-4">
+                      <div className="space-y-1">
+                        <p className="font-medium">{member.fullName}</p>
+                        <p className="text-sm text-muted-foreground">{member.email}</p>
+                        <p className="text-xs text-muted-foreground">User ID: {member.userId}</p>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       )}
     </div>
   )

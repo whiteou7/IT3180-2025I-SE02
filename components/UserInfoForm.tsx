@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { ofetch } from "ofetch"
 import { APIBody } from "@/types/api"
+import { useUserStore } from "@/store/userStore"
 
 export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: () => void }) {
   const [formData, setFormData] = useState<User>({
@@ -18,6 +19,9 @@ export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: 
   })
 
   const [loading, setLoading] = useState(false)
+
+  const currentRole = useUserStore(s => s.role)
+  const authorized = currentRole == "admin"
 
   // Fetch user info
   useEffect(() => {
@@ -112,7 +116,7 @@ export function UserInfoForm({ userId, onSubmit }: { userId: string, onSubmit?: 
         </div>
         <div className="space-y-2">
           <Label htmlFor="role">Role</Label>
-          <Input id="role" value={formData.role} readOnly />
+          <Input id="role" value={formData.role} readOnly={!authorized} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="gender">Gender</Label>
