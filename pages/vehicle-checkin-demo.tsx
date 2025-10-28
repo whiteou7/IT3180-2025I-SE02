@@ -52,7 +52,7 @@ export default function VehicleCheckInDemo() {
   const checkVehicleStatus = async () => {
     if (!userId) return
     try {
-      const res = await ofetch<APIBody<any[]>>(
+      const res = await ofetch(
         `/api/users/${userId}/vehicle-logs`,
         {
           ignoreResponseError: true,
@@ -210,13 +210,13 @@ export default function VehicleCheckInDemo() {
                   className={`
                     px-8 py-4 text-lg font-semibold transition-all duration-300
                     ${checkInStatus === "checking" 
-                      ? "animate-pulse bg-blue-600 hover:bg-blue-700" 
-                      : checkInStatus === "success"
-                      ? "bg-green-600 hover:bg-green-700 animate-bounce"
-                      : checkInStatus === "error"
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-primary hover:bg-primary/90"
-                    }
+      ? "animate-pulse bg-blue-600 hover:bg-blue-700" 
+      : checkInStatus === "success"
+        ? "bg-green-600 hover:bg-green-700 animate-bounce"
+        : checkInStatus === "error"
+          ? "bg-red-600 hover:bg-red-700"
+          : "bg-primary hover:bg-primary/90"
+    }
                   `}
                 >
                   {checkInStatus === "checking" ? (
@@ -262,8 +262,8 @@ export default function VehicleCheckInDemo() {
               <div>
                 <h3 className="font-semibold mb-2">How it works:</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Click "Check In" to simulate vehicle entry</li>
-                  <li>• Click "Check Out" to simulate vehicle exit</li>
+                  <li>• Click &quot;Check In&quot; to simulate vehicle entry</li>
+                  <li>• Click &quot;Check Out&quot; to simulate vehicle exit</li>
                   <li>• Visual animations provide feedback</li>
                   <li>• Status updates in real-time</li>
                 </ul>
