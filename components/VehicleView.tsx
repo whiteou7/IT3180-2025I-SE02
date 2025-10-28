@@ -7,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { ofetch } from "ofetch"
 import { toast } from "sonner"
 import { APIBody } from "@/types/api"
+import { useRouter } from "next/router"
 
 type VehicleInfo = {
   vehicleId: number
@@ -25,11 +26,14 @@ type VehicleViewProps = {
 }
 
 export function VehicleView({ userId }: VehicleViewProps) {
+  const router = useRouter()
   const [vehicleInfo, setVehicleInfo] = useState<VehicleInfo | null>(null)
   const [vehicleLogs, setVehicleLogs] = useState<VehicleLog[]>([])
   const [loading, setLoading] = useState(false)
   const [licensePlate, setLicensePlate] = useState("")
   const [isEditing, setIsEditing] = useState(false)
+  const [isRegistering, setIsRegistering] = useState(false)
+  const [newLicensePlate, setNewLicensePlate] = useState("")
 
   // Fetch vehicle info
   const fetchVehicleInfo = async () => {
@@ -112,6 +116,39 @@ export function VehicleView({ userId }: VehicleViewProps) {
     }
   }
 
+  const handleRegisterVehicle = async () => {
+    if (!newLicensePlate.trim()) {
+      toast.error("Please enter a license plate")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await ofetch<APIBody<VehicleInfo>>(
+        `/api/users/${userId}/vehicle`,
+        {
+          method: "POST",
+          body: { licensePlate: newLicensePlate.trim() },
+          ignoreResponseError: true,
+        }
+      )
+
+      if (res.success) {
+        toast.success("Vehicle registered successfully")
+        setIsRegistering(false)
+        setNewLicensePlate("")
+        fetchVehicleInfo()
+      } else {
+        toast.error(res.message ?? "Failed to register vehicle")
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to register vehicle")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Get dates that have vehicle logs
   const getDatesWithLogs = () => {
     return vehicleLogs
@@ -128,13 +165,60 @@ export function VehicleView({ userId }: VehicleViewProps) {
 
   if (!vehicleInfo) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">
-            No vehicle registered
-          </p>
-        </CardContent>
-      </Card>
+      <>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold capitalize">Vehicle</h2>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Vehicle Registration</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {!isRegistering ? (
+              <div className="text-center space-y-4">
+                <p className="text-muted-foreground">
+                  No vehicle registered
+                </p>
+                <Button onClick={() => setIsRegistering(true)}>
+                  Register Vehicle
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="license-plate">License Plate</Label>
+                  <Input
+                    id="license-plate"
+                    value={newLicensePlate}
+                    onChange={(e) => setNewLicensePlate(e.target.value)}
+                    placeholder="Enter license plate"
+                    className="mt-2"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleRegisterVehicle}
+                    disabled={loading || !newLicensePlate.trim()}
+                  >
+                    {loading ? "Registering..." : "Register Vehicle"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setIsRegistering(false)
+                      setNewLicensePlate("")
+                    }}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </>
     )
   }
 
@@ -142,6 +226,13 @@ export function VehicleView({ userId }: VehicleViewProps) {
     <>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold capitalize">Vehicle</h2>
+        <Button 
+          variant="outline" 
+          onClick={() => router.push("/vehicle-checkin-demo")}
+          className="flex items-center gap-2"
+        >
+          🚗 Demo Check-In
+        </Button>
       </div>
 
       <div className="space-y-4">
