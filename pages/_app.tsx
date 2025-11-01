@@ -2,6 +2,7 @@
 import type { AppProps } from "next/app"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
+import { ThemeProvider } from "next-themes"
 import "../styles/globals.css"
 import { Toaster } from "sonner"
 import Header from "../components/Header"
@@ -30,20 +31,22 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   if (isSmallScreen) {
     return (
-      <div className="flex items-center justify-center h-screen text-center p-6">
-        <p>Please view the app on desktop screen thanks:3</p>
-      </div>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <div className="flex items-center justify-center h-screen text-center p-6">
+          <p>Please view the app on desktop screen thanks:3</p>
+        </div>
+      </ThemeProvider>
     )
   }
 
   return (
-    <>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <Header />
       <main className="pt-16">
         <Component {...pageProps} />
       </main>
       <Toaster position="top-center" richColors />
-    </>
+    </ThemeProvider>
   )
 }
 
