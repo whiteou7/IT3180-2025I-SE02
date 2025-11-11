@@ -5,6 +5,7 @@ CREATE TYPE progression_status AS ENUM ('pending', 'rejected', 'in_progress', 'c
 CREATE TYPE property_status AS ENUM ('found', 'not found', 'deleted');
 CREATE TYPE gender AS ENUM ('male', 'female');
 CREATE TYPE role AS ENUM ('tenant', 'admin');
+CREATE TYPE billing_status AS ENUM ('unpaid', 'paid', 'deleted');
 
 -- =========================================
 -- BUILDINGS
@@ -47,7 +48,8 @@ CREATE TABLE users (
 CREATE TABLE services (
     service_id SERIAL PRIMARY KEY,
     service_name TEXT NOT NULL,
-    price DECIMAL(10,2) NOT NULL
+    price DECIMAL(10,2) NOT NULL,
+    description TEXT
 );
 
 -- =========================================
@@ -90,7 +92,8 @@ CREATE TABLE service_logs (
     service_log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     service_id INT NOT NULL REFERENCES services(service_id) ON DELETE CASCADE,
     user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    billing_status billing_status DEFAULT 'unpaid'
 );
 
 -- =========================================
