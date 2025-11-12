@@ -49,7 +49,8 @@ CREATE TABLE services (
     service_id SERIAL PRIMARY KEY,
     service_name TEXT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
-    description TEXT
+    description TEXT,
+    tax INT NOT NULL
 );
 
 -- =========================================
@@ -85,11 +86,11 @@ CREATE TABLE vehicle_logs (
 );
 
 -- =========================================
--- SERVICE_LOGS
--- 1-1 services, n-n users (track when a user uses a service)
+-- BILLINGS
+-- n-n services, n-n users (track when a user uses services)
 -- =========================================
-CREATE TABLE service_logs (
-    service_log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE billings (
+    billing_id TEXT NOT NULL,
     service_id INT NOT NULL REFERENCES services(service_id) ON DELETE CASCADE,
     user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
