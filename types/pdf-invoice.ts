@@ -9,5 +9,3 @@ declare module "@h1dd3nsn1p3r/pdf-invoice" {
     create(): Promise<string>
   }
 }
-
-

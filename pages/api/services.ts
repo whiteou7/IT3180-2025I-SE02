@@ -110,4 +110,3 @@ export default async function handler(
     message: `Method ${req.method} Not Allowed`,
   })
 }
-

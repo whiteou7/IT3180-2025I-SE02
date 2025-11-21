@@ -19,5 +19,3 @@ export type TaxReport = {
   totalIncome: number
   totalTax: number
 }
-
-

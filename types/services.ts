@@ -5,4 +5,3 @@ export type Service = {
   description: string | null;
   tax: number;
 }
-

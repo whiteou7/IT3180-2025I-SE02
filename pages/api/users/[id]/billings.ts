@@ -1,17 +1,25 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "@/db";
-import type { APIBody } from "@/types/api";
-import type { BillingDetail } from "@/types/billings";
+import type { NextApiRequest, NextApiResponse } from "next"
+import { db } from "@/db"
+import type { APIBody } from "@/types/api"
+import type { BillingDetail, BillingService } from "@/types/billings"
+
+type RawServiceFromDB = {
+  serviceId: number
+  serviceName: string
+  price: number | string
+  tax: number | string
+  description: string | null
+}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<BillingDetail[]>>
 ) {
-  const { id: userId } = req.query;
+  const { id: userId } = req.query
 
   if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET"]);
-    return res.status(405).json({ success: false, message: "Method Not Allowed" });
+    res.setHeader("Allow", ["GET"])
+    return res.status(405).json({ success: false, message: "Method Not Allowed" })
   }
 
   try {
@@ -37,47 +45,45 @@ export default async function handler(
       WHERE b.user_id = ${userId as string}
       GROUP BY b.billing_id, b.user_id, u.full_name
       ORDER BY used_at DESC
-    `;
+    `
 
     const billings: BillingDetail[] = result.map((row) => {
-      const servicesList = row.services || [];
+      const servicesList = (row.services || []) as RawServiceFromDB[]
 
-      const total = servicesList.reduce((sum: number, s: any) => {
-        const price = Number(s.price);
-        const tax = Number(s.tax);
-        return sum + price + (price * tax / 100);
-      }, 0);
+      const totalPrice = servicesList.reduce((sum: number, s: RawServiceFromDB) => {
+        const price = Number(s.price)
+        const tax = Number(s.tax)
+        return sum + price + (price * tax / 100)
+      }, 0)
 
       return {
         billingId: row.billingId,
         userId: row.userId,
         fullName: row.fullName,
-        totalAmount: total,
-        billingStatus: row.billingStatus,
-        usedAt: row.usedAt ? new Date(row.usedAt) : null,
-        paymentDate: null,
+        totalPrice: totalPrice,
         
-        services: servicesList.map((s: any) => ({
+        services: servicesList.map((s: RawServiceFromDB): BillingService => ({
           serviceId: s.serviceId,    
           serviceName: s.serviceName,
           price: Number(s.price),
           tax: Number(s.tax),
           description: s.description
         }))
-      };
-    });
+      }
+    })
 
     return res.status(200).json({
       success: true,
       message: "User billings fetched successfully.",
       data: billings,
-    });
+    })
 
-  } catch (error: any) {
-    console.error("Error fetching user billings:", error);
+  } catch (error: unknown) {
+    console.error("Error fetching user billings:", error)
+    const errorMessage = error instanceof Error ? error.message : "Internal Server Error"
     return res.status(500).json({ 
       success: false, 
-      message: error.message || "Internal Server Error" 
-    });
+      message: errorMessage
+    })
   }
 }
