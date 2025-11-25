@@ -5,8 +5,10 @@ import { useRouter } from "next/router"
 import { ThemeProvider } from "next-themes"
 import "../styles/globals.css"
 import { Toaster } from "sonner"
-import Header from "../components/Header"
 import { useUserStore } from "@/store/userStore"
+import { AppSidebar } from "@/components/Sidebar"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -41,10 +43,20 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <Header />
-      <main className="pt-16">
-        <Component {...pageProps} />
-      </main>
+      <SidebarProvider>
+        <AppSidebar/>
+        <SidebarInset>
+          <header className="fixed flex h-16 shrink-0 items-center gap-2">
+            <div className="flex items-center gap-2 px-3">
+              <SidebarTrigger />
+              <ThemeToggle />
+            </div>
+          </header>
+          <main>
+            <Component {...pageProps} />
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
       <Toaster position="top-center" richColors />
     </ThemeProvider>
   )
