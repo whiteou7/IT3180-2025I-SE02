@@ -30,7 +30,10 @@ export default async function handler(
           p.property_id,
           p.property_name,
           p.user_id,
-          p.is_public
+          p.is_public,
+          p.property_type,
+          p.status,
+          p.created_at
         FROM properties p
         WHERE p.user_id = ${userId as string}
           AND (
@@ -40,12 +43,12 @@ export default async function handler(
               FROM property_reports pr 
               WHERE pr.property_id = p.property_id
             )
-            -- OR the most recent report has status 'found'
+            -- OR the most recent report has status 'found' or 'deleted'
             OR EXISTS (
               SELECT 1 
               FROM property_reports pr 
               WHERE pr.property_id = p.property_id
-                AND pr.status = 'found'
+                AND pr.status = 'found' OR pr.status = 'deleted'
                 AND pr.created_at = (
                   SELECT MAX(created_at) 
                   FROM property_reports 

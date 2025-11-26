@@ -67,8 +67,8 @@ export default async function handler(
 
       // Create property
       const [createdProperty] = await db<{ propertyId: number }[]>`
-        INSERT INTO properties (property_name, user_id, is_public)
-        VALUES ('Vehicle', ${userId}, ${false})
+        INSERT INTO properties (property_name, user_id, is_public, property_type)
+        VALUES ('Vehicle', ${userId}, ${false}, 'vehicle')
         RETURNING property_id;
       `
 

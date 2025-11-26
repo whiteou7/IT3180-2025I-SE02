@@ -79,8 +79,8 @@ const data = {
       icon: Building2,
       items: [
         {
-          title: "Incident Reports",
-          url: "/property/incidents",
+          title: "Properties",
+          url: "/property",
         },
         {
           title: "Lost Property",

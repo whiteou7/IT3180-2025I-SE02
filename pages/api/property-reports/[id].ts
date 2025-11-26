@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { PropertyReport } from "@/types/reports"
+import type { UserRole } from "@/types/enum"
 
 /**
  * PATCH /api/property-reports/[id] - Update property report status
@@ -16,26 +17,86 @@ export default async function handler(
   try {
     if (req.method === "PATCH") {
       const { approved, issuedStatus, status, issuerId } = req.body as {
-        approved?: boolean;
-        issuedStatus?: string | null;
-        status?: string | null;
-        issuerId?: string | null;
+        approved?: boolean
+        issuedStatus?: string | null
+        status?: string | null
+        issuerId?: string | null
       }
 
-      if (approved === undefined && issuedStatus === undefined && status === undefined && issuerId === undefined) {
+      if (
+        approved === undefined &&
+        issuedStatus === undefined &&
+        status === undefined &&
+        issuerId === undefined
+      ) {
         return res.status(400).json({ success: false, message: "No updatable fields provided" })
+      }
+
+      const [reportMeta] = await db<{ propertyId: number | null; propertyOwnerId: string | null }[]>`
+        SELECT pr.property_id, p.user_id AS property_owner_id
+        FROM property_reports pr
+        JOIN properties p ON p.property_id = pr.property_id
+        WHERE pr.property_report_id = ${id as string}
+      `
+
+      if (!reportMeta) {
+        return res.status(404).json({ success: false, message: "Property report not found" })
       }
 
       let updated: PropertyReport | null = null
 
       if (approved !== undefined) {
+        if (!issuerId) {
+          return res.status(400).json({ success: false, message: "issuerId is required to approve reports" })
+        }
+
+        const [actor] = await db<{ role: UserRole }[]>`
+          SELECT role FROM users WHERE user_id = ${issuerId}
+        `
+
+        if (!actor) {
+          return res.status(404).json({ success: false, message: "Approver not found" })
+        }
+
+        const isAdmin = actor.role === "admin"
+        const isOwner = issuerId === reportMeta.propertyOwnerId
+
+        if (!isAdmin && !isOwner) {
+          return res.status(403).json({ success: false, message: "You are not allowed to approve this report" })
+        }
+
         const [row] = await db<PropertyReport[]>`
           UPDATE property_reports
-          SET approved = ${approved}, updated_at = CURRENT_TIMESTAMP
+          SET approved = ${approved}, issuer_id = ${issuerId}, updated_at = CURRENT_TIMESTAMP
           WHERE property_report_id = ${id as string}
           RETURNING *;
         `
         updated = row
+
+        if (row?.propertyId) {
+          if (approved) {
+            await db`
+              UPDATE properties
+              SET status = ${row.status}
+              WHERE property_id = ${row.propertyId}
+            `
+          } else {
+            const [nextStatus] = await db<{ status: string | null }[]>`
+              SELECT status
+              FROM property_reports
+              WHERE property_id = ${row.propertyId}
+                AND approved = true
+              ORDER BY updated_at DESC
+              LIMIT 1;
+            `
+
+            await db`
+              UPDATE properties
+              SET status = ${nextStatus?.status ?? "found"}
+              WHERE property_id = ${row.propertyId}
+            `
+          }
+        }
       }
 
       if (issuedStatus !== undefined) {
@@ -51,14 +112,14 @@ export default async function handler(
       if (status !== undefined) {
         const [row] = await db<PropertyReport[]>`
           UPDATE property_reports
-          SET status = ${status}, updated_at = CURRENT_TIMESTAMP
+          SET status = ${status}, approved = false, updated_at = CURRENT_TIMESTAMP
           WHERE property_report_id = ${id as string}
           RETURNING *;
         `
         updated = row
       }
 
-      if (issuerId !== undefined) {
+      if (issuerId !== undefined && approved === undefined) {
         const [row] = await db<PropertyReport[]>`
           UPDATE property_reports
           SET issuer_id = ${issuerId}, updated_at = CURRENT_TIMESTAMP
@@ -76,14 +137,31 @@ export default async function handler(
     }
 
     else if (req.method === "DELETE") {
-      const [deleted] = await db<{ propertyReportId: string }[]>`
+      const [deleted] = await db<PropertyReport[]>`
         DELETE FROM property_reports
         WHERE property_report_id = ${id as string}
-        RETURNING property_report_id;
+        RETURNING *;
       `
 
       if (!deleted) {
         return res.status(404).json({ success: false, message: "Report not found" })
+      }
+
+      if (deleted.propertyId) {
+        const [nextStatus] = await db<{ status: string | null }[]>`
+          SELECT status
+          FROM property_reports
+          WHERE property_id = ${deleted.propertyId}
+            AND approved = true
+          ORDER BY updated_at DESC
+          LIMIT 1;
+        `
+
+        await db`
+          UPDATE properties
+          SET status = ${nextStatus?.status ?? "found"}
+          WHERE property_id = ${deleted.propertyId}
+        `
       }
 
       return res.status(200).json({ success: true, message: "Report deleted", data: null })

@@ -61,7 +61,10 @@ CREATE TABLE properties (
     property_id SERIAL PRIMARY KEY,
     property_name TEXT NOT NULL,
     user_id TEXT REFERENCES users(user_id) ON DELETE SET NULL,
-    is_public BOOLEAN DEFAULT TRUE
+    is_public BOOLEAN DEFAULT TRUE,
+    property_type TEXT NOT NULL DEFAULT 'general',
+    status property_status DEFAULT 'found',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =========================================

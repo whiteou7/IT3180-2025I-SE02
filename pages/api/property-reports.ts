@@ -16,12 +16,12 @@ export default async function handler(
       const reports = await db<PropertyReport[]>`
         SELECT 
           pr.property_report_id, 
-          pr.user_id, 
+          pr.user_id AS owner_id, 
           pr.property_id, 
           pr.status, 
           pr.created_at, 
           pr.issuer_id, 
-          u1.full_name AS user_full_name,        -- Full name of the user
+          u1.full_name AS owner_full_name,        -- Full name of the owner
           u2.full_name AS issuer_full_name,      -- Full name of the issuer
           pr.updated_at,
           p.property_name,
@@ -63,7 +63,9 @@ export default async function handler(
       const [newReport] = await db<PropertyReport[]>`
         INSERT INTO property_reports (user_id, property_id, content, status)
         VALUES (${userId}, ${propertyId}, ${content}, 'not found')
-        RETURNING *;
+        RETURNING *, (
+          SELECT user_id FROM properties WHERE property_id = ${propertyId}
+        ) AS property_owner_id;
       `
 
       return res.status(201).json({
