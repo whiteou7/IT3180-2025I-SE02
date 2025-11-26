@@ -11,3 +11,9 @@ export type VehicleLog = {
   buildingId: number | null;
   floor: number | null;
 };
+
+type Vehicle = {
+  vehicleId: number
+  propertyId: number
+  licensePlate: string
+}

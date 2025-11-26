@@ -1,19 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
-
-type VehicleInfo = {
-  vehicleId: number
-  propertyId: number
-  licensePlate: string
-}
+import { Vehicle } from "@/types/properties"
 
 /**
  * GET /api/users/[id]/vehicle-info - Get vehicle info and logs for a user
  */
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<APIBody<VehicleInfo | null>>
+  res: NextApiResponse<APIBody<Vehicle | null>>
 ) {
   const { id: userId } = req.query
 
@@ -33,7 +28,7 @@ export default async function handler(
   }
 
   try {
-    const [vehicle] = await db<VehicleInfo[]>`
+    const [vehicle] = await db<Vehicle[]>`
       SELECT 
         v.vehicle_id,
         v.property_id,
