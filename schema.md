@@ -41,6 +41,7 @@ CREATE TABLE users (
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     gender gender,
+    phone_number TEXT,
     apartment_id INT REFERENCES apartments(apartment_id) ON DELETE SET NULL
 );
 
