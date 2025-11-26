@@ -294,7 +294,7 @@ export default function AnnouncementsPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/notifications/announcements">Notifications</BreadcrumbLink>
+              <BreadcrumbLink href="/communication/announcements">Communication</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

@@ -40,8 +40,9 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 │    ├─ Billing & Invoice Center      │
 │    └─ Financial Reports             │
 │                                     │
-│  📢 EP4 - Notifications             │
-│    └─ Public Announcements          │
+│  📢 EP4 - Communication             │
+│    ├─ Public Announcements          │
+│    └─ Private Chat                  │
 │                                     │
 │  🛠️ EP5 - Building Services         │
 │    ├─ Service Catalog & Cart        │
@@ -392,7 +393,7 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 ---
 
-### 5. EP4 - Notifications
+### 5. EP4 - Communication
 
 #### 5.1 Public Announcements
 
@@ -429,6 +430,41 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 - General announcements
 
 **User Stories:** US-003, US-016
+
+---
+
+#### 5.2 Private Chat
+
+**Route:** `/notifications/chat`  
+**Access:** All roles (with restrictions: tenant, police, accountant can only chat with admin; admin can chat with anyone)  
+**Layout:** Split view - Chat list sidebar and message area
+
+**Components:**
+- Chat list sidebar:
+  - List of all conversations
+  - Shows other user's name and avatar
+  - Displays last message preview
+  - Unread message count badge
+  - Search user button (opens dialog)
+- Message area:
+  - Chat header with other user's info
+  - Scrollable message list
+  - Message bubbles (different styles for sent/received)
+  - Message input field with send button
+  - Timestamp for each message
+- Search users dialog:
+  - Search input field
+  - List of matching users
+  - User avatar and role display
+  - Click to start new chat
+
+**Content:**
+- Private messaging between users
+- Real-time message updates (polling every 3 seconds)
+- Chat history persistence
+- User search functionality
+
+**User Stories:** Communication and messaging features
 
 ---
 
@@ -765,7 +801,7 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 | Invoice Management | Own only | ✅ All | ❌ | ✅ All |
 | Financial Reports | ❌ | ✅ | ❌ | ✅ |
 | Public Announcements | ✅ | ✅ | ✅ | ✅ |
-| Direct Messages | ✅ | ✅ | ✅ | ✅ |
+| Private Chat | ✅ (admin only) | ✅ | ✅ (admin only) | ✅ (admin only) |
 | Service Catalog | Browse/add/pay | ✅ View | ❌ | ❌ |
 | Service Administration | ❌ | ✅ | ❌ | ❌ |
 | Feedback | Submit/view own | ✅ All | ❌ | ❌ |

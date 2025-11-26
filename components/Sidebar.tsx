@@ -134,13 +134,21 @@ const data: { navMain: SidebarNavItem[] } = {
       ],
     },
     {
-      title: "Notifications",
+      title: "Communication",
       url: "#",
       icon: Bell,
       items: [
         {
           title: "Public Announcements",
-          url: "/notifications/announcements",
+          url: "/communication/announcements",
+          tenant: true,
+          admin: true,
+          police: true,
+          accountant: true,
+        },
+        {
+          title: "Private Chat",
+          url: "/communication/chat",
           tenant: true,
           admin: true,
           police: true,

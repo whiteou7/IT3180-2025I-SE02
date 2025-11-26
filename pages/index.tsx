@@ -39,7 +39,7 @@ export default function HomePage() {
     },
     {
       icon: Bell,
-      title: "Notifications",
+      title: "Communications",
       description: "Send announcements and manage communications",
     },
     {

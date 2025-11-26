@@ -164,3 +164,36 @@ CREATE TABLE feedbacks (
 -- Create index on user_id for faster queries
 CREATE INDEX idx_feedbacks_user_id ON feedbacks(user_id);
 CREATE INDEX idx_feedbacks_status ON feedbacks(status);
+
+-- =========================================
+-- CHATS
+-- Private chat conversations between users
+-- =========================================
+CREATE TABLE chats (
+    chat_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user1_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    user2_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user1_id, user2_id)
+);
+
+-- =========================================
+-- MESSAGES
+-- Messages within a chat conversation
+-- =========================================
+CREATE TABLE messages (
+    message_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    chat_id UUID NOT NULL REFERENCES chats(chat_id) ON DELETE CASCADE,
+    sender_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP
+);
+
+-- Create indexes for faster queries
+CREATE INDEX idx_chats_user1_id ON chats(user1_id);
+CREATE INDEX idx_chats_user2_id ON chats(user2_id);
+CREATE INDEX idx_messages_chat_id ON messages(chat_id);
+CREATE INDEX idx_messages_sender_id ON messages(sender_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at);
