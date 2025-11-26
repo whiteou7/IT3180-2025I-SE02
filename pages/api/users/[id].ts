@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import { User } from "@/types/users"
 import { APIBody } from "@/types/api"
+import type { UserRole, Gender } from "@/types/enum"
 
 /**
  * PUT /api/users/[id] - Update user information
@@ -24,9 +25,9 @@ export default async function handler(
       const { email, fullName, role, yearOfBirth, gender } = req.body as {
         email: string;
         fullName: string;
-        role: "tenant" | "admin";
-        yearOfBirth: number;
-        gender: "male" | "female";
+        role: UserRole;
+        yearOfBirth: number | null;
+        gender: Gender | null;
       }
 
       const updatedUser = await db<User[]>`
@@ -35,8 +36,8 @@ export default async function handler(
           email = ${email},
           full_name = ${fullName},
           role = ${role},
-          year_of_birth = ${yearOfBirth},
-          gender = ${gender}
+          year_of_birth = ${yearOfBirth ?? null},
+          gender = ${gender ?? null}
         WHERE user_id = ${userId}
         RETURNING 
           user_id,
@@ -44,7 +45,8 @@ export default async function handler(
           full_name,
           role,
           year_of_birth,
-          gender;
+          gender,
+          apartment_id;
       `
 
       if (updatedUser.length === 0) {
@@ -67,7 +69,8 @@ export default async function handler(
           full_name,
           role,
           year_of_birth,
-          gender
+          gender,
+          apartment_id
         FROM users
         WHERE user_id = ${userId};
       `

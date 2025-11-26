@@ -24,22 +24,29 @@ export default async function handler(
       userId?: string;
       filter?: "week" | "month" | "year";
     }
-    const baseQuery = db<VehicleLog[]>`
+    let baseQuery = db<VehicleLog[]>`
       SELECT 
-        u.user_id, 
-        u.full_name, 
-        v.vehicle_id, 
-        v.license_plate, 
-        vl.entrance_time, 
-        vl.exit_time
+        vl.vehicle_log_id,
+        vl.entrance_time,
+        vl.exit_time,
+        v.vehicle_id,
+        v.license_plate,
+        u.user_id,
+        u.full_name,
+        u.apartment_id,
+        a.apartment_number,
+        a.building_id,
+        a.floor
       FROM 
         vehicle_logs vl
       JOIN 
         vehicles v ON vl.vehicle_id = v.vehicle_id
       JOIN 
         properties p ON p.property_id = v.property_id
-      JOIN 
+      LEFT JOIN 
         users u ON u.user_id = p.user_id
+      LEFT JOIN 
+        apartments a ON a.apartment_id = u.apartment_id
     `
 
     const whereClauses = []
@@ -48,25 +55,21 @@ export default async function handler(
     }
 
     if (filter === "week") {
-      whereClauses.push(db<VehicleLog[]>`vl.entrance_time >= NOW() - '7 days'::interval`)
+      whereClauses.push(db`vl.entrance_time >= NOW() - '7 days'::interval`)
     } else if (filter === "month") {
-      whereClauses.push(db<VehicleLog[]>`vl.entrance_time >= NOW() - '1 month'::interval`)
+      whereClauses.push(db`vl.entrance_time >= NOW() - '1 month'::interval`)
     } else if (filter === "year") {
-      whereClauses.push(db<VehicleLog[]>`vl.entrance_time >= NOW() - '1 year'::interval`)
+      whereClauses.push(db`vl.entrance_time >= NOW() - '1 year'::interval`)
     }
 
-    const sortQuery = db<VehicleLog[]>`ORDER BY vl.entrance_time asc`
-
-    let finalQuery
-    
     if (whereClauses.length > 0) {
-      const combinedWhere = whereClauses.reduce((prev, curr) => db<VehicleLog[]>`${prev} AND ${curr}`)
-      finalQuery = db<VehicleLog[]>`${baseQuery} WHERE ${combinedWhere} ${sortQuery}`
-    } else {
-      finalQuery = db<VehicleLog[]>`${baseQuery} ${sortQuery}`
+      const combinedWhere = whereClauses.reduce(
+        (prev, curr) => db`${prev} AND ${curr}`
+      )
+      baseQuery = db<VehicleLog[]>`${baseQuery} WHERE ${combinedWhere}`
     }
 
-    const logs = await finalQuery
+    const logs = await db<VehicleLog[]>`${baseQuery} ORDER BY vl.entrance_time DESC`
 
     return res.status(200).json({
       success: true,

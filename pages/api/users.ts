@@ -4,6 +4,7 @@ import crypto from "crypto"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { User } from "@/types/users"
+import type { UserRole, Gender } from "@/types/enum"
 
 /**
  * POST /api/users - Create a new user account
@@ -18,10 +19,13 @@ export default async function handler(
 ) {
   try {
     if (req.method === "POST") {
-      const { email, fullName, password } = req.body as {
+      const { email, fullName, password, role, yearOfBirth, gender } = req.body as {
         email: string;
         fullName: string;
         password: string;
+        role?: UserRole;
+        yearOfBirth?: number;
+        gender?: Gender;
       }
 
       // Validate required fields
@@ -50,8 +54,8 @@ export default async function handler(
 
       // Insert new user
       await db`
-        INSERT INTO users (user_id, email, full_name, password)
-        VALUES (${userId}, ${email}, ${fullName}, ${hashedPassword});
+        INSERT INTO users (user_id, email, full_name, password, role, year_of_birth, gender)
+        VALUES (${userId}, ${email}, ${fullName}, ${hashedPassword}, ${role ?? "tenant" as const}, ${yearOfBirth ?? null}, ${gender ?? null});
       `
 
       return res.status(201).json({
@@ -69,7 +73,8 @@ export default async function handler(
           full_name, 
           role,
           year_of_birth,
-          gender
+          gender,
+          apartment_id
         FROM users;
       `
 

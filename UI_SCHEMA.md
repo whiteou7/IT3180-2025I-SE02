@@ -33,8 +33,8 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 │    └─ Residence Status              │
 │                                     │
 │  🏢 EP2 - Property Management       │
-│    ├─ Incident Reports              │
-│    └─ Lost Property                 │
+│    ├─ Properties                    │
+│    └─ Lost Property Report          │
 │                                     │
 │  💰 EP3 - Fee Collection            │
 │    ├─ Service Bills                 │
@@ -269,63 +269,36 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 ### 3. EP2 - Property Management
 
-#### 3.1 Incident Reports
+#### 3.1 Properties
 
-**Route:** `/property/incidents`  
-**Access:** Residents (create/view own), Admin (all), Law Enforcement (all)  
-**Layout:** Report list with creation form
+**Route:** `/property`  
+**Access:** Residents (create/view own), Admin (all)
+**Layout:** Property list with creation form
 
 **Components:**
-- Report creation button (floating action button)
-- Report list with filters:
-  - Status filter (Pending, In Progress, Resolved, Closed)
-  - Priority filter (Low, Medium, High, Urgent)
+- Property creation button (floating action button)
+- Property list with filters:
+  - Status filter (Found, Not Found, Deleted)
   - Date range filter
   - Type filter
-- Report cards/list items:
-  - Report ID
+- Property cards/list items:
+  - Property ID
   - Title
-  - Reporter name
-  - Incident type icon
-  - Priority badge
   - Status badge
   - Created date
   - Actions (View, Update status)
-- Report detail view:
-  - Full report information
-  - Attached images/documents
-  - Status timeline
-  - Comments/updates section
-  - Assign to officer (Law Enforcement)
-  - Resolution notes
-- Quick report form (modal):
-  - Incident type selector
-  - Location
-  - Description (textarea)
-  - Priority selector
-  - Photo upload
-  - Submit button
-
-**Content:**
-- Incident reporting interface (US-008)
-- Report tracking
-- Status management
-- Communication thread
-
-**User Stories:** US-008
 
 ---
 
 #### 3.2 Lost Property
 
 **Route:** `/property/lost-property`  
-**Access:** Residents (create/view), Admin (all)  
+**Access:** Residents (create/view), Admin (all), Police (all)  
 **Layout:** Lost property registry
 
 **Components:**
 - Report lost property button
 - Lost property list:
-  - Item photo/icon
   - Item name
   - Description
   - Reported by
@@ -338,7 +311,6 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
   - Description
   - Last seen location
   - Last seen date/time
-  - Photo upload
   - Contact information
 - Found property section (Admin):
   - List of found items

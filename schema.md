@@ -4,7 +4,7 @@
 CREATE TYPE progression_status AS ENUM ('pending', 'rejected', 'in_progress', 'completed', 'deleted');
 CREATE TYPE property_status AS ENUM ('found', 'not found', 'deleted');
 CREATE TYPE gender AS ENUM ('male', 'female');
-CREATE TYPE role AS ENUM ('tenant', 'admin');
+CREATE TYPE role AS ENUM ('tenant', 'admin', 'police', 'accountant');
 CREATE TYPE billing_status AS ENUM ('unpaid', 'paid', 'deleted');
 
 -- =========================================

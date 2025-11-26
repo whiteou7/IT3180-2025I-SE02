@@ -3,10 +3,11 @@ import bcrypt from "bcryptjs"
 
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
+import type { UserRole } from "@/types/enum"
 
 type LoginSuccess = {
   userId: string
-  role: "tenant" | "admin"
+  role: UserRole
 }
 
 export default async function handler(
@@ -34,7 +35,7 @@ export default async function handler(
     }
 
     const [user] = await db<
-      { userId: string; role: "tenant" | "admin"; password: string }[]
+      { userId: string; role: UserRole; password: string }[]
     >`
       SELECT user_id, role, password
       FROM users

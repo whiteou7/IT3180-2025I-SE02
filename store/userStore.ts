@@ -1,10 +1,11 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import type { UserRole } from "@/types/enum"
 
 export type UserState = {
   userId: string
-  role: "tenant" | "admin"
-  setUser: (userId: string, role: "tenant" | "admin") => void
+  role: UserRole
+  setUser: (userId: string, role: UserRole) => void
   clearUser: () => void
 }
 

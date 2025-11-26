@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/router"
+import Link from "next/link"
 import {
   LayoutDashboard,
   Users,
@@ -68,6 +69,7 @@ const data = {
         {
           title: "Residence Status",
           url: "/residents/status",
+          admin: true
         },
       ],
     },
@@ -174,14 +176,16 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
-  const { userId, clearUser } = useUserStore()
+  const { userId, role, clearUser } = useUserStore()
   const isLoggedIn = Boolean(userId)
   const authLabel = isLoggedIn ? "Logout" : "Login"
   const AuthIcon = isLoggedIn ? LogOut : LogIn
+  const isAdmin = role === "admin"
 
   const handleAuthAction = React.useCallback(() => {
     if (isLoggedIn) {
       clearUser()
+      router.push("/")
       return
     }
 
@@ -194,7 +198,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/dashboard">
+              <Link href="/dashboard">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Building2 className="size-4" />
                 </div>
@@ -202,58 +206,61 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="font-medium">Apartment Management</span>
                   <span className="text-xs">System</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+      
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu>
-            {data.navMain.map((item) => {
-              const Icon = item.icon
-              const hasItems = item.items && item.items.length > 0
+        {isLoggedIn && (
+          <SidebarGroup>
+            <SidebarMenu>
+              {data.navMain.map((item) => {
+                const Icon = item.icon
+                const hasItems = item.items && item.items.length > 0
               
-              if (hasItems) {
+                if (hasItems) {
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <Collapsible defaultOpen={false}>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton tooltip={item.title}>
+                            {Icon && <Icon className="size-4" />}
+                            <span>{item.title}</span>
+                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.items.map((subItem) => (isAdmin || !subItem.admin) && (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton asChild>
+                                  <Link href={subItem.url}>{subItem.title}</Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </SidebarMenuItem>
+                  )
+                }
+              
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <Collapsible defaultOpen={false}>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={item.title}>
-                          {Icon && <Icon className="size-4" />}
-                          <span>{item.title}</span>
-                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]:rotate-90" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.items.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild>
-                                <a href={subItem.url}>{subItem.title}</a>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </Collapsible>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <Link href={item.url} className="font-medium">
+                        {Icon && <Icon className="size-4" />}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
-              }
-              
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url} className="font-medium">
-                      {Icon && <Icon className="size-4" />}
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

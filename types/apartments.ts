@@ -1,14 +1,12 @@
-export type ApartmentMember = {
-  userId: string;
-  fullName: string;
-  email: string;
-}
+import type { User } from "./users"
 
-export type Apartment ={
-  apartmentId: number;
-  buildingId: number;
-  floor: number;
-  monthlyFee: number;
-  apartmentNumber: number;
-  members?: ApartmentMember[];
+export type ApartmentMember = Pick<User, "userId" | "fullName" | "email">
+
+export type Apartment = {
+  apartmentId: number
+  buildingId: number
+  floor: number
+  monthlyFee: number
+  apartmentNumber: number
+  members?: ApartmentMember[]
 }
