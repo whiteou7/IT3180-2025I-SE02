@@ -89,26 +89,17 @@ const data = {
       ],
     },
     {
-      title: "Services",
+      title: "Fee Collection",
       url: "#",
       icon: DollarSign,
       items: [
         {
-          title: "Service Catalog",
-          url: "/services/catalog",
-        },
-        {
           title: "Billing Center",
-          url: "/services/billing",
-        },
-        {
-          title: "Service Administration",
-          url: "/services/manage",
-          admin: true,
+          url: "/billing",
         },
         {
           title: "Financial Reports",
-          url: "/services/reports",
+          url: "/billing/reports",
           admin: true,
         },
       ],
@@ -122,10 +113,6 @@ const data = {
           title: "Public Announcements",
           url: "/notifications/announcements",
         },
-        {
-          title: "Feedback",
-          url: "/notifications/feedbacks",
-        },
       ],
     },
     {
@@ -134,12 +121,17 @@ const data = {
       icon: Wrench,
       items: [
         {
-          title: "Service Booking",
-          url: "/services/booking",
+          title: "Service Catalog",
+          url: "/services/catalog",
         },
         {
-          title: "Customer Support",
-          url: "/services/support",
+          title: "Service Administration",
+          url: "/services/manage",
+          admin: true,
+        },
+        {
+          title: "Feedback",
+          url: "/services/feedbacks",
         },
       ],
     },

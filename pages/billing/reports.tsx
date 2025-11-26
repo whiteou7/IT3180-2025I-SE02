@@ -125,6 +125,10 @@ export default function FinancialReportsPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
+              <BreadcrumbLink href="/billing">Billing</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
               <BreadcrumbPage>Financial reports</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>

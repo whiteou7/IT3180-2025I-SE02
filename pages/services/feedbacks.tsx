@@ -340,7 +340,7 @@ export default function FeedbacksPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/notifications/feedbacks">Notifications</BreadcrumbLink>
+              <BreadcrumbLink href="/services/feedbacks">Services</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

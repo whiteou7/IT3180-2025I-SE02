@@ -37,18 +37,16 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 │    └─ Lost Property Report          │
 │                                     │
 │  💰 EP3 - Fee Collection            │
-│    ├─ Service Catalog & Cart        │
 │    ├─ Billing & Invoice Center      │
-│    ├─ Service Administration        │
 │    └─ Financial Reports             │
 │                                     │
 │  📢 EP4 - Notifications             │
-│    ├─ Public Announcements          │
-│    └─ Feedback                │
+│    └─ Public Announcements          │
 │                                     │
 │  🛠️ EP5 - Building Services         │
-│    ├─ Service Booking               │
-│    └─ Customer Support              │
+│    ├─ Service Catalog & Cart        │
+│    ├─ Service Administration        │
+│    └─ Feedback                      │
 │                                     │
 │  ⚙️ EP6 - System Operations         │
 │    └─ System Settings               │
@@ -328,42 +326,9 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 ### 4. EP3 - Fee Collection
 
-#### 4.1 Service Catalog & Cart
+#### 4.1 Billing & Invoice Center
 
-**Route:** `/services/catalog`  
-**Access:** Residents (browse/add/pay), Admin (view)  
-**Layout:** Service marketplace with cart drawer and checkout lane
-
-**Components:**
-- Service filters:
-  - Category tabs (Cleaning, Maintenance, Utilities, Amenities)
-  - Search bar and price range slider
-- Service cards:
-  - Name, description, duration, price, availability status
-  - `Add to cart` button with quantity selector
-- Cart drawer:
-  - Selected services list with editable quantity
-  - Subtotal, tax/fee breakdown, promo code input
-  - `Proceed to payment` button launching checkout modal
-- Checkout modal:
-  - Selected services summary
-  - Payment method selector (Bank transfer, Card, E-wallet)
-  - Billing contact info and optional notes
-  - Confirmation + success toast
-- Order history snippet for quick rebooking
-
-**Content:**
-- Tenant-facing service discovery (US-005, US-007)
-- Shopping cart + checkout workflow
-- Real-time availability updates
-
-**User Stories:** US-005, US-007
-
----
-
-#### 4.2 Billing & Invoice Center
-
-**Route:** `/services/billing`  
+**Route:** `/billing`  
 **Access:** Residents (own bills), Admin (all bills)  
 **Layout:** Unified billing dashboard with detail drawer
 
@@ -392,38 +357,9 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 ---
 
-#### 4.3 Service Administration
+#### 4.2 Financial Reports
 
-**Route:** `/services/manage`  
-**Access:** Admin  
-**Layout:** Admin workspace with CRUD grid and bill ledger
-
-**Components:**
-- Service list DataTable:
-  - Columns: Service name, category, price, availability, last updated
-  - Actions: View, Edit, Duplicate, Delete
-- Service editor modal:
-  - Form fields for metadata, pricing tiers, capacity windows, attachments
-  - Publish/unpublish toggle with preview
-- New service wizard with validation and draft saving
-- Bill ledger tab:
-  - All bills generated from service orders
-  - Filters by resident, status, period
-  - Inline link to billing detail page
-- Audit log of service changes
-
-**Content:**
-- Admin CRUD for catalog (US-004, US-007)
-- End-to-end visibility on every bill raised from services
-- Governance trail for compliance
-
-**User Stories:** US-004, US-007
-
----
-
-#### 4.4 Financial Reports
-
-**Route:** `/services/reports`  
+**Route:** `/billing/reports`  
 **Access:** Admin, Accountant  
 **Layout:** Report dashboard with charts
 
@@ -496,9 +432,73 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 ---
 
-#### 5.2 Feedback
+### 6. EP5 - Building Services
 
-**Route:** `/notifications/feedbacks`  
+#### 6.1 Service Catalog & Cart
+
+**Route:** `/services/catalog`  
+**Access:** Residents (browse/add/pay), Admin (view)  
+**Layout:** Service marketplace with cart drawer and checkout lane
+
+**Components:**
+- Service filters:
+  - Category tabs (Cleaning, Maintenance, Utilities, Amenities)
+  - Search bar and price range slider
+- Service cards:
+  - Name, description, duration, price, availability status
+  - `Add to cart` button with quantity selector
+- Cart drawer:
+  - Selected services list with editable quantity
+  - Subtotal, tax/fee breakdown, promo code input
+  - `Proceed to payment` button launching checkout modal
+- Checkout modal:
+  - Selected services summary
+  - Payment method selector (Bank transfer, Card, E-wallet)
+  - Billing contact info and optional notes
+  - Confirmation + success toast
+- Order history snippet for quick rebooking
+
+**Content:**
+- Tenant-facing service discovery (US-005, US-007)
+- Shopping cart + checkout workflow
+- Real-time availability updates
+
+**User Stories:** US-005, US-007
+
+---
+
+#### 6.2 Service Administration
+
+**Route:** `/services/manage`  
+**Access:** Admin  
+**Layout:** Admin workspace with CRUD grid and bill ledger
+
+**Components:**
+- Service list DataTable:
+  - Columns: Service name, category, price, availability, last updated
+  - Actions: View, Edit, Duplicate, Delete
+- Service editor modal:
+  - Form fields for metadata, pricing tiers, capacity windows, attachments
+  - Publish/unpublish toggle with preview
+- New service wizard with validation and draft saving
+- Bill ledger tab:
+  - All bills generated from service orders
+  - Filters by resident, status, period
+  - Inline link to billing detail page
+- Audit log of service changes
+
+**Content:**
+- Admin CRUD for catalog (US-004, US-007)
+- End-to-end visibility on every bill raised from services
+- Governance trail for compliance
+
+**User Stories:** US-004, US-007
+
+---
+
+#### 6.3 Feedback
+
+**Route:** `/services/feedbacks`  
 **Access:** All roles  
 **Layout:** Feedback list with search and filters
 **Description:** Feedback is a way for residents to give feedback to the building management. It is meant to be a private communication channel.
@@ -518,101 +518,6 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 - Feedback management 
 
 **User Stories:** US-016, US-019
-
----
-
-### 6. EP5 - Services
-
-#### 6.1 Service Booking
-
-**Route:** `/services/booking`  
-**Access:** Residents (book services), Admin (manage services)  
-**Layout:** Service catalog with booking calendar
-
-**Components:**
-- Service category tabs:
-  - Cleaning
-  - Maintenance
-  - Utilities
-  - Amenities
-  - Other
-- Service cards:
-  - Service name
-  - Description
-  - Price (if applicable)
-  - Duration
-  - Availability
-  - Book button
-- Booking form (modal):
-  - Service selector
-  - Date picker
-  - Time slot selector
-  - Special requests (textarea)
-  - Contact info
-  - Confirm booking button
-- My bookings section:
-  - Upcoming bookings
-  - Past bookings
-  - Booking status
-  - Cancel/Reschedule options
-- Service management (Admin):
-  - Add/edit services
-  - Set availability
-  - Manage bookings
-  - Service calendar view
-
-**Content:**
-- Service registration (US-007)
-- Online booking interface
-- Booking management
-
-**User Stories:** US-007
-
----
-
-#### 6.2 Customer Support
-
-**Route:** `/services/support`  
-**Access:** Residents (submit feedback), Admin (manage feedback)  
-**Layout:** Support ticket system
-
-**Components:**
-- Support ticket list:
-  - Ticket ID
-  - Subject
-  - Category
-  - Status (Open, In Progress, Resolved, Closed)
-  - Priority
-  - Created date
-  - Actions (View, Update)
-- Create ticket button:
-  - Category selector
-  - Subject
-  - Description
-  - Priority
-  - Attachments
-  - Submit button
-- Ticket detail view:
-  - Full ticket information
-  - Response thread
-  - Status timeline
-  - Add response/comment
-  - Close ticket button
-- Feedback/rating system:
-  - Service rating (1-5 stars)
-  - Feedback form
-  - Submit feedback button
-- Feedback dashboard (Admin):
-  - All feedback list
-  - Rating statistics
-  - Response management
-
-**Content:**
-- Customer service interface (US-006)
-- Feedback collection
-- Service evaluation
-
-**User Stories:** US-006, US-019
 
 ---
 
@@ -860,8 +765,9 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 | Financial Reports | ❌ | ✅ | ❌ | ✅ |
 | Public Announcements | ✅ | ✅ | ✅ | ✅ |
 | Direct Messages | ✅ | ✅ | ✅ | ✅ |
-| Service Booking | Book services | ✅ Manage | ❌ | ❌ |
-| Customer Support | Submit tickets | ✅ Manage | ❌ | ❌ |
+| Service Catalog | Browse/add/pay | ✅ View | ❌ | ❌ |
+| Service Administration | ❌ | ✅ | ❌ | ❌ |
+| Feedback | Submit/view own | ✅ All | ❌ | ❌ |
 | System Settings | ❌ | ✅ | ❌ | ❌ |
 | Security Reports | ❌ | ✅ | ✅ | ❌ |
 | General Reports | ❌ | ✅ | ❌ | ❌ |
