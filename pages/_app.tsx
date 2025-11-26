@@ -10,16 +10,41 @@ import { AppSidebar } from "@/components/Sidebar"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/ThemeToggle"
 
+// Public routes that don't require authentication
+const publicRoutes = ["/", "/login"]
+
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const [fullName, setFullName] = useState("")
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const { userId, fullName: storeFullName } = useUserStore()
+
   useEffect(() => {
-    const { userId, role, fullName } = useUserStore.getState()
-    setFullName(fullName)
-    if (userId && role && router.pathname === "/") {
-      router.push("/feed")
+    setFullName(storeFullName)
+    const isPublicRoute = publicRoutes.includes(router.pathname) || router.pathname === "/"
+    const isAuthenticated = !!userId
+
+    // If user is logged in and on root or index, redirect to dashboard
+    if (isAuthenticated && (router.pathname === "/")) {
+      router.push("/dashboard")
+      setIsCheckingAuth(false)
+      return
     }
-  }, [router])
+
+    // If user is not logged in and trying to access protected route, redirect to /index
+    if (!isAuthenticated && !isPublicRoute) {
+      router.push("/")
+      setIsCheckingAuth(false)
+      return
+    }
+
+    setIsCheckingAuth(false)
+  }, [router.pathname, userId, storeFullName])
+
+  // Show nothing while checking authentication to prevent flash
+  if (isCheckingAuth) {
+    return null
+  }
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -30,7 +55,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <div className="flex items-center gap-2 px-3">
               <SidebarTrigger />
               <ThemeToggle />
-              <span className="text-sm">Welcome back, {fullName}</span>
+              {fullName && <span className="text-sm">Welcome back, {fullName}</span>}
             </div>
           </header>
           <main>
