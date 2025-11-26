@@ -52,7 +52,7 @@ import type { ResidentStatus } from "@/types/enum"
 
 export type ResidentProfile = Pick<
   User,
-  "userId" | "fullName" | "email" | "role" | "yearOfBirth" | "gender" | "apartmentId"
+  "userId" | "fullName" | "email" | "role" | "yearOfBirth" | "gender" | "phoneNumber" | "apartmentId"
 > & {
   apartmentNumber?: number | null
   buildingId?: number | null
@@ -149,8 +149,6 @@ export function ResidentFilters({
             <SelectItem value="all">All roles</SelectItem>
             <SelectItem value="tenant">Resident</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="police">Police</SelectItem>
-            <SelectItem value="accountant">Accountant</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -277,6 +275,7 @@ const residentFormSchema = z.object({
   role: z.enum(["tenant", "admin", "police", "accountant"] as const),
   yearOfBirth: z.string().optional(),
   gender: z.enum(["male", "female"] as const).optional(),
+  phoneNumber: z.string().optional(),
 })
 
 export type ResidentFormValues = z.infer<typeof residentFormSchema>
@@ -288,6 +287,7 @@ type ResidentProfileDrawerProps = {
   onSubmit: (values: ResidentFormValues) => Promise<void> | void
   isSaving?: boolean
   isAdmin?: boolean
+  isSpecialAccount?: boolean
 }
 
 export function ResidentProfileDrawer({
@@ -297,6 +297,7 @@ export function ResidentProfileDrawer({
   onSubmit,
   isSaving,
   isAdmin = false,
+  isSpecialAccount = false,
 }: ResidentProfileDrawerProps) {
   const form = useForm<ResidentFormValues>({
     resolver: zodResolver(residentFormSchema),
@@ -307,6 +308,7 @@ export function ResidentProfileDrawer({
         role: resident.role,
         yearOfBirth: resident.yearOfBirth?.toString() ?? "",
         gender: resident.gender ?? undefined,
+        phoneNumber: resident.phoneNumber ?? "",
       }
       : {
         fullName: "",
@@ -314,6 +316,7 @@ export function ResidentProfileDrawer({
         role: "tenant",
         yearOfBirth: "",
         gender: undefined,
+        phoneNumber: "",
       },
   })
 
@@ -325,6 +328,7 @@ export function ResidentProfileDrawer({
         role: resident.role,
         yearOfBirth: resident.yearOfBirth?.toString() ?? "",
         gender: resident.gender ?? undefined,
+        phoneNumber: resident.phoneNumber ?? "",
       })
     }
   }, [resident, form])
@@ -348,25 +352,29 @@ export function ResidentProfileDrawer({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="flex flex-col gap-6 overflow-y-auto sm:max-w-xl">
           <SheetHeader>
-            <SheetTitle>{resident?.fullName ?? "Resident details"}</SheetTitle>
+            <SheetTitle>{resident?.fullName ?? (isSpecialAccount ? "Special Account Details" : "Resident details")}</SheetTitle>
             <SheetDescription>
-            Review and update resident profile using persisted database fields.
+              {isSpecialAccount 
+                ? "Review and update special account profile using persisted database fields."
+                : "Review and update resident profile using persisted database fields."}
             </SheetDescription>
           </SheetHeader>
 
           {resident ? (
             <div className="space-y-2 rounded-xl border bg-muted/20 p-4 mx-4 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Resident ID</span>
+                <span className="text-muted-foreground">{isSpecialAccount ? "Account ID" : "Resident ID"}</span>
                 <span className="font-mono text-xs">{resident.userId}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Apartment</span>
-                <span className="font-medium">{apartmentLabel}</span>
-              </div>
+              {!isSpecialAccount && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Apartment</span>
+                  <span className="font-medium">{apartmentLabel}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Role</span>
-                <span className="capitalize">{resident.role}</span>
+                <span className="capitalize">{resident.role === "tenant" ? "Resident" : resident.role === "admin" ? "Admin" : resident.role === "police" ? "Police" : "Accountant"}</span>
               </div>
             </div>
           ) : null}
@@ -400,6 +408,19 @@ export function ResidentProfileDrawer({
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="resident@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone number</FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder="+1234567890" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -549,6 +570,115 @@ export function ResidentEmptyState({
   )
 }
 
+export type SpecialAccountProfile = Pick<
+  User,
+  "userId" | "fullName" | "email" | "role" | "yearOfBirth" | "gender" | "phoneNumber"
+>
+
+type SpecialAccountsTableProps = {
+  accounts: SpecialAccountProfile[]
+  isLoading?: boolean
+  onSelectAccount: (account: SpecialAccountProfile) => void
+}
+
+export function SpecialAccountsTable({
+  accounts,
+  isLoading,
+  onSelectAccount,
+}: SpecialAccountsTableProps) {
+  if (isLoading) {
+    return (
+      <div className="rounded-xl border bg-card/40 p-6">
+        <div className="space-y-2">
+          <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
+          <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="mt-6 space-y-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-10 w-full animate-pulse rounded bg-muted/60"
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl border bg-card/60 shadow-sm">
+      <ScrollArea className="max-h-[560px] rounded-xl">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Birth year</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {accounts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  No special accounts found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              accounts.map((account) => (
+                <TableRow
+                  key={account.userId}
+                  className="cursor-pointer"
+                  onClick={() => onSelectAccount(account)}
+                >
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{account.fullName}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-muted-foreground text-sm">
+                      {account.email}
+                    </span>
+                  </TableCell>
+                  <TableCell className="capitalize">
+                    {account.role === "police" ? "Police" : "Accountant"}
+                  </TableCell>
+                  <TableCell>
+                    {account.phoneNumber ?? "—"}
+                  </TableCell>
+                  <TableCell>
+                    {account.yearOfBirth ?? "—"}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+    </div>
+  )
+}
+
+export function useSpecialAccountSearch(
+  accounts: SpecialAccountProfile[],
+  searchQuery: string
+) {
+  return React.useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+    if (!query.length) {
+      return accounts
+    }
+    return accounts.filter(
+      (account) =>
+        account.fullName.toLowerCase().includes(query) ||
+        account.email.toLowerCase().includes(query) ||
+        (account.phoneNumber ?? "").toLowerCase().includes(query)
+    )
+  }, [accounts, searchQuery])
+}
+
 const createUserSchema = z.object({
   fullName: z.string().min(3, "Full name must be at least 3 characters"),
   email: z.email("Invalid email address"),
@@ -556,6 +686,7 @@ const createUserSchema = z.object({
   role: z.enum(["tenant", "admin", "police", "accountant"] as const),
   yearOfBirth: z.string().optional(),
   gender: z.enum(["male", "female"] as const).optional(),
+  phoneNumber: z.string().optional(),
 })
 
 export type CreateUserFormValues = z.infer<typeof createUserSchema>
@@ -582,6 +713,7 @@ export function CreateUserDialog({
       role: "tenant",
       yearOfBirth: "",
       gender: undefined,
+      phoneNumber: "",
     },
   })
 
@@ -631,6 +763,19 @@ export function CreateUserDialog({
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="user@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone number</FormLabel>
+                  <FormControl>
+                    <Input type="tel" placeholder="+1234567890" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

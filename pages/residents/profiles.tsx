@@ -31,10 +31,15 @@ import {
   CreateUserFormValues,
   useResidentFilters,
   useResidentSearch,
+  SpecialAccountProfile,
+  SpecialAccountsTable,
+  useSpecialAccountSearch,
 } from "@/components/residents/resident-profiles"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useUserStore } from "@/store/userStore"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
 
 const buildResidentProfile = (
   user: User,
@@ -51,6 +56,7 @@ const buildResidentProfile = (
     role: user.role,
     yearOfBirth: user.yearOfBirth ?? null,
     gender: user.gender ?? null,
+    phoneNumber: user.phoneNumber ?? null,
     apartmentId: assignedApartment?.apartmentId ?? user.apartmentId,
     apartmentNumber: assignedApartment?.apartmentNumber,
     buildingId: assignedApartment?.buildingId,
@@ -61,12 +67,16 @@ const buildResidentProfile = (
 
 export default function ResidentProfilesPage() {
   const [residents, setResidents] = useState<ResidentProfile[]>([])
+  const [specialAccounts, setSpecialAccounts] = useState<SpecialAccountProfile[]>([])
   const [selectedResident, setSelectedResident] = useState<ResidentProfile | null>(null)
+  const [selectedAccount, setSelectedAccount] = useState<SpecialAccountProfile | null>(null)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [activeTab, setActiveTab] = useState("residents")
+  const [specialAccountSearch, setSpecialAccountSearch] = useState("")
   const { filters, setFilters } = useResidentFilters()
   const { role, userId } = useUserStore()
   const isAdmin = role === "admin"
@@ -93,17 +103,37 @@ export default function ResidentProfilesPage() {
           apartments.map((apartment) => [apartment.apartmentId, apartment])
         )
 
-        let dataset = (usersResponse.data as User[]).map((user) =>
+        const allUsers = usersResponse.data as User[]
+        
+        // Separate residents (tenant and admin) from special accounts (accountant and police)
+        const residentUsers = allUsers.filter(
+          (user) => user.role === "tenant" || user.role === "admin"
+        )
+        const specialAccountUsers = allUsers.filter(
+          (user) => user.role === "accountant" || user.role === "police"
+        )
+
+        let residentDataset = residentUsers.map((user) =>
           buildResidentProfile(user, apartmentLookup)
         )
+        const specialAccountDataset: SpecialAccountProfile[] = specialAccountUsers.map((user) => ({
+          userId: user.userId,
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          yearOfBirth: user.yearOfBirth ?? null,
+          gender: user.gender ?? null,
+          phoneNumber: user.phoneNumber ?? null,
+        }))
 
         // Tenants can only see their own profile
         if (!isAdmin) {
-          dataset = dataset.filter((resident) => resident.userId === userId)
+          residentDataset = residentDataset.filter((resident) => resident.userId === userId)
         }
 
         if (active) {
-          setResidents(dataset)
+          setResidents(residentDataset)
+          setSpecialAccounts(specialAccountDataset)
         }
       } catch (error) {
         console.error(error)
@@ -122,6 +152,7 @@ export default function ResidentProfilesPage() {
   }, [isAdmin, userId])
 
   const filteredResidents = useResidentSearch(residents, filters)
+  const filteredSpecialAccounts = useSpecialAccountSearch(specialAccounts, specialAccountSearch)
   const assignmentStats = useMemo(() => {
     const assigned = residents.filter((resident) => resident.status === "assigned").length
     return {
@@ -133,20 +164,29 @@ export default function ResidentProfilesPage() {
 
   const handleRowClick = (resident: ResidentProfile) => {
     setSelectedResident(resident)
+    setSelectedAccount(null)
+    setDrawerOpen(true)
+  }
+
+  const handleAccountClick = (account: SpecialAccountProfile) => {
+    setSelectedAccount(account)
+    setSelectedResident(null)
     setDrawerOpen(true)
   }
 
   const handleSave = async (values: ResidentFormValues) => {
-    if (!selectedResident) return
+    const targetUser = selectedResident || selectedAccount
+    if (!targetUser) return
+    
     const parsedYear = values.yearOfBirth ? Number(values.yearOfBirth) : undefined
     const yearOfBirth =
       parsedYear && Number.isFinite(parsedYear)
         ? parsedYear
-        : selectedResident.yearOfBirth
-    const gender = values.gender ?? selectedResident.gender ?? null
+        : targetUser.yearOfBirth
+    const gender = values.gender ?? targetUser.gender ?? null
     try {
       setIsSaving(true)
-      const response = await ofetch(`/api/users/${selectedResident.userId}`, {
+      const response = await ofetch(`/api/users/${targetUser.userId}`, {
         method: "PUT",
         body: {
           email: values.email,
@@ -154,31 +194,53 @@ export default function ResidentProfilesPage() {
           role: values.role,
           yearOfBirth,
           gender,
+          phoneNumber: values.phoneNumber || null,
         },
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to save resident")
+        throw new Error(response?.message ?? "Unable to save user")
       }
-      setResidents((prev) =>
-        prev.map((resident) =>
-          resident.userId === selectedResident.userId
-            ? {
-              ...resident,
-              fullName: values.fullName,
-              email: values.email,
-              role: values.role,
-              yearOfBirth: yearOfBirth ?? null,
-              gender,
-            }
-            : resident
+      
+      if (selectedResident) {
+        setResidents((prev) =>
+          prev.map((resident) =>
+            resident.userId === selectedResident.userId
+              ? {
+                ...resident,
+                fullName: values.fullName,
+                email: values.email,
+                role: values.role,
+                yearOfBirth: yearOfBirth ?? null,
+                gender,
+                phoneNumber: values.phoneNumber || null,
+              }
+              : resident
+          )
         )
-      )
-      toast.success("Resident profile updated")
+        toast.success("Resident profile updated")
+      } else if (selectedAccount) {
+        setSpecialAccounts((prev) =>
+          prev.map((account) =>
+            account.userId === selectedAccount.userId
+              ? {
+                ...account,
+                fullName: values.fullName,
+                email: values.email,
+                role: values.role,
+                yearOfBirth: yearOfBirth ?? null,
+                gender,
+                phoneNumber: values.phoneNumber || null,
+              }
+              : account
+          )
+        )
+        toast.success("Special account updated")
+      }
       setDrawerOpen(false)
     } catch (error) {
       console.error(error)
-      toast.error("Failed to save resident")
+      toast.error("Failed to save user")
     } finally {
       setIsSaving(false)
     }
@@ -196,6 +258,7 @@ export default function ResidentProfilesPage() {
           role: values.role,
           yearOfBirth: values.yearOfBirth ? Number(values.yearOfBirth) : undefined,
           gender: values.gender,
+          phoneNumber: values.phoneNumber || undefined,
         },
         ignoreResponseError: true,
       })
@@ -214,14 +277,33 @@ export default function ResidentProfilesPage() {
         const apartmentLookup = new Map(
           apartments.map((apartment) => [apartment.apartmentId, apartment])
         )
-        let dataset = (usersResponse.data as User[]).map((user) =>
+        const allUsers = usersResponse.data as User[]
+        
+        const residentUsers = allUsers.filter(
+          (user) => user.role === "tenant" || user.role === "admin"
+        )
+        const specialAccountUsers = allUsers.filter(
+          (user) => user.role === "accountant" || user.role === "police"
+        )
+
+        let residentDataset = residentUsers.map((user) =>
           buildResidentProfile(user, apartmentLookup)
         )
-        // Tenants can only see their own profile
+        const specialAccountDataset: SpecialAccountProfile[] = specialAccountUsers.map((user) => ({
+          userId: user.userId,
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          yearOfBirth: user.yearOfBirth ?? null,
+          gender: user.gender ?? null,
+          phoneNumber: user.phoneNumber ?? null,
+        }))
+
         if (!isAdmin) {
-          dataset = dataset.filter((resident) => resident.userId === userId)
+          residentDataset = residentDataset.filter((resident) => resident.userId === userId)
         }
-        setResidents(dataset)
+        setResidents(residentDataset)
+        setSpecialAccounts(specialAccountDataset)
       }
     } catch (error) {
       console.error(error)
@@ -299,27 +381,88 @@ export default function ResidentProfilesPage() {
             </Card>
           </div>
         )}
-        {isAdmin && (
-          <ResidentFilters filters={filters} onChange={setFilters} isLoading={isLoading} />
-        )}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList>
+            <TabsTrigger value="residents">Residents</TabsTrigger>
+            <TabsTrigger value="special-accounts">Special Accounts</TabsTrigger>
+          </TabsList>
 
-        {filteredResidents.length ? (
-          <ResidentProfilesTable
-            residents={filteredResidents}
-            isLoading={isLoading}
-            onSelectResident={handleRowClick}
-          />
-        ) : isLoading ? null : (
-          <ResidentEmptyState className="py-20" message="No resident matches the selected filters." />
-        )}
+          <TabsContent value="residents" className="space-y-6">
+            {isAdmin && (
+              <ResidentFilters filters={filters} onChange={setFilters} isLoading={isLoading} />
+            )}
+
+            {filteredResidents.length ? (
+              <ResidentProfilesTable
+                residents={filteredResidents}
+                isLoading={isLoading}
+                onSelectResident={handleRowClick}
+              />
+            ) : isLoading ? null : (
+              <ResidentEmptyState className="py-20" message="No resident matches the selected filters." />
+            )}
+          </TabsContent>
+
+          <TabsContent value="special-accounts" className="space-y-6">
+            {isAdmin && (
+              <div className="flex flex-col gap-3 rounded-xl border bg-card/40 p-4 backdrop-blur">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Search special accounts
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      Search by name, email, or phone number.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isLoading}
+                    onClick={() => setSpecialAccountSearch("")}
+                  >
+                    Reset
+                  </Button>
+                </div>
+                <Input
+                  placeholder="Search by name, email, or phone..."
+                  value={specialAccountSearch}
+                  disabled={isLoading}
+                  onChange={(event) => setSpecialAccountSearch(event.target.value)}
+                />
+              </div>
+            )}
+
+            {filteredSpecialAccounts.length ? (
+              <SpecialAccountsTable
+                accounts={filteredSpecialAccounts}
+                isLoading={isLoading}
+                onSelectAccount={handleAccountClick}
+              />
+            ) : isLoading ? null : (
+              <ResidentEmptyState className="py-20" message="No special accounts found." />
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
       <ResidentProfileDrawer
-        resident={selectedResident}
+        resident={selectedResident || (selectedAccount ? {
+          userId: selectedAccount.userId,
+          fullName: selectedAccount.fullName,
+          email: selectedAccount.email,
+          role: selectedAccount.role,
+          yearOfBirth: selectedAccount.yearOfBirth,
+          gender: selectedAccount.gender,
+          phoneNumber: selectedAccount.phoneNumber,
+          apartmentId: null,
+          status: "unassigned" as ResidentStatus,
+        } : null)}
         open={isDrawerOpen}
         onOpenChange={setDrawerOpen}
         onSubmit={handleSave}
         isSaving={isSaving}
         isAdmin={isAdmin}
+        isSpecialAccount={!!selectedAccount}
       />
       {isAdmin && (
         <CreateUserDialog

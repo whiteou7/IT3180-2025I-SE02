@@ -19,13 +19,14 @@ export default async function handler(
 ) {
   try {
     if (req.method === "POST") {
-      const { email, fullName, password, role, yearOfBirth, gender } = req.body as {
+      const { email, fullName, password, role, yearOfBirth, gender, phoneNumber } = req.body as {
         email: string;
         fullName: string;
         password: string;
         role?: UserRole;
         yearOfBirth?: number;
         gender?: Gender;
+        phoneNumber?: string;
       }
 
       // Validate required fields
@@ -54,8 +55,8 @@ export default async function handler(
 
       // Insert new user
       await db`
-        INSERT INTO users (user_id, email, full_name, password, role, year_of_birth, gender)
-        VALUES (${userId}, ${email}, ${fullName}, ${hashedPassword}, ${role ?? "tenant" as const}, ${yearOfBirth ?? null}, ${gender ?? null});
+        INSERT INTO users (user_id, email, full_name, password, role, year_of_birth, gender, phone_number)
+        VALUES (${userId}, ${email}, ${fullName}, ${hashedPassword}, ${role ?? "tenant" as const}, ${yearOfBirth ?? null}, ${gender ?? null}, ${phoneNumber ?? null});
       `
 
       return res.status(201).json({
@@ -74,6 +75,7 @@ export default async function handler(
           role,
           year_of_birth,
           gender,
+          phone_number,
           apartment_id
         FROM users;
       `
