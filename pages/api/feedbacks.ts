@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Feedback } from "@/types/feedbacks"
-import type { FeedbackStatus } from "@/types/enum"
 
 /**
  * GET /api/feedbacks - Retrieve feedbacks (all for admin, own for residents)
@@ -141,4 +140,3 @@ export default async function handler(
     return res.status(500).json({ success: false, message: (error as Error).message })
   }
 }
-

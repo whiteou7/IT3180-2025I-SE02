@@ -4,7 +4,6 @@ import { ofetch } from "ofetch"
 import { toast } from "sonner"
 import {
   BadgePercent,
-  Clock4,
   Loader2,
   RefreshCw,
   Search,
@@ -474,4 +473,3 @@ export default function ServiceCatalogPage() {
     </>
   )
 }
-

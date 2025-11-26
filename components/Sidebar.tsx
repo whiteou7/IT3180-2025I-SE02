@@ -38,7 +38,22 @@ import {
 } from "@/components/ui/collapsible"
 import { useUserStore } from "@/store/userStore"
 
-const data = {
+type SidebarSubItem = {
+  title: string
+  url: string
+  admin?: boolean
+  police?: boolean
+  accountant?: boolean
+}
+
+type SidebarNavItem = {
+  title: string
+  url: string
+  icon: React.ComponentType
+  items?: SidebarSubItem[]
+}
+
+const data: { navMain: SidebarNavItem[] } = {
   navMain: [
     {
       title: "Dashboard",
@@ -97,11 +112,6 @@ const data = {
           title: "Billing Center",
           url: "/billing",
         },
-        {
-          title: "Financial Reports",
-          url: "/billing/reports",
-          admin: true,
-        },
       ],
     },
     {
@@ -143,6 +153,7 @@ const data = {
         {
           title: "System Settings",
           url: "/system/settings",
+          admin: true,
         },
       ],
     },
@@ -154,14 +165,19 @@ const data = {
         {
           title: "Security Reports",
           url: "/reports/security",
+          admin: true,
+          police: true,
         },
         {
           title: "Financial Reports",
           url: "/reports/financial",
+          admin: true,
+          accountant: true,
         },
         {
           title: "General Reports",
           url: "/reports/general",
+          admin: true,
         },
       ],
     },
@@ -175,6 +191,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const authLabel = isLoggedIn ? "Logout" : "Login"
   const AuthIcon = isLoggedIn ? LogOut : LogIn
   const isAdmin = role === "admin"
+  const isPolice = role === "police"
+  const isAccountant = role === "accountant"
 
   const handleAuthAction = React.useCallback(() => {
     if (isLoggedIn) {
@@ -214,26 +232,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 const Icon = item.icon
                 const hasItems = item.items && item.items.length > 0
               
-                if (hasItems) {
+                if (hasItems && item.items) {
                   return (
                     <SidebarMenuItem key={item.title}>
                       <Collapsible defaultOpen={false}>
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton tooltip={item.title}>
-                            {Icon && <Icon className="size-4" />}
+                            {Icon && <Icon />}
                             <span>{item.title}</span>
                             <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]:rotate-90" />
                           </SidebarMenuButton>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                           <SidebarMenuSub>
-                            {item.items.map((subItem) => (isAdmin || !subItem.admin) && (
-                              <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton asChild>
-                                  <Link href={subItem.url}>{subItem.title}</Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
+                            {item.items.map((subItem) => {
+                              // Check if user has access based on role flags
+                              const hasAccess = 
+                                (!subItem.admin && !subItem.police && !subItem.accountant) || // No restrictions
+                                (subItem.admin && isAdmin) ||
+                                (subItem.police && isPolice) ||
+                                (subItem.accountant && isAccountant)
+                              return hasAccess && (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton asChild>
+                                    <Link href={subItem.url}>{subItem.title}</Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              )
+                            })}
                           </SidebarMenuSub>
                         </CollapsibleContent>
                       </Collapsible>
@@ -244,9 +270,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild tooltip={item.title}>
-                      <Link href={item.url} className="font-medium">
-                        {Icon && <Icon className="size-4" />}
-                        <span>{item.title}</span>
+                      <Link href={item.url}>
+                        {Icon && <Icon />}
+                        <span className="font-medium">{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

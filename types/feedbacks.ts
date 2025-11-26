@@ -10,4 +10,3 @@ export type Feedback = {
   createdAt: string
   updatedAt: string
 }
-

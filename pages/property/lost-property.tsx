@@ -30,7 +30,6 @@ import { propertyStatuses } from "@/components/property/properties"
 export default function LostPropertyPage() {
   const { userId, role } = useUserStore()
   const isAdmin = role === "admin"
-  const isLawEnforcement = role === "police"
 
   const [reports, setReports] = useState<PropertyReport[]>([])
   const [properties, setProperties] = useState<Property[]>([])

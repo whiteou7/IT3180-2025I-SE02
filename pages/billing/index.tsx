@@ -64,7 +64,7 @@ export default function BillingCenterPage() {
   const [billings, setBillings] = useState<BillingSummary[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [statusFilter, setStatusFilter] = useState<BillingStatus | "all">("all")
-  const [selectedUser, setSelectedUser] = useState<string>("")
+  const [selectedUser, setSelectedUser] = useState<string>("all")
   const [users, setUsers] = useState<User[]>([])
   const [detailId, setDetailId] = useState<string | null>(null)
   const [detail, setDetail] = useState<BillingDetail | null>(null)
@@ -90,7 +90,7 @@ export default function BillingCenterPage() {
       const query: Record<string, string> = {}
       if (!isManager) {
         query.userId = userId
-      } else if (selectedUser) {
+      } else if (selectedUser && selectedUser !== "all") {
         query.userId = selectedUser
       }
       if (statusFilter !== "all") {
@@ -222,10 +222,10 @@ export default function BillingCenterPage() {
       setDetail((prev) =>
         prev && prev.billingId === billingId
           ? {
-              ...prev,
-              billingStatus: "paid",
-              paidAt: new Date().toISOString(),
-            }
+            ...prev,
+            billingStatus: "paid",
+            paidAt: new Date().toISOString(),
+          }
           : prev
       )
     } catch (error) {
@@ -347,7 +347,7 @@ export default function BillingCenterPage() {
                         <SelectValue placeholder="All residents" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All residents</SelectItem>
+                        <SelectItem value="all">All residents</SelectItem>
                         {users.map((user) => (
                           <SelectItem key={user.userId} value={user.userId}>
                             {user.fullName}
@@ -547,4 +547,3 @@ export default function BillingCenterPage() {
     </>
   )
 }
-

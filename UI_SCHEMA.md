@@ -359,7 +359,7 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 #### 4.2 Financial Reports
 
-**Route:** `/billing/reports`  
+**Route:** `/reports/financial`  
 **Access:** Admin, Accountant  
 **Layout:** Report dashboard with charts
 
@@ -530,46 +530,47 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 **Layout:** Settings panel with sections
 
 **Components:**
-- Settings navigation tabs:
-  - General
-  - Security
-  - Backup
-  - Notifications
-  - Integration
-- General settings:
-  - System name
-  - Logo upload
-  - Timezone
-  - Language
-  - Date format
-- Security settings:
-  - Password policy
-  - Session timeout
-  - Two-factor authentication
-  - Access logs
-- Backup settings:
-  - Backup schedule
-  - Backup location
-  - Manual backup button
-  - Restore options
-  - Backup history
-- Notification settings:
-  - Email configuration
-  - SMS configuration
-  - Notification templates
-- Integration settings:
-  - Payment gateway
-  - Email service
-  - Storage service
+- Database & Storage tab:
+  - Preview mode:
+    - Read only
+    - When enabled: censors sensitive credentials
+    - When disabled: shows full connection strings and keys
+  - PostgreSQL connection display:
+    - Connection string/link (read from environment variable)
+    - Display format: clickable link or copyable text
+    - When preview mode is ON: credentials are censored (e.g., `postgresql://***:***@host:port/dbname`)
+    - When preview mode is OFF: full connection string visible
+    - Connection status indicator (connected/disconnected)
+  - Supabase storage display:
+    - Storage URL/link (read from environment variable)
+    - API key display (read from environment variable)
+    - When preview mode is ON: key is censored (e.g., `sb-***...***`)
+    - When preview mode is OFF: full key visible
+    - Copy to clipboard buttons for both URL and key
+    - Storage connection status indicator
+  - Database dump section:
+    - "Dump Database" button
+    - Dump format selector (SQL, CSV, JSON)
+    - Dump options:
+      - Include schema only
+      - Include data only
+      - Include both schema and data
+      - Select specific tables (multi-select)
+    - Download dump file button (appears after dump generation)
+    - Dump history list:
+      - Previous dump files with timestamps
+      - Download links for previous dumps
+      - Delete old dump option
+    - Progress indicator during dump generation
 - Performance monitoring:
   - System health dashboard
   - Response time metrics
   - Error logs
 
 **Content:**
-- System configuration (US-004)
-- Security settings (US-020)
-- Backup configuration (US-022)
+- Database connection management
+- Storage connection management
+- Database export functionality
 
 **User Stories:** US-004, US-020, US-022
 

@@ -121,4 +121,3 @@ export default async function handler(
     return res.status(500).json({ success: false, message: (error as Error).message })
   }
 }
-
