@@ -1,31 +1,29 @@
-import { useEffect, useState } from "react"
-import { useRouter } from "next/router"
 import Link from "next/link"
 import {
   Building2,
   Users,
   DollarSign,
   Bell,
-  Settings,
-  BarChart3,
   ArrowRight,
   Shield,
+  Lock,
+  FileText,
+  PackageSearch,
+  BarChart3,
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useUserStore } from "@/store/userStore"
 
-interface DashboardStats {
-  totalResidents?: number
-  totalProperties?: number
-  pendingBills?: number
-  recentAnnouncements?: number
-}
-
 export default function DashboardPage() {
   const { userId, role, fullName } = useUserStore()
 
-  const quickActions = [
+  const isAdmin = role === "admin"
+  const isPolice = role === "police"
+  const isAccountant = role === "accountant"
+  const isTenant = role === "tenant"
+
+  const allQuickActions = [
     {
       title: "Resident Profiles",
       description: "View and manage resident information",
@@ -33,6 +31,8 @@ export default function DashboardPage() {
       href: "/residents/profiles",
       color: "text-blue-600 dark:text-blue-400",
       bgColor: "bg-blue-50 dark:bg-blue-950",
+      tenant: true,
+      admin: true,
     },
     {
       title: "Properties",
@@ -41,6 +41,8 @@ export default function DashboardPage() {
       href: "/property",
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-50 dark:bg-green-950",
+      tenant: true,
+      admin: true,
     },
     {
       title: "Billing Center",
@@ -49,6 +51,9 @@ export default function DashboardPage() {
       href: "/billing",
       color: "text-yellow-600 dark:text-yellow-400",
       bgColor: "bg-yellow-50 dark:bg-yellow-950",
+      tenant: true,
+      admin: true,
+      accountant: true,
     },
     {
       title: "Announcements",
@@ -57,48 +62,79 @@ export default function DashboardPage() {
       href: "/notifications/announcements",
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-50 dark:bg-purple-950",
-    },
-  ]
-
-  const mainSections = [
-    {
-      title: "Resident Management",
-      description: "Manage residents, apartments, and access control",
-      icon: Users,
-      href: "/residents/profiles",
-      items: [
-        { label: "Resident Profiles", href: "/residents/profiles" },
-        { label: "Apartment Directory", href: "/residents/apartments" },
-        { label: "Access Control", href: "/residents/access-control" },
-        { label: "Document Management", href: "/residents/documents" },
-      ],
+      tenant: true,
+      admin: true,
+      police: true,
+      accountant: true,
     },
     {
-      title: "Property Management",
-      description: "Track properties and lost items",
-      icon: Building2,
-      href: "/property",
-      items: [
-        { label: "Properties", href: "/property" },
-        { label: "Lost Property", href: "/property/lost-property" },
-      ],
+      title: "Access Control",
+      description: "Manage access permissions and security",
+      icon: Lock,
+      href: "/residents/access-control",
+      color: "text-red-600 dark:text-red-400",
+      bgColor: "bg-red-50 dark:bg-red-950",
+      tenant: true,
+      admin: true,
+      police: true,
     },
     {
-      title: "Reports & Analytics",
-      description: "View system reports and analytics",
+      title: "Document Management",
+      description: "View and manage resident documents",
+      icon: FileText,
+      href: "/residents/documents",
+      color: "text-indigo-600 dark:text-indigo-400",
+      bgColor: "bg-indigo-50 dark:bg-indigo-950",
+      tenant: true,
+      admin: true,
+      police: true,
+    },
+    {
+      title: "Lost Property",
+      description: "Report and track lost items",
+      icon: PackageSearch,
+      href: "/property/lost-property",
+      color: "text-orange-600 dark:text-orange-400",
+      bgColor: "bg-orange-50 dark:bg-orange-950",
+      tenant: true,
+      admin: true,
+      police: true,
+    },
+    {
+      title: "Security Reports",
+      description: "View security and access reports",
       icon: BarChart3,
-      href: "/reports/general",
-      items: [
-        { label: "General Reports", href: "/reports/general", admin: true },
-        { label: "Financial Reports", href: "/reports/financial", admin: true, accountant: true },
-        { label: "Security Reports", href: "/reports/security", admin: true, police: true },
-      ],
+      href: "/reports/security",
+      color: "text-cyan-600 dark:text-cyan-400",
+      bgColor: "bg-cyan-50 dark:bg-cyan-950",
+      admin: true,
+      police: true,
+    },
+    {
+      title: "Financial Reports",
+      description: "View financial analytics and reports",
+      icon: BarChart3,
+      href: "/reports/financial",
+      color: "text-emerald-600 dark:text-emerald-400",
+      bgColor: "bg-emerald-50 dark:bg-emerald-950",
+      admin: true,
+      accountant: true,
     },
   ]
 
-  const isAdmin = role === "admin"
-  const isPolice = role === "police"
-  const isAccountant = role === "accountant"
+  // Filter quick actions based on role (same logic as Sidebar.tsx)
+  const filteredActions = allQuickActions.filter((action) => {
+    return (
+      (!action.admin && !action.police && !action.accountant && !action.tenant) || // No restrictions
+      (action.admin && isAdmin) ||
+      (action.police && isPolice) ||
+      (action.accountant && isAccountant) ||
+      (action.tenant && isTenant)
+    )
+  })
+
+  // Limit to maximum 4 quick actions per role
+  const quickActions = filteredActions.slice(0, 4)
 
   if (!userId) {
     return null
