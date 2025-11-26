@@ -51,9 +51,9 @@ export function LoginForm({
         return
       }
 
-      const { userId, role } = response.data
+      const { userId, role, fullName } = response.data
 
-      setUser(userId, role)
+      setUser(userId, role, fullName)
       toast.success(response.message ?? "Login successful.")
       router.push("/dashboard")
     } catch (error) {

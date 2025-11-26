@@ -13,9 +13,10 @@ import { ThemeToggle } from "@/components/ThemeToggle"
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const [isSmallScreen, setIsSmallScreen] = useState(false)
-
+  const [fullName, setFullName] = useState("")
   useEffect(() => {
-    const { userId, role } = useUserStore.getState()
+    const { userId, role, fullName } = useUserStore.getState()
+    setFullName(fullName)
     if (userId && role && router.pathname === "/") {
       router.push("/feed")
     }
@@ -50,6 +51,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <div className="flex items-center gap-2 px-3">
               <SidebarTrigger />
               <ThemeToggle />
+              <span className="text-sm">Welcome back, {fullName}</span>
             </div>
           </header>
           <main>

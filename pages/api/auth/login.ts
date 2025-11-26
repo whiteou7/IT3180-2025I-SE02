@@ -8,6 +8,7 @@ import type { UserRole } from "@/types/enum"
 type LoginSuccess = {
   userId: string
   role: UserRole
+  fullName: string
 }
 
 export default async function handler(
@@ -35,9 +36,9 @@ export default async function handler(
     }
 
     const [user] = await db<
-      { userId: string; role: UserRole; password: string }[]
+      { userId: string; role: UserRole; password: string, fullName: string }[]
     >`
-      SELECT user_id, role, password
+      SELECT user_id, role, password, full_name
       FROM users
       WHERE email = ${email};
     `
@@ -64,6 +65,7 @@ export default async function handler(
       data: {
         userId: user.userId,
         role: user.role,
+        fullName: user.fullName,
       },
     })
   } catch (error) {
