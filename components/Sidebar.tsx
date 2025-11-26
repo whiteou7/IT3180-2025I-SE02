@@ -41,6 +41,7 @@ import { useUserStore } from "@/store/userStore"
 type SidebarSubItem = {
   title: string
   url: string
+  tenant?: boolean
   admin?: boolean
   police?: boolean
   accountant?: boolean
@@ -68,18 +69,28 @@ const data: { navMain: SidebarNavItem[] } = {
         {
           title: "Resident Profiles",
           url: "/residents/profiles",
+          tenant: true,
+          admin: true,
         },
         {
           title: "Apartment Directory",
           url: "/residents/apartments",
+          tenant: true,
+          admin: true,
         },
         {
           title: "Access Control",
           url: "/residents/access-control",
+          tenant: true,
+          admin: true,
+          police: true,
         },
         {
           title: "Document Management",
           url: "/residents/documents",
+          tenant: true,
+          admin: true,
+          police: true,
         },
         {
           title: "Residence Status",
@@ -96,10 +107,15 @@ const data: { navMain: SidebarNavItem[] } = {
         {
           title: "Properties",
           url: "/property",
+          tenant: true,
+          admin: true,
         },
         {
           title: "Lost Property",
           url: "/property/lost-property",
+          tenant: true,
+          admin: true,
+          police: true,
         },
       ],
     },
@@ -111,6 +127,9 @@ const data: { navMain: SidebarNavItem[] } = {
         {
           title: "Billing Center",
           url: "/billing",
+          tenant: true,
+          admin: true,
+          accountant: true,
         },
       ],
     },
@@ -122,6 +141,10 @@ const data: { navMain: SidebarNavItem[] } = {
         {
           title: "Public Announcements",
           url: "/notifications/announcements",
+          tenant: true,
+          admin: true,
+          police: true,
+          accountant: true,
         },
       ],
     },
@@ -133,6 +156,8 @@ const data: { navMain: SidebarNavItem[] } = {
         {
           title: "Service Catalog",
           url: "/services/catalog",
+          tenant: true,
+          admin: true,
         },
         {
           title: "Service Administration",
@@ -142,6 +167,8 @@ const data: { navMain: SidebarNavItem[] } = {
         {
           title: "Feedback",
           url: "/services/feedbacks",
+          tenant: true,
+          admin: true,
         },
       ],
     },
@@ -193,6 +220,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isAdmin = role === "admin"
   const isPolice = role === "police"
   const isAccountant = role === "accountant"
+  const isTenant = role === "tenant"
 
   const handleAuthAction = React.useCallback(() => {
     if (isLoggedIn) {
@@ -203,6 +231,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     router.push("/login")
   }, [isLoggedIn, clearUser, router])
+
+  // Helper function to check if a sub-item is accessible
+  const isSubItemAccessible = React.useCallback((subItem: SidebarSubItem) => {
+    return (
+      (!subItem.admin && !subItem.police && !subItem.accountant) || // No restrictions
+      (subItem.admin && isAdmin) ||
+      (subItem.police && isPolice) ||
+      (subItem.accountant && isAccountant) ||
+      (subItem.tenant && isTenant)
+    )
+  }, [isAdmin, isPolice, isAccountant, isTenant])
+
+  // Helper function to check if any child items are accessible
+  const hasAccessibleChildren = React.useCallback((items: SidebarSubItem[]) => {
+    return items.some(isSubItemAccessible)
+  }, [isSubItemAccessible])
 
   return (
     <Sidebar {...props} variant="inset">
@@ -233,6 +277,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 const hasItems = item.items && item.items.length > 0
               
                 if (hasItems && item.items) {
+                  // Only render parent item if at least one child is accessible
+                  if (!hasAccessibleChildren(item.items)) {
+                    return null
+                  }
+
                   return (
                     <SidebarMenuItem key={item.title}>
                       <Collapsible defaultOpen={false}>
@@ -247,12 +296,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           <SidebarMenuSub>
                             {item.items.map((subItem) => {
                               // Check if user has access based on role flags
-                              const hasAccess = 
-                                (!subItem.admin && !subItem.police && !subItem.accountant) || // No restrictions
-                                (subItem.admin && isAdmin) ||
-                                (subItem.police && isPolice) ||
-                                (subItem.accountant && isAccountant)
-                              return hasAccess && (
+                              if (!isSubItemAccessible(subItem)) {
+                                return null
+                              }
+                              return (
                                 <SidebarMenuSubItem key={subItem.title}>
                                   <SidebarMenuSubButton asChild>
                                     <Link href={subItem.url}>{subItem.title}</Link>

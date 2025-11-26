@@ -30,7 +30,7 @@ export default function DocumentManagementPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const { role, userId } = useUserStore()
-  const isAdmin = role === "admin"
+  const hasAllowedRole = role === "admin" || role === "police"
 
   useEffect(() => {
     let mounted = true
@@ -42,7 +42,7 @@ export default function DocumentManagementPage() {
         }
         let userList = response.data as User[]
         // Tenants can only see their own documents
-        if (!isAdmin) {
+        if (!hasAllowedRole) {
           userList = userList.filter((user) => user.userId === userId)
         }
         if (mounted) {
@@ -59,7 +59,7 @@ export default function DocumentManagementPage() {
     return () => {
       mounted = false
     }
-  }, [isAdmin, userId])
+  }, [hasAllowedRole, userId])
 
   useEffect(() => {
     if (!selectedUserId) return
@@ -130,7 +130,7 @@ export default function DocumentManagementPage() {
               Centralize personal, apartment, and legal documents for residents.
             </p>
           </div>
-          {isAdmin && (
+          {hasAllowedRole && (
             <Select value={selectedUserId} onValueChange={setSelectedUserId} disabled={!users.length}>
               <SelectTrigger className="w-full sm:w-64">
                 <SelectValue placeholder="Select resident" />

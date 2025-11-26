@@ -60,7 +60,7 @@ const statusBadges: Record<BillingStatus, { label: string; variant: "default" | 
 
 export default function BillingCenterPage() {
   const { userId, role } = useUserStore()
-  const isManager = role === "admin" || role === "accountant"
+  const hasAllowedRole = role === "admin" || role === "accountant"
   const [billings, setBillings] = useState<BillingSummary[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [statusFilter, setStatusFilter] = useState<BillingStatus | "all">("all")
@@ -72,7 +72,7 @@ export default function BillingCenterPage() {
   const [isPaying, setIsPaying] = useState(false)
 
   useEffect(() => {
-    if (isManager) {
+    if (hasAllowedRole) {
       ofetch("/api/users", { ignoreResponseError: true })
         .then((response) => {
           if (response?.success) {
@@ -81,14 +81,14 @@ export default function BillingCenterPage() {
         })
         .catch((error) => console.error(error))
     }
-  }, [isManager])
+  }, [hasAllowedRole])
 
   const fetchBillings = useCallback(async () => {
     if (!userId) return
     setIsLoading(true)
     try {
       const query: Record<string, string> = {}
-      if (!isManager) {
+      if (!hasAllowedRole) {
         query.userId = userId
       } else if (selectedUser && selectedUser !== "all") {
         query.userId = selectedUser
@@ -114,7 +114,7 @@ export default function BillingCenterPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [userId, isManager, selectedUser, statusFilter])
+  }, [userId, hasAllowedRole, selectedUser, statusFilter])
 
   useEffect(() => {
     fetchBillings()
@@ -341,7 +341,7 @@ export default function BillingCenterPage() {
                     </SelectContent>
                   </Select>
 
-                  {isManager && (
+                  {hasAllowedRole && (
                     <Select value={selectedUser} onValueChange={setSelectedUser}>
                       <SelectTrigger className="w-52">
                         <SelectValue placeholder="All residents" />

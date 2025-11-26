@@ -384,7 +384,7 @@ export default function ResidentProfilesPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList>
             <TabsTrigger value="residents">Residents</TabsTrigger>
-            <TabsTrigger value="special-accounts">Special Accounts</TabsTrigger>
+            {isAdmin && <TabsTrigger value="special-accounts">Special Accounts</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="residents" className="space-y-6">

@@ -40,7 +40,7 @@ export default function AccessControlPage() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const { role, userId } = useUserStore()
-  const isAdmin = role === "admin"
+  const hasAllowedRole = role === "admin" || role === "police"
 
   useEffect(() => {
     let active = true
@@ -53,7 +53,7 @@ export default function AccessControlPage() {
           queryParams.filter = queryFilter
         }
         // For residents, only fetch their own logs
-        if (!isAdmin && userId) {
+        if (!hasAllowedRole && userId) {
           queryParams.userId = userId
         }
         const response = await ofetch("/api/vehicles/checkin", {
@@ -80,7 +80,7 @@ export default function AccessControlPage() {
     return () => {
       active = false
     }
-  }, [filters.timeframe, isAdmin, userId])
+  }, [filters.timeframe, hasAllowedRole, userId])
 
   const filteredLogs = useMemo(() => {
     const query = filters.search.trim().toLowerCase()
