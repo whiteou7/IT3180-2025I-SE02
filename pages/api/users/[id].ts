@@ -22,12 +22,13 @@ export default async function handler(
   }
   try {
     if (req.method === "PUT") {
-      const { email, fullName, role, yearOfBirth, gender } = req.body as {
+      const { email, fullName, role, yearOfBirth, gender, phoneNumber } = req.body as {
         email: string;
         fullName: string;
         role: UserRole;
         yearOfBirth: number | null;
         gender: Gender | null;
+        phoneNumber?: string | null;
       }
 
       const updatedUser = await db<User[]>`
@@ -37,7 +38,8 @@ export default async function handler(
           full_name = ${fullName},
           role = ${role},
           year_of_birth = ${yearOfBirth ?? null},
-          gender = ${gender ?? null}
+          gender = ${gender ?? null},
+          phone_number = ${phoneNumber ?? null}
         WHERE user_id = ${userId}
         RETURNING 
           user_id,
@@ -46,6 +48,7 @@ export default async function handler(
           role,
           year_of_birth,
           gender,
+          phone_number,
           apartment_id;
       `
 
@@ -70,6 +73,7 @@ export default async function handler(
           role,
           year_of_birth,
           gender,
+          phone_number,
           apartment_id
         FROM users
         WHERE user_id = ${userId};

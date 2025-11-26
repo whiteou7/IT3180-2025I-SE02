@@ -7,5 +7,6 @@ export type User = {
   role: UserRole
   yearOfBirth: number | null
   gender: Gender | null
+  phoneNumber: string | null
   apartmentId?: number | null
 }
