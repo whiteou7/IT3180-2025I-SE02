@@ -7,6 +7,7 @@ CREATE TYPE service_category AS ENUM ('cleaning', 'maintenance', 'utilities', 'a
 CREATE TYPE gender AS ENUM ('male', 'female');
 CREATE TYPE role AS ENUM ('tenant', 'admin', 'police', 'accountant');
 CREATE TYPE billing_status AS ENUM ('unpaid', 'paid', 'deleted');
+CREATE TYPE feedback_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
 
 -- =========================================
 -- BUILDINGS
@@ -141,5 +142,24 @@ CREATE TABLE posts (
     post_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     content TEXT NOT NULL,
+    category TEXT DEFAULT 'general',
+    title TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- =========================================
+-- FEEDBACKS
+-- =========================================
+CREATE TABLE feedbacks (
+    feedback_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    tags TEXT[], -- Array of tags
+    status feedback_status DEFAULT 'open',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create index on user_id for faster queries
+CREATE INDEX idx_feedbacks_user_id ON feedbacks(user_id);
+CREATE INDEX idx_feedbacks_status ON feedbacks(status);

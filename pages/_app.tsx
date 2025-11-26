@@ -12,7 +12,6 @@ import { ThemeToggle } from "@/components/ThemeToggle"
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [fullName, setFullName] = useState("")
   useEffect(() => {
     const { userId, role, fullName } = useUserStore.getState()
@@ -21,26 +20,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       router.push("/feed")
     }
   }, [router])
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsSmallScreen(window.innerWidth < 768)
-    }
-
-    checkScreenSize()
-    window.addEventListener("resize", checkScreenSize)
-    return () => window.removeEventListener("resize", checkScreenSize)
-  }, [])
-
-  if (isSmallScreen) {
-    return (
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <div className="flex items-center justify-center h-screen text-center p-6">
-          <p>Please view the app on desktop screen thanks:3</p>
-        </div>
-      </ThemeProvider>
-    )
-  }
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

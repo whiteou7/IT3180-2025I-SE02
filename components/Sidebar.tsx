@@ -123,8 +123,8 @@ const data = {
           url: "/notifications/announcements",
         },
         {
-          title: "Direct Messages",
-          url: "/notifications/messages",
+          title: "Feedback",
+          url: "/notifications/feedbacks",
         },
       ],
     },

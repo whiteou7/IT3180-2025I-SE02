@@ -44,7 +44,7 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 │                                     │
 │  📢 EP4 - Notifications             │
 │    ├─ Public Announcements          │
-│    └─ Direct Messages               │
+│    └─ Feedback                │
 │                                     │
 │  🛠️ EP5 - Building Services         │
 │    ├─ Service Booking               │
@@ -474,24 +474,16 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 - Announcement cards:
   - Title
   - Category badge
-  - Author (BQT)
+  - Author
   - Publish date
-  - Priority indicator
   - Content preview
   - Read more button
 - Announcement detail view:
   - Full content
-  - Attachments
-  - Related announcements
-  - Comments section (if enabled)
-- Create announcement (Admin):
+- Create announcement (Everyone):
   - Title
   - Category
-  - Content (rich text editor)
-  - Priority
-  - Target audience (All, Specific apartments)
-  - Schedule publish date
-  - Attachments
+  - Content (written in markdown)
   - Publish button
 
 **Content:**
@@ -504,43 +496,32 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 ---
 
-#### 5.2 Direct Messages
+#### 5.2 Feedback
 
-**Route:** `/notifications/messages`  
+**Route:** `/notifications/feedbacks`  
 **Access:** All roles  
-**Layout:** Messaging interface
+**Layout:** Feedback list with search and filters
+**Description:** Feedback is a way for residents to give feedback to the building management. It is meant to be a private communication channel.
 
 **Components:**
-- Message list sidebar:
-  - Conversation list
-  - Unread count badges
-  - Search conversations
-- Message thread view:
-  - Participant info
-  - Message history (scrollable)
-  - Message input area
-  - Send button
-  - Attachment button
-- New message button:
-  - Recipient selector (Residents see BQT, Admin sees all)
-  - Subject
-  - Message content
-  - Send button
-- Message notifications:
-  - Unread indicator
-  - Notification badge
-  - Email notifications (optional)
+- Feedback list:
+  - Show all feedbacks for admin
+  - For residents, show only their feedbacks
+  - Feedback ID
+  - Feedback content
+  - Feedback date
+  - Feedback tags
+  - Feedback status (Open, In Progress, Resolved, Closed)
 
 **Content:**
-- Private messaging (US-016)
-- BQT-Resident communication
-- Message history
+- Feedback collection
+- Feedback management 
 
-**User Stories:** US-016
+**User Stories:** US-016, US-019
 
 ---
 
-### 6. EP5 - Building Services
+### 6. EP5 - Services
 
 #### 6.1 Service Booking
 
