@@ -30,6 +30,10 @@ export default async function handler(
         u.full_name,
         MAX(b.billing_status) as billing_status, 
         MAX(b.used_at) as used_at,
+        MAX(b.due_date) as due_date,
+        MIN(b.period_start) as period_start,
+        MAX(b.period_end) as period_end,
+        MAX(b.paid_at) as paid_at,
         json_agg(
           json_build_object(
             'serviceId', s.service_id,
@@ -37,7 +41,7 @@ export default async function handler(
             'price', s.price,
             'tax', s.tax,
             'description', s.description
-          )
+          ) ORDER BY s.service_id
         ) as services
       FROM billings b
       JOIN users u ON b.user_id = u.user_id
@@ -60,7 +64,12 @@ export default async function handler(
         billingId: row.billingId,
         userId: row.userId,
         fullName: row.fullName,
-        totalPrice: totalPrice,
+        totalPrice,
+        billingStatus: row.billingStatus,
+        dueDate: row.dueDate,
+        periodStart: row.periodStart,
+        periodEnd: row.periodEnd,
+        paidAt: row.paidAt,
         
         services: servicesList.map((s: RawServiceFromDB): BillingService => ({
           serviceId: s.serviceId,    

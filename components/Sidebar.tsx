@@ -89,25 +89,27 @@ const data = {
       ],
     },
     {
-      title: "Fee Collection",
+      title: "Services",
       url: "#",
       icon: DollarSign,
       items: [
         {
-          title: "Service Bills",
-          url: "/billing/bills",
+          title: "Service Catalog",
+          url: "/services/catalog",
         },
         {
-          title: "Payment Processing",
-          url: "/billing/payments",
+          title: "Billing Center",
+          url: "/services/billing",
         },
         {
-          title: "Invoice Management",
-          url: "/billing/invoices",
+          title: "Service Administration",
+          url: "/services/manage",
+          admin: true,
         },
         {
           title: "Financial Reports",
-          url: "/billing/reports",
+          url: "/services/reports",
+          admin: true,
         },
       ],
     },

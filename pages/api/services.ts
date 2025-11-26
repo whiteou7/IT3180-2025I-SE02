@@ -2,12 +2,15 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Service } from "@/types/services"
+import type { ServiceCategory } from "@/types/enum"
 
 type CreateServiceBody = {
-  serviceName: string;
-  price: number;
-  description?: string | null;
-  tax: number;
+  serviceName: string
+  price: number
+  description?: string | null
+  tax: number
+  category?: ServiceCategory
+  isAvailable?: boolean
 }
 
 /**
@@ -22,21 +25,41 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
+      const categoryFilter = Array.isArray(req.query.category) ? req.query.category[0] : req.query.category
+      const searchTerm = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search
+      const availabilityFilter = Array.isArray(req.query.availability) ? req.query.availability[0] : req.query.availability
       const services = await db<Service[]>`
         SELECT 
           service_id,
           service_name,
           price,
           description,
-          tax
+          tax,
+          category,
+          is_available,
+          updated_at
         FROM services
         ORDER BY service_id;
       `
 
+      const filtered = services.filter((service) => {
+        const matchesCategory =
+          !categoryFilter || categoryFilter === "all" || service.category === categoryFilter
+        const matchesAvailability =
+          availabilityFilter === undefined ||
+          availabilityFilter === "" ||
+          (availabilityFilter === "available" ? service.isAvailable : !service.isAvailable)
+        const matchesSearch =
+          !searchTerm ||
+          service.serviceName.toLowerCase().includes(String(searchTerm).toLowerCase()) ||
+          (service.description ?? "").toLowerCase().includes(String(searchTerm).toLowerCase())
+        return matchesCategory && matchesAvailability && matchesSearch
+      })
+
       return res.status(200).json({
         success: true,
         message: "Services fetched successfully.",
-        data: services,
+        data: filtered,
       })
     } catch (error) {
       console.error("Error fetching services:", error)
@@ -54,6 +77,8 @@ export default async function handler(
         price,
         description = null,
         tax,
+        category = "other",
+        isAvailable = true,
       } = req.body as CreateServiceBody
 
       if (
@@ -84,9 +109,21 @@ export default async function handler(
         })
       }
 
+      const allowedCategories: ServiceCategory[] = ["cleaning", "maintenance", "utilities", "amenities", "other"]
+      const normalizedCategory: ServiceCategory = allowedCategories.includes(category)
+        ? category
+        : "other"
+
       const [newService] = await db<{ serviceId: number }[]>`
-        INSERT INTO services (service_name, price, description, tax)
-        VALUES (${serviceName}, ${parsedPrice}, ${description}, ${parsedTax})
+        INSERT INTO services (service_name, price, description, tax, category, is_available)
+        VALUES (
+          ${serviceName},
+          ${parsedPrice},
+          ${description},
+          ${parsedTax},
+          ${normalizedCategory},
+          ${Boolean(isAvailable)}
+        )
         RETURNING service_id;
       `
 

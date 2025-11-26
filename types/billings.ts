@@ -1,3 +1,5 @@
+import type { BillingStatus } from "./enum"
+
 export type BillingService = {
   serviceId: number
   serviceName: string
@@ -12,6 +14,25 @@ export type BillingDetail = {
   fullName: string
   services: BillingService[]
   totalPrice: number
+  billingStatus: BillingStatus
+  dueDate: string
+  periodStart: string
+  periodEnd: string
+  paidAt?: string | null
+}
+
+export type BillingSummary = {
+  billingId: string
+  userId: string
+  fullName: string
+  billingStatus: BillingStatus
+  dueDate: string
+  periodStart: string
+  periodEnd: string
+  paidAt?: string | null
+  totalAmount: number
+  serviceCount: number
+  services: BillingService[]
 }
 
 export type TaxReport = {

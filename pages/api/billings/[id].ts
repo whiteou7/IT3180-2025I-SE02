@@ -19,6 +19,10 @@ export default async function handler(
           b.user_id,
           b.billing_status,
           b.used_at,
+          b.due_date,
+          b.period_start,
+          b.period_end,
+          b.paid_at,
           u.full_name,
           s.service_id,
           s.service_name,
@@ -48,6 +52,11 @@ export default async function handler(
         userId: firstRow.userId,              
         fullName: firstRow.fullName,          
         totalPrice: totalPrice,
+        billingStatus: firstRow.billingStatus as BillingDetail["billingStatus"],
+        dueDate: firstRow.dueDate,
+        periodStart: firstRow.periodStart,
+        periodEnd: firstRow.periodEnd,
+        paidAt: firstRow.paidAt ?? null,
         
         services: result.map(row => ({
           serviceId: row.serviceId,
@@ -68,7 +77,8 @@ export default async function handler(
     else if (req.method === "PUT") {
       const updated = await db`
         UPDATE billings 
-        SET billing_status = 'paid'
+        SET billing_status = 'paid',
+            paid_at = NOW()
         WHERE billing_id = ${id as string}
         RETURNING billing_id
       `

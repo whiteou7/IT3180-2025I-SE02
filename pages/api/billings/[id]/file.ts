@@ -46,6 +46,10 @@ export default async function handler(
       description: string | null
       tax: number
       billingStatus: string
+      dueDate: string
+      periodStart: string
+      periodEnd: string
+      paidAt: string | null
     }[]>`
       SELECT 
         b.billing_id,
@@ -56,37 +60,38 @@ export default async function handler(
         s.price,
         s.description,
         s.tax,
-        b.billing_status
+        b.billing_status,
+        b.due_date,
+        b.period_start,
+        b.period_end,
+        b.paid_at
       FROM billings b
       JOIN users u ON u.user_id = b.user_id
       JOIN services s ON s.service_id = b.service_id
-      WHERE b.billing_id = ${id}
-        AND b.billing_status = 'unpaid';
+      WHERE b.billing_id = ${id};
     `
 
     if (rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No unpaid billings found for this billing ID",
+        message: "No billings found for this billing ID",
       })
     }
 
     const userInfo = rows[0]
 
-    const services: BillingService[] = rows.map((row: (typeof rows)[number]) => {
-      const price = Number(row.price)
-      const taxAmount = Number((price * 0.08).toFixed(2))
-      return {
-        serviceId: row.serviceId,
-        serviceName: row.serviceName,
-        price,
-        description: row.description,
-        tax: taxAmount,
-      }
-    })
+    const services: BillingService[] = rows.map((row: (typeof rows)[number]) => ({
+      serviceId: row.serviceId,
+      serviceName: row.serviceName,
+      price: Number(row.price),
+      description: row.description,
+      tax: Number(row.tax),
+    }))
 
-    const baseTotal = services.reduce((sum, service) => sum + service.price, 0)
-    const totalPrice = Number((baseTotal * 1.08).toFixed(2))
+    const totalPrice = services.reduce((sum, service) => {
+      const taxAmount = (service.price * service.tax) / 100
+      return sum + service.price + taxAmount
+    }, 0)
 
     const billing: BillingDetail = {
       billingId: userInfo.billingId,
@@ -94,14 +99,18 @@ export default async function handler(
       fullName: userInfo.fullName,
       services,
       totalPrice,
+      billingStatus: userInfo.billingStatus as BillingDetail["billingStatus"],
+      dueDate: userInfo.dueDate,
+      periodStart: userInfo.periodStart,
+      periodEnd: userInfo.periodEnd,
+      paidAt: userInfo.paidAt,
     }
 
     const tmpFileName = `invoice-${billing.userId}-${Date.now()}.pdf`
     const tmpFilePath = path.join(os.tmpdir(), tmpFileName)
 
     const invoiceDate = new Date()
-    const dueDate = new Date(invoiceDate)
-    dueDate.setMonth(dueDate.getMonth() + 1)
+    const dueDate = billing.dueDate ? new Date(billing.dueDate) : new Date(invoiceDate)
 
     const invoicePayload = {
       company: {
@@ -114,7 +123,7 @@ export default async function handler(
         number: billing.billingId,
         date: invoiceDate.toISOString().slice(0, 10),
         dueDate: dueDate.toISOString().slice(0, 10),
-        status: "UNPAID",
+        status: billing.billingStatus.toUpperCase(),
         path: tmpFilePath,
         currency: "USD",
         locale: "en-US",
@@ -124,7 +133,7 @@ export default async function handler(
         description: s.description ?? "",
         quantity: 1,
         price: s.price,
-        tax: 8,
+        tax: s.tax,
       })),
       qr: {
         data: billing.billingId,

@@ -2,16 +2,19 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Service } from "@/types/services"
+import type { ServiceCategory } from "@/types/enum"
 
 type UpsertBody = {
-  serviceName: string;
-  price: number;
-  description?: string | null;
-  tax: number;
+  serviceName: string
+  price: number
+  description?: string | null
+  tax: number
+  category?: ServiceCategory
+  isAvailable?: boolean
 }
 
 type DeleteBody = {
-  serviceId: number;
+  serviceId: number
 }
 
 function parseServiceId(idParam: string | string[] | undefined) {
@@ -44,7 +47,10 @@ export default async function handler(
           service_name,
           price,
           description,
-          tax
+          tax,
+          category,
+          is_available,
+          updated_at
         FROM services
         WHERE service_id = ${serviceId};
       `
@@ -69,6 +75,8 @@ export default async function handler(
         price,
         description = null,
         tax,
+        category = "other",
+        isAvailable = true,
       } = req.body as UpsertBody
 
       if (
@@ -99,20 +107,30 @@ export default async function handler(
         })
       }
 
+      const allowedCategories: ServiceCategory[] = ["cleaning", "maintenance", "utilities", "amenities", "other"]
+      const normalizedCategory: ServiceCategory =
+        category && allowedCategories.includes(category) ? category : "other"
+
       const updatedService = await db<Service[]>`
         UPDATE services
         SET 
           service_name = ${serviceName},
           price = ${parsedPrice},
           description = ${description},
-          tax = ${parsedTax}
+          tax = ${parsedTax},
+          category = ${normalizedCategory},
+          is_available = ${Boolean(isAvailable)},
+          updated_at = NOW()
         WHERE service_id = ${serviceId}
         RETURNING 
           service_id,
           service_name,
           price,
           description,
-          tax;
+          tax,
+          category,
+          is_available,
+          updated_at;
       `
 
       if (updatedService.length === 0) {

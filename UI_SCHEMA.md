@@ -37,9 +37,9 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 │    └─ Lost Property Report          │
 │                                     │
 │  💰 EP3 - Fee Collection            │
-│    ├─ Service Bills                 │
-│    ├─ Payment Processing            │
-│    ├─ Invoice Management            │
+│    ├─ Service Catalog & Cart        │
+│    ├─ Billing & Invoice Center      │
+│    ├─ Service Administration        │
 │    └─ Financial Reports             │
 │                                     │
 │  📢 EP4 - Notifications             │
@@ -328,125 +328,102 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 
 ### 4. EP3 - Fee Collection
 
-#### 4.1 Service Bills
+#### 4.1 Service Catalog & Cart
 
-**Route:** `/billing/bills`  
-**Access:** Residents (own bills), Admin, Accountant (all bills)  
-**Layout:** Bill list with payment interface
+**Route:** `/services/catalog`  
+**Access:** Residents (browse/add/pay), Admin (view)  
+**Layout:** Service marketplace with cart drawer and checkout lane
 
 **Components:**
-- Bill summary cards:
-  - Total pending amount
-  - Overdue bills count
-  - This month's bills
-- Bill list table:
-  - Bill number
-  - Service type
-  - Period (month/year)
-  - Amount
-  - Due date
-  - Status badge (Paid, Pending, Overdue)
-  - Actions (View, Pay, Download)
-- Bill detail view:
-  - Bill breakdown
-  - Service charges list
-  - Payment history
-  - Invoice PDF download
-  - Payment button
-- Filters:
-  - Status filter
-  - Date range
-  - Service type
-- Export button (Accountant, Admin)
+- Service filters:
+  - Category tabs (Cleaning, Maintenance, Utilities, Amenities)
+  - Search bar and price range slider
+- Service cards:
+  - Name, description, duration, price, availability status
+  - `Add to cart` button with quantity selector
+- Cart drawer:
+  - Selected services list with editable quantity
+  - Subtotal, tax/fee breakdown, promo code input
+  - `Proceed to payment` button launching checkout modal
+- Checkout modal:
+  - Selected services summary
+  - Payment method selector (Bank transfer, Card, E-wallet)
+  - Billing contact info and optional notes
+  - Confirmation + success toast
+- Order history snippet for quick rebooking
 
 **Content:**
-- Service bill display (US-014)
-- Bill status tracking (US-012)
-- Payment history
+- Tenant-facing service discovery (US-005, US-007)
+- Shopping cart + checkout workflow
+- Real-time availability updates
+
+**User Stories:** US-005, US-007
+
+---
+
+#### 4.2 Billing & Invoice Center
+
+**Route:** `/services/billing`  
+**Access:** Residents (own bills), Admin (all bills)  
+**Layout:** Unified billing dashboard with detail drawer
+
+**Components:**
+- Billing overview cards (Total due, Upcoming due date, Paid this month)
+- Bill list table:
+  - Bill number, service bundle, period, amount, due date, status
+  - Bulk select for multi-bill payment
+- Bill detail drawer:
+  - Charge breakdown, adjustments, previous payments
+  - `Pay selected bill` action
+  - `Generate invoice` button producing PDF/email
+- Payment panel:
+  - Supports partial payments and stored methods
+  - Upload receipt + reference ID for manual proofs
+- Invoice history:
+  - Download links, resend via email, status badges
+- Filters and export (Admin only)
+
+**Content:**
+- Tenant bill tracking + payment execution (US-012, US-014)
+- Instant invoice generation per payment
+- Admin visibility on every bill
 
 **User Stories:** US-012, US-014
 
 ---
 
-#### 4.2 Payment Processing
+#### 4.3 Service Administration
 
-**Route:** `/billing/payments`  
-**Access:** Residents (make payments), Admin, Accountant (view all)  
-**Layout:** Payment interface with transaction history
-
-**Components:**
-- Payment form:
-  - Bill selector (if multiple pending)
-  - Payment method selector:
-    - Bank transfer
-    - Credit card
-    - E-wallet
-    - Cash (Admin only)
-  - Amount input
-  - Payment reference/transaction ID
-  - Receipt upload (optional)
-  - Submit payment button
-- Payment history table:
-  - Transaction ID
-  - Bill reference
-  - Amount
-  - Payment method
-  - Payment date
-  - Status
-  - Receipt download
-- Payment confirmation modal
-- Online payment integration (if applicable)
-
-**Content:**
-- Online payment interface (US-005)
-- Payment processing workflow
-- Transaction records
-
-**User Stories:** US-005
-
----
-
-#### 4.3 Invoice Management
-
-**Route:** `/billing/invoices`  
-**Access:** Residents (own invoices), Admin, Accountant (all)  
-**Layout:** Invoice list with generation tools
+**Route:** `/services/manage`  
+**Access:** Admin  
+**Layout:** Admin workspace with CRUD grid and bill ledger
 
 **Components:**
-- Invoice list with search:
-  - Invoice number
-  - Resident name
-  - Apartment
-  - Amount
-  - Issue date
-  - Status
-  - Actions (View, Download, Email)
-- Invoice generation (Admin, Accountant):
-  - Auto-generation settings
-  - Manual invoice creation
-  - Template selector
-- Invoice detail view:
-  - Full invoice display
-  - PDF preview
-  - Email send button
-  - Print button
-- Bulk operations:
-  - Bulk email
-  - Bulk download
-  - Bulk print
+- Service list DataTable:
+  - Columns: Service name, category, price, availability, last updated
+  - Actions: View, Edit, Duplicate, Delete
+- Service editor modal:
+  - Form fields for metadata, pricing tiers, capacity windows, attachments
+  - Publish/unpublish toggle with preview
+- New service wizard with validation and draft saving
+- Bill ledger tab:
+  - All bills generated from service orders
+  - Filters by resident, status, period
+  - Inline link to billing detail page
+- Audit log of service changes
 
 **Content:**
-- Invoice generation (US-014)
-- Invoice export (US-015)
-- Email notifications (US-023)
+- Admin CRUD for catalog (US-004, US-007)
+- End-to-end visibility on every bill raised from services
+- Governance trail for compliance
 
-**User Stories:** US-014, US-015, US-023
+**User Stories:** US-004, US-007
 
 ---
 
 #### 4.4 Financial Reports
 
-**Route:** `/billing/reports`  
+**Route:** `/services/reports`  
 **Access:** Admin, Accountant  
 **Layout:** Report dashboard with charts
 
@@ -473,7 +450,7 @@ The sidebar provides hierarchical navigation organized by epics. Each epic conta
 **Content:**
 - Financial report generation (US-013)
 - Tax report export (US-015)
-- Data visualization
+- Data visualization for Accountant/Admin review
 
 **User Stories:** US-013, US-015, US-018
 

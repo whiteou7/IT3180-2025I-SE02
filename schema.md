@@ -3,6 +3,7 @@
 -- =========================================
 CREATE TYPE progression_status AS ENUM ('pending', 'rejected', 'in_progress', 'completed', 'deleted');
 CREATE TYPE property_status AS ENUM ('found', 'not found', 'deleted');
+CREATE TYPE service_category AS ENUM ('cleaning', 'maintenance', 'utilities', 'amenities', 'other');
 CREATE TYPE gender AS ENUM ('male', 'female');
 CREATE TYPE role AS ENUM ('tenant', 'admin', 'police', 'accountant');
 CREATE TYPE billing_status AS ENUM ('unpaid', 'paid', 'deleted');
@@ -50,7 +51,10 @@ CREATE TABLE services (
     service_name TEXT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     description TEXT,
-    tax INT NOT NULL
+    tax INT NOT NULL,
+    category service_category DEFAULT 'other',
+    is_available BOOLEAN DEFAULT TRUE,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =========================================
@@ -97,7 +101,11 @@ CREATE TABLE billings (
     service_id INT NOT NULL REFERENCES services(service_id) ON DELETE CASCADE,
     user_id TEXT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    billing_status billing_status DEFAULT 'unpaid'
+    billing_status billing_status DEFAULT 'unpaid',
+    due_date TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL '15 days'),
+    period_start TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    period_end TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL '30 days'),
+    paid_at TIMESTAMP
 );
 
 -- =========================================
