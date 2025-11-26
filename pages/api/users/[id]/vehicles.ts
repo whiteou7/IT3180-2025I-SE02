@@ -4,7 +4,7 @@ import type { APIBody } from "@/types/api"
 import { Vehicle } from "@/types/properties"
 
 /**
- * GET /api/users/[id]/vehicle-info - Get vehicle info and logs for a user
+ * GET /api/users/[id]/vehicles - Get vehicle info and logs for a user
  */
 export default async function handler(
   req: NextApiRequest,
@@ -56,10 +56,11 @@ export default async function handler(
       data: vehicle,
     })
   } catch (error) {
-    console.error("Error in /api/users/[id]/vehicle-info:", error)
+    console.error("Error in /api/users/[id]/vehicles:", error)
     return res.status(500).json({
       success: false,
       message: (error as Error).message,
     })
   }
 }
+

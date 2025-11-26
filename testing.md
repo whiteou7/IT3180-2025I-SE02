@@ -413,12 +413,12 @@ POST http://localhost:3000/api/users/[userId]/vehicle/checkin
 
 ---
 
-#### GET /api/users/[id]/vehicle-info
+#### GET /api/users/[id]/vehicles
 **Get Vehicle Information**
 
 **Request:**
 ```
-GET http://localhost:3000/api/users/[userId]/vehicle-info
+GET http://localhost:3000/api/users/[userId]/vehicles
 ```
 
 **Expected Response:**

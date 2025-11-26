@@ -58,7 +58,7 @@ export default function AccessControlPage() {
     const checkVehicle = async () => {
       try {
         const res = await ofetch<APIBody<Vehicle>>(
-          `/api/users/${userId}/vehicle-info`,
+          `/api/users/${userId}/vehicles`,
           {
             ignoreResponseError: true,
           }

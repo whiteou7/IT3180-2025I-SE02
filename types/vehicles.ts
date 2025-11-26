@@ -12,7 +12,7 @@ export type VehicleLog = {
   floor: number | null;
 };
 
-type Vehicle = {
+export type Vehicle = {
   vehicleId: number
   propertyId: number
   licensePlate: string

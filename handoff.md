@@ -240,7 +240,7 @@ Register vehicle for user
 Toggle vehicle entry/exit
 - **Response**: `{ success, message, data: { time } }`
 
-#### `GET /api/users/[id]/vehicle-info`
+#### `GET /api/users/[id]/vehicles`
 Get vehicle information
 - **Response**: `{ success, message, data: { vehicleId, propertyId, licensePlate } }`
 

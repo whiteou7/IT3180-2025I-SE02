@@ -7,20 +7,14 @@ import { toast } from "sonner"
 import { APIBody } from "@/types/api"
 import { useUserStore } from "@/store/userStore"
 import { useRouter } from "next/router"
-import { VehicleLog } from "@/types/vehicles"
-
-type VehicleInfo = {
-  vehicleId: number
-  propertyId: number
-  licensePlate: string
-}
+import { Vehicle, VehicleLog } from "@/types/vehicles"
 
 type CheckInStatus = "idle" | "checking" | "success" | "error"
 
 export default function VehicleCheckInDemo() {
   const { userId } = useUserStore()
   const router = useRouter()
-  const [vehicleInfo, setVehicleInfo] = useState<VehicleInfo | null>(null)
+  const [vehicleInfo, setVehicleInfo] = useState<Vehicle | null>(null)
   const [checkInStatus, setCheckInStatus] = useState<CheckInStatus>("idle")
   const [lastCheckInTime, setLastCheckInTime] = useState<string | null>(null)
   const [isInside, setIsInside] = useState<boolean>(false)
@@ -31,8 +25,8 @@ export default function VehicleCheckInDemo() {
     if (!userId) return
     setLoading(true)
     try {
-      const res = await ofetch<APIBody<VehicleInfo>>(
-        `/api/users/${userId}/vehicle-info`,
+      const res = await ofetch<APIBody<Vehicle>>(
+        `/api/users/${userId}/vehicles`,
         {
           ignoreResponseError: true,
         }
