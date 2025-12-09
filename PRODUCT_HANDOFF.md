@@ -1,4 +1,4 @@
-# Product Handoff Documentation - BlueMoon
+# Product Handoff Documentation
 
 ## Mục lục
 
@@ -14,7 +14,7 @@
 ## 1. Project Overview (Tổng quan dự án)
 
 ### Tên dự án
-**BlueMoon - Hệ thống Quản lý Chung cư**
+**Hệ thống Quản lý Chung cư**
 
 ### Mục tiêu
 Cung cấp giải pháp quản lý toàn diện cho cư dân, ban quản lý và đội ngũ an ninh trong khu chung cư, hỗ trợ các hoạt động vận hành hàng ngày và quản lý tài chính.

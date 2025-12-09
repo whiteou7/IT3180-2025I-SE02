@@ -409,7 +409,7 @@ export function PropertyReportSheet({ report, open, onOpenChange }: PropertyRepo
           <SheetDescription>Complete audit trail for the selected property.</SheetDescription>
         </SheetHeader>
         {report ? (
-          <div className="space-y-6">
+          <div className="space-y-6 mx-4">
             <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
               <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 Status

@@ -417,7 +417,7 @@ export default function ServiceCatalogPage() {
             <SheetDescription>Review bundled services before generating a bill.</SheetDescription>
           </SheetHeader>
 
-          <div className="flex-1 space-y-4 overflow-y-auto">
+          <div className="flex-1 space-y-4 overflow-y-auto mx-4">
             {cartEntries.length ? (
               cartEntries.map((entry) => (
                 <div key={entry.service.serviceId} className="rounded-xl border p-4">

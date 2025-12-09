@@ -227,184 +227,89 @@ export default function GeneralReportsPage() {
         </div>
 
         <AuthGate isAuthenticated={Boolean(userId)}>
-          <Tabs defaultValue="builder" className="w-full">
-            <TabsList>
-              <TabsTrigger value="builder">Report Builder</TabsTrigger>
-              <TabsTrigger value="templates">Templates</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="builder" className="space-y-6">
-              {/* Report Builder */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Report Builder</CardTitle>
-                  <CardDescription>
+          {/* Report Builder */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Report Builder</CardTitle>
+              <CardDescription>
                     Configure your custom report
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label>Data Source</Label>
-                      <Select
-                        value={dataSource}
-                        onValueChange={(value) => setDataSource(value as DataSource)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="residents">Residents</SelectItem>
-                          <SelectItem value="apartments">Apartments</SelectItem>
-                          <SelectItem value="services">Services</SelectItem>
-                          <SelectItem value="documents">Documents</SelectItem>
-                          <SelectItem value="billings">Billings</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Data Source</Label>
+                  <Select
+                    value={dataSource}
+                    onValueChange={(value) => setDataSource(value as DataSource)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="residents">Residents</SelectItem>
+                      <SelectItem value="apartments">Apartments</SelectItem>
+                      <SelectItem value="services">Services</SelectItem>
+                      <SelectItem value="documents">Documents</SelectItem>
+                      <SelectItem value="billings">Billings</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-                  <Button onClick={generateReport} disabled={isLoading} className="w-full sm:w-auto">
-                    <BarChart3 className="mr-2 size-4" />
-                    {isLoading ? "Generating..." : "Generate Report"}
-                  </Button>
-                </CardContent>
-              </Card>
+              <Button onClick={generateReport} disabled={isLoading} className="w-full sm:w-auto">
+                <BarChart3 className="mr-2 size-4" />
+                {isLoading ? "Generating..." : "Generate Report"}
+              </Button>
+            </CardContent>
+          </Card>
 
-              {/* Report Preview */}
-              {reportData.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle>Report Preview</CardTitle>
-                        <CardDescription>
-                          {reportData.length} records found
-                        </CardDescription>
-                      </div>
-                      <Button variant="outline" onClick={handleExportCSV}>
-                        <Download className="mr-2 size-4" />
-                        Export CSV
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="max-h-[500px]">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            {Object.keys(reportData[0] || {}).map((key) => (
-                              <TableHead key={key}>{key}</TableHead>
-                            ))}
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {reportData.slice(0, 100).map((row, index) => (
-                            <TableRow key={index}>
-                              {Object.values(row).map((value, cellIndex) => (
-                                <TableCell key={cellIndex}>
-                                  {typeof value === "object" ? JSON.stringify(value) : String(value)}
-                                </TableCell>
-                              ))}
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                      {reportData.length > 100 && (
-                        <div className="mt-4 text-center text-sm text-muted-foreground">
-                          Showing first 100 of {reportData.length} records
-                        </div>
-                      )}
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-
-            <TabsContent value="templates" className="space-y-6">
-              {/* Pre-built Templates */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pre-built Templates</CardTitle>
-                  <CardDescription>
-                    Quick report generation from templates
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Select Template</Label>
-                    <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a template" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {prebuiltTemplates.map((template) => (
-                          <SelectItem key={template.id} value={template.id}>
-                            {template.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {selectedTemplate && (
-                    <div className="rounded-md border p-4">
-                      {(() => {
-                        const template = prebuiltTemplates.find((t) => t.id === selectedTemplate)
-                        return (
-                          <>
-                            <h4 className="font-medium">{template?.name}</h4>
-                            <p className="text-muted-foreground text-sm mt-1">
-                              {template?.description}
-                            </p>
-                            <Button
-                              className="mt-4"
-                              onClick={() => {
-                                if (template) {
-                                  setDataSource(template.dataSource)
-                                  generateReport()
-                                }
-                              }}
-                            >
-                              Generate Report
-                            </Button>
-                          </>
-                        )
-                      })()}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Saved Templates */}
-              {savedTemplates.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Saved Templates</CardTitle>
+          {/* Report Preview */}
+          {reportData.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Report Preview</CardTitle>
                     <CardDescription>
-                      Your custom report templates
+                      {reportData.length} records found
                     </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {savedTemplates.map((template) => (
-                        <div
-                          key={template.id}
-                          className="flex items-center justify-between rounded-md border p-3"
-                        >
-                          <div>
-                            <p className="font-medium">{template.name}</p>
-                            <p className="text-muted-foreground text-sm">{template.description}</p>
-                          </div>
-                          <Badge>{template.dataSource}</Badge>
-                        </div>
+                  </div>
+                  <Button variant="outline" onClick={handleExportCSV}>
+                    <Download className="mr-2 size-4" />
+                        Export CSV
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      {Object.keys(reportData[0] || {}).map((key) => (
+                        <TableHead key={key}>{key}</TableHead>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-          </Tabs>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reportData.slice(0, 100).map((row, index) => (
+                      <TableRow key={index}>
+                        {Object.values(row).map((value, cellIndex) => (
+                          <TableCell key={cellIndex}>
+                            {typeof value === "object" ? JSON.stringify(value) : String(value)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {reportData.length > 100 && (
+                  <div className="mt-4 text-center text-sm text-muted-foreground">
+                          Showing first 100 of {reportData.length} records
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </AuthGate>
       </div>
     </>

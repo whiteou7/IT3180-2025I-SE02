@@ -187,67 +187,63 @@ export function ResidentProfilesTable({
   }
 
   return (
-    <div className="rounded-xl border bg-card/60 shadow-sm">
-      <ScrollArea className="max-h-[560px] rounded-xl">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Resident</TableHead>
-              <TableHead>Apartment</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Birth year</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {residents.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Resident</TableHead>
+          <TableHead>Apartment</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Birth year</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {residents.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={5} className="h-24 text-center">
                   No residents found for the current filters.
-                </TableCell>
-              </TableRow>
-            ) : (
-              residents.map((resident) => {
-                const apartmentLabel =
+            </TableCell>
+          </TableRow>
+        ) : (
+          residents.map((resident) => {
+            const apartmentLabel =
                   resident.apartmentNumber && resident.buildingId
                     ? `B${resident.buildingId} • #${resident.apartmentNumber}`
                     : resident.apartmentNumber
                       ? `#${resident.apartmentNumber}`
                       : "Unassigned"
-                return (
-                  <TableRow
-                    key={resident.userId}
-                    className="cursor-pointer"
-                    onClick={() => onSelectResident(resident)}
-                  >
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{resident.fullName}</span>
-                        <span className="text-muted-foreground text-xs">
-                          {resident.email}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {apartmentLabel}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={resident.status} />
-                    </TableCell>
-                    <TableCell className="capitalize">
-                      {resident.role === "tenant" ? "Resident" : resident.role === "admin" ? "Admin" : resident.role === "police" ? "Police" : "Accountant"}
-                    </TableCell>
-                    <TableCell>
-                      {resident.yearOfBirth ?? "—"}
-                    </TableCell>
-                  </TableRow>
-                )
-              })
-            )}
-          </TableBody>
-        </Table>
-      </ScrollArea>
-    </div>
+            return (
+              <TableRow
+                key={resident.userId}
+                className="cursor-pointer"
+                onClick={() => onSelectResident(resident)}
+              >
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{resident.fullName}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {resident.email}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="font-medium">
+                  {apartmentLabel}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={resident.status} />
+                </TableCell>
+                <TableCell className="capitalize">
+                  {resident.role === "tenant" ? "Resident" : resident.role === "admin" ? "Admin" : resident.role === "police" ? "Police" : "Accountant"}
+                </TableCell>
+                <TableCell>
+                  {resident.yearOfBirth ?? "—"}
+                </TableCell>
+              </TableRow>
+            )
+          })
+        )}
+      </TableBody>
+    </Table>
   )
 }
 
@@ -606,58 +602,54 @@ export function SpecialAccountsTable({
   }
 
   return (
-    <div className="rounded-xl border bg-card/60 shadow-sm">
-      <ScrollArea className="max-h-[560px] rounded-xl">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Birth year</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {accounts.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Phone</TableHead>
+          <TableHead>Birth year</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {accounts.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={5} className="h-24 text-center">
                   No special accounts found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              accounts.map((account) => (
-                <TableRow
-                  key={account.userId}
-                  className="cursor-pointer"
-                  onClick={() => onSelectAccount(account)}
-                >
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{account.fullName}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-muted-foreground text-sm">
-                      {account.email}
-                    </span>
-                  </TableCell>
-                  <TableCell className="capitalize">
-                    {account.role === "police" ? "Police" : "Accountant"}
-                  </TableCell>
-                  <TableCell>
-                    {account.phoneNumber ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    {account.yearOfBirth ?? "—"}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </ScrollArea>
-    </div>
+            </TableCell>
+          </TableRow>
+        ) : (
+          accounts.map((account) => (
+            <TableRow
+              key={account.userId}
+              className="cursor-pointer"
+              onClick={() => onSelectAccount(account)}
+            >
+              <TableCell>
+                <div className="flex flex-col">
+                  <span className="font-medium">{account.fullName}</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <span className="text-muted-foreground text-sm">
+                  {account.email}
+                </span>
+              </TableCell>
+              <TableCell className="capitalize">
+                {account.role === "police" ? "Police" : "Accountant"}
+              </TableCell>
+              <TableCell>
+                {account.phoneNumber ?? "—"}
+              </TableCell>
+              <TableCell>
+                {account.yearOfBirth ?? "—"}
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
   )
 }
 

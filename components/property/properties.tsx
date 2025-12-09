@@ -329,7 +329,7 @@ export function PropertyDetailSheet({ property, open, onOpenChange }: PropertyDe
           </SheetDescription>
         </SheetHeader>
         {property ? (
-          <ScrollArea className="pr-4">
+          <ScrollArea className="pr-4 mx-4">
             <div className="space-y-6">
               <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
                 <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">

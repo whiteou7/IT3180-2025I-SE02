@@ -181,6 +181,8 @@ export type StatusChangePayload = {
   apartmentId?: number
 }
 
+import { ofetch } from "ofetch"
+
 export function StatusChangeDialog({
   open,
   record,
@@ -192,6 +194,20 @@ export function StatusChangeDialog({
     status: record?.status ?? "unassigned",
     apartmentId: record?.apartmentId ?? undefined,
   })
+
+  const [apartments, setApartments] = React.useState<
+    { apartmentId: number; buildingId: number; apartmentNumber: number }[]
+  >([])
+
+  React.useEffect(() => {
+    if (open) {
+      ofetch("/api/apartments")
+        .then((res) => {
+          if (res?.data) setApartments(res.data)
+        })
+        .catch(() => {})
+    }
+  }, [open])
 
   React.useEffect(() => {
     if (record) {
@@ -223,15 +239,19 @@ export function StatusChangeDialog({
         <DialogHeader>
           <DialogTitle>Update assignment</DialogTitle>
           <DialogDescription>
-            Toggle whether the resident is linked to an apartment. Assignments call the apartment API.
+            Toggle whether the resident is linked to an apartment.
           </DialogDescription>
         </DialogHeader>
+
         {record ? (
           <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* resident info */}
             <div className="rounded-lg border bg-muted/20 p-3 text-sm">
               <p className="font-medium">{record.fullName}</p>
               <p className="text-muted-foreground text-xs">{apartmentLabel}</p>
             </div>
+
+            {/* status */}
             <div className="space-y-1">
               <label className="text-sm font-medium">Status</label>
               <Select
@@ -249,29 +269,46 @@ export function StatusChangeDialog({
                 </SelectContent>
               </Select>
             </div>
+
+            {/* apartment select */}
             {formState.status === "assigned" ? (
               <div className="space-y-1">
-                <label className="text-sm font-medium">Apartment ID</label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={formState.apartmentId?.toString() ?? ""}
-                  onChange={(event) =>
+                <label className="text-sm font-medium">Apartment</label>
+                <Select
+                  value={
+                    formState.apartmentId
+                      ? String(formState.apartmentId)
+                      : undefined
+                  }
+                  onValueChange={(value) =>
                     handleChange({
-                      apartmentId: event.target.value
-                        ? Number(event.target.value)
-                        : undefined,
+                      apartmentId: value ? Number(value) : undefined,
                     })
                   }
-                  placeholder="Enter apartment ID"
-                />
-                <p className="text-muted-foreground text-xs">
-                  Provide the numeric `apartment_id` defined in the schema.
-                </p>
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select apartment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {apartments.map((apt) => (
+                      <SelectItem
+                        key={apt.apartmentId}
+                        value={String(apt.apartmentId)}
+                      >
+                        B{apt.buildingId} • #{apt.apartmentNumber}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             ) : null}
+
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSaving}>

@@ -466,7 +466,7 @@ export default function BillingCenterPage() {
             </div>
           ) : (
             <>
-              <div className="rounded-xl border p-4 text-sm">
+              <div className="rounded-xl border mx-4 p-4 text-sm">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">Billing ID</p>
@@ -494,7 +494,7 @@ export default function BillingCenterPage() {
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 mx-4">
                 <h3 className="text-sm font-semibold">Services</h3>
                 {detail.services.map((service) => (
                   <div key={service.serviceId} className="rounded-lg border p-3 text-sm">
@@ -519,13 +519,13 @@ export default function BillingCenterPage() {
                 <Button
                   onClick={() => handleDownloadInvoice(detail.billingId)}
                   variant="outline"
-                  className="gap-2"
+                  className="gap-2 mx-4"
                 >
                   <FileText className="size-4" />
                   Generate invoice
                 </Button>
                 {detail.billingStatus === "unpaid" && (
-                  <Button onClick={() => handleMarkPaid(detail.billingId)} disabled={isPaying} className="gap-2">
+                  <Button onClick={() => handleMarkPaid(detail.billingId)} disabled={isPaying} className="gap-2 mx-4">
                     {isPaying ? (
                       <>
                         <Loader2 className="size-4 animate-spin" />

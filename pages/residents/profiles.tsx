@@ -393,11 +393,13 @@ export default function ResidentProfilesPage() {
             )}
 
             {filteredResidents.length ? (
-              <ResidentProfilesTable
-                residents={filteredResidents}
-                isLoading={isLoading}
-                onSelectResident={handleRowClick}
-              />
+              <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
+                <ResidentProfilesTable
+                  residents={filteredResidents}
+                  isLoading={isLoading}
+                  onSelectResident={handleRowClick}
+                />
+              </div>
             ) : isLoading ? null : (
               <ResidentEmptyState className="py-20" message="No resident matches the selected filters." />
             )}
@@ -434,11 +436,13 @@ export default function ResidentProfilesPage() {
             )}
 
             {filteredSpecialAccounts.length ? (
-              <SpecialAccountsTable
-                accounts={filteredSpecialAccounts}
-                isLoading={isLoading}
-                onSelectAccount={handleAccountClick}
-              />
+              <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
+                <SpecialAccountsTable
+                  accounts={filteredSpecialAccounts}
+                  isLoading={isLoading}
+                  onSelectAccount={handleAccountClick}
+                />
+              </div>
             ) : isLoading ? null : (
               <ResidentEmptyState className="py-20" message="No special accounts found." />
             )}

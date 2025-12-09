@@ -135,7 +135,7 @@ export default function SecurityReportsPage() {
           apartmentNumber: number | null
         }> }; message?: string }>("/api/vehicles/checkin", {
           query: {
-            filter: reportType === "daily" ? undefined : reportType === "weekly" ? "week" : "month",
+            filter: reportType === "daily" ? "daily" : reportType === "weekly" ? "week" : "month",
           },
           ignoreResponseError: true,
         }),
@@ -489,48 +489,46 @@ export default function SecurityReportsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ScrollArea className="max-h-[400px]">
-                      <Table>
-                        <TableHeader>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Resident</TableHead>
+                          <TableHead>Apartment</TableHead>
+                          <TableHead>License Plate</TableHead>
+                          <TableHead>Entry Time</TableHead>
+                          <TableHead>Exit Time</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {reportData.accessLogs.length === 0 ? (
                           <TableRow>
-                            <TableHead>Resident</TableHead>
-                            <TableHead>Apartment</TableHead>
-                            <TableHead>License Plate</TableHead>
-                            <TableHead>Entry Time</TableHead>
-                            <TableHead>Exit Time</TableHead>
-                            <TableHead>Status</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {reportData.accessLogs.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={6} className="text-center text-muted-foreground">
+                            <TableCell colSpan={6} className="text-center text-muted-foreground">
                                 No access events found
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          reportData.accessLogs.map((log) => (
+                            <TableRow key={log.vehicleLogId}>
+                              <TableCell>{log.fullName || "Unknown"}</TableCell>
+                              <TableCell>{log.apartmentNumber ? `#${log.apartmentNumber}` : "—"}</TableCell>
+                              <TableCell className="font-mono text-xs">{log.licensePlate || "—"}</TableCell>
+                              <TableCell>
+                                {new Date(log.entranceTime).toLocaleString()}
+                              </TableCell>
+                              <TableCell>
+                                {log.exitTime ? new Date(log.exitTime).toLocaleString() : "—"}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant={log.exitTime ? "secondary" : "default"}>
+                                  {log.exitTime ? "Exited" : "Inside"}
+                                </Badge>
                               </TableCell>
                             </TableRow>
-                          ) : (
-                            reportData.accessLogs.map((log) => (
-                              <TableRow key={log.vehicleLogId}>
-                                <TableCell>{log.fullName || "Unknown"}</TableCell>
-                                <TableCell>{log.apartmentNumber ? `#${log.apartmentNumber}` : "—"}</TableCell>
-                                <TableCell className="font-mono text-xs">{log.licensePlate || "—"}</TableCell>
-                                <TableCell>
-                                  {new Date(log.entranceTime).toLocaleString()}
-                                </TableCell>
-                                <TableCell>
-                                  {log.exitTime ? new Date(log.exitTime).toLocaleString() : "—"}
-                                </TableCell>
-                                <TableCell>
-                                  <Badge variant={log.exitTime ? "secondary" : "default"}>
-                                    {log.exitTime ? "Exited" : "Inside"}
-                                  </Badge>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </ScrollArea>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
                   </CardContent>
                 </Card>
               )}

@@ -361,11 +361,11 @@ export default function FinancialReportsPage() {
                     <XAxis dataKey="month" />
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} />
+                    <Line type="monotone" dataKey="revenue" stroke="var(--primary)" strokeWidth={2} />
                     <Line
                       type="monotone"
                       dataKey="outstanding"
-                      stroke="var(--color-outstanding)"
+                      stroke="var(--destructive)"
                       strokeWidth={2}
                     />
                   </LineChart>

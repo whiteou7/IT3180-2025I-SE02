@@ -22,7 +22,7 @@ export default async function handler(
   try {
     const { userId, filter } = req.query as {
       userId?: string;
-      filter?: "week" | "month" | "year";
+      filter?: "week" | "month" | "year" |"daily";
     }
     let baseQuery = db<VehicleLog[]>`
       SELECT 
@@ -60,6 +60,8 @@ export default async function handler(
       whereClauses.push(db`vl.entrance_time >= NOW() - '1 month'::interval`)
     } else if (filter === "year") {
       whereClauses.push(db`vl.entrance_time >= NOW() - '1 year'::interval`)
+    } else if (filter == "daily") {
+      whereClauses.push(db`vl.entrance_time >= NOW() - '1 day'::interval`)
     }
 
     if (whereClauses.length > 0) {

@@ -271,37 +271,35 @@ export function ApartmentDetailsDialog({
               </div>
               <Separator className="my-3" />
               {apartment.members?.length ? (
-                <ScrollArea className="max-h-60 pr-4">
-                  <div className="space-y-3">
-                    {apartment.members.map((member) => (
-                      <div
-                        key={member.userId}
-                        className="flex items-center justify-between rounded-lg border bg-card/50 p-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar className="size-9">
-                            <AvatarFallback>
-                              {member.fullName
-                                .split(" ")
-                                .slice(0, 2)
-                                .map((word) => word[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">
-                              {member.fullName}
-                            </p>
-                            <p className="text-muted-foreground text-xs">
-                              {member.email}
-                            </p>
-                          </div>
+                <div className="space-y-3">
+                  {apartment.members.map((member) => (
+                    <div
+                      key={member.userId}
+                      className="flex items-center justify-between rounded-lg border bg-card/50 p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar className="size-9">
+                          <AvatarFallback>
+                            {member.fullName
+                              .split(" ")
+                              .slice(0, 2)
+                              .map((word) => word[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {member.fullName}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {member.email}
+                          </p>
                         </div>
-                        <Badge variant="secondary">Primary resident</Badge>
                       </div>
-                    ))}
-                  </div>
-                </ScrollArea>
+                      <Badge variant="secondary">Primary resident</Badge>
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <div className="rounded-lg border border-dashed bg-muted/40 p-6 text-center text-sm text-muted-foreground">
                   No residents assigned yet.

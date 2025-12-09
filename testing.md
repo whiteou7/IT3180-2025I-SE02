@@ -1,7 +1,7 @@
 # Testing Documentation - Apartment Management System
 
 **Version:** 1.0  
-**Date:** 2024  
+**Date:** 2025-12-09
 **Project:** Intro to SE - SE02
 
 ---
@@ -30,8 +30,9 @@
 
 3. **Test Accounts** (Click demo buttons on login page)
    - **Admin:** Full system access
-   - **Tenant 1:** Resident features only
-   - **Tenant 2:** Resident features only
+   - **Tenant:** Resident features only
+   - **Police:** Law enforcement features only
+   - **Accountant:** Accounting features only
 
 ---
 
