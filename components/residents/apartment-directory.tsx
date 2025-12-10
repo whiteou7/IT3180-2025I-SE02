@@ -192,7 +192,7 @@ export function ApartmentDirectoryGrid({
             <CardContent className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Home className="size-4" />
-                <span>{apartment.monthlyFee.toLocaleString()} ₫/month</span>
+                <span>{apartment.monthlyFee.toLocaleString()} $/month</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Users className="size-4" />
@@ -249,7 +249,7 @@ export function ApartmentDetailsDialog({
                 <Building2 className="size-4 text-muted-foreground" />
                 Monthly fee:{" "}
                 <span className="font-semibold">
-                  {apartment.monthlyFee.toLocaleString()} ₫
+                  {apartment.monthlyFee.toLocaleString()} $
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
@@ -443,7 +443,7 @@ export function CreateApartmentDialog({
               name="monthlyFee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Monthly fee (₫)</FormLabel>
+                  <FormLabel>Monthly fee ($)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -605,7 +605,7 @@ export function EditApartmentDialog({
               name="monthlyFee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Monthly fee (₫)</FormLabel>
+                  <FormLabel>Monthly fee ($)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
