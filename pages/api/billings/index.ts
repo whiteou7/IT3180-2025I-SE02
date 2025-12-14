@@ -113,11 +113,12 @@ export default async function handler(
   try {
     const newBillingId = await db.begin(async (sql) => {
       const billingId = randomUUID()
+      const uniqueServiceIds = [...new Set(serviceIds)]
       const services = await sql`
-        SELECT service_id FROM services WHERE service_id IN ${sql(serviceIds)}
+        SELECT service_id FROM services WHERE service_id IN ${sql(uniqueServiceIds)}
       `
 
-      if (services.length !== serviceIds.length) {
+      if (services.length !== uniqueServiceIds.length) {
         throw new Error("One or more services are invalid.")
       }
 
