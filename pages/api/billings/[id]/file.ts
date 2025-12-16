@@ -6,7 +6,6 @@ import os from "os"
 import { db } from "@/db"
 import type { BillingDetail, BillingService } from "@/types/billings"
 import type { APIBody } from "@/types/api"
-import { PDFInvoice } from "@h1dd3nsn1p3r/pdf-invoice"
 
 type BillingFileDetail = BillingDetail & {
   file: string
@@ -141,6 +140,7 @@ export default async function handler(
       note: "Thank you for your payment.",
     }
 
+    const { PDFInvoice } = await import("@h1dd3nsn1p3r/pdf-invoice")
     const invoice = new PDFInvoice(invoicePayload)
     const generatedPath = await invoice.create()
     
