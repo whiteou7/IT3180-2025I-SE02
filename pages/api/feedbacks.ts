@@ -90,7 +90,7 @@ export default async function handler(
         }
       }
 
-      return res.status(200).json({ success: true, message: "Feedbacks fetched successfully", data: feedbacks })
+      return res.status(200).json({ success: true, message: "Tải danh sách phản hồi thành công", data: feedbacks })
     } else if (req.method === "POST") {
       const { content, userId, tags } = req.body as {
         content: string;
@@ -99,11 +99,17 @@ export default async function handler(
       }
 
       if (!content || typeof content !== "string") {
-        return res.status(400).json({ success: false, message: "`content` is required and must be a string" })
+        return res.status(400).json({
+          success: false,
+          message: "Vui lòng nhập nội dung phản hồi",
+        })
       }
 
       if (!userId || typeof userId !== "string") {
-        return res.status(400).json({ success: false, message: "`userId` is required and must be a string" })
+        return res.status(400).json({
+          success: false,
+          message: "Thiếu mã người dùng",
+        })
       }
 
       // Insert feedback
@@ -130,10 +136,10 @@ export default async function handler(
         LIMIT 1;
       `
 
-      return res.status(201).json({ success: true, message: "Feedback created", data: created })
+      return res.status(201).json({ success: true, message: "Tạo phản hồi thành công", data: created })
     } else {
       res.setHeader("Allow", ["GET", "POST"])
-      return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
+      return res.status(405).json({ success: false, message: `Phương thức ${req.method} không được phép` })
     }
   } catch (error) {
     console.error("Error in /api/feedbacks:", error)

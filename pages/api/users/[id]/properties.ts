@@ -17,7 +17,7 @@ export default async function handler(
   if (!userId) {
     return res.status(400).json({
       success: false,
-      message: "User ID is required",
+      message: "Thiếu mã người dùng",
     })
   }
 
@@ -41,7 +41,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Properties fetched successfully",
+        message: "Tải danh sách tài sản thành công",
         data: properties,
       })
     }
@@ -57,7 +57,7 @@ export default async function handler(
       if (!propertyName) {
         return res.status(400).json({
           success: false,
-          message: "propertyName is required",
+          message: "Vui lòng nhập tên tài sản",
         })
       }
 
@@ -68,7 +68,7 @@ export default async function handler(
       if (!userRecord) {
         return res.status(404).json({
           success: false,
-          message: "User not found",
+          message: "Không tìm thấy người dùng",
         })
       }
 
@@ -78,7 +78,7 @@ export default async function handler(
       if (requestedPublic && userRecord.role !== "admin") {
         return res.status(403).json({
           success: false,
-          message: "Only administrators can register public properties",
+          message: "Chỉ quản trị viên mới có thể đăng ký tài sản công khai",
         })
       }
 
@@ -86,7 +86,7 @@ export default async function handler(
         if (!licensePlate?.trim()) {
           return res.status(400).json({
             success: false,
-            message: "License plate is required for vehicle registrations",
+            message: "Vui lòng nhập biển số xe",
           })
         }
 
@@ -101,7 +101,7 @@ export default async function handler(
         if (existingVehicle) {
           return res.status(409).json({
             success: false,
-            message: "Each user can only register one vehicle",
+            message: "Mỗi người chỉ có thể đăng ký 1 phương tiện",
           })
         }
 
@@ -127,7 +127,7 @@ export default async function handler(
 
         return res.status(201).json({
           success: true,
-          message: "Vehicle registered successfully",
+          message: "Đăng ký phương tiện thành công",
           data: { propertyId: result.propertyId },
         })
       }
@@ -145,7 +145,7 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Property created successfully",
+        message: "Tạo tài sản thành công",
         data: { propertyId: newProperty.propertyId },
       })
     }
@@ -153,7 +153,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET", "POST"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error in /api/users/[id]/properties:", error)

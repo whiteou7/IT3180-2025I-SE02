@@ -30,7 +30,7 @@ export default async function handler(
       ) {
         return res.status(400).json({
           success: false,
-          message: "Missing required body keys",
+          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
         })
       }
 
@@ -44,13 +44,13 @@ export default async function handler(
       if (!updatedApartment) {
         return res.status(404).json({
           success: false,
-          message: "Apartment not found.",
+          message: "Không tìm thấy căn hộ.",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Apartment updated successfully.",
+        message: "Cập nhật căn hộ thành công.",
         data: updatedApartment,
       })
     }
@@ -70,7 +70,7 @@ export default async function handler(
       if (!apartment) {
         return res.status(404).json({
           success: false,
-          message: "Apartment not found.",
+          message: "Không tìm thấy căn hộ.",
         })
       }
 
@@ -91,7 +91,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Fetched apartment",
+        message: "Tải thông tin căn hộ thành công",
         data: apartmentWithMembers,
       })
     }
@@ -106,13 +106,13 @@ export default async function handler(
       if (!deletedApartment) {
         return res.status(404).json({
           success: false,
-          message: "Apartment not found.",
+          message: "Không tìm thấy căn hộ.",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Apartment deleted successfully.",
+        message: "Xóa căn hộ thành công.",
         data: null,
       })
     }
@@ -121,7 +121,7 @@ export default async function handler(
       res.setHeader("Allow", ["PUT", "GET", "DELETE"])
       return res.status(405).json({
         success: false,
-        message: `Method ${req.method} Not Allowed`,
+        message: `Phương thức ${req.method} không được phép`,
       })
     }
 
@@ -129,7 +129,7 @@ export default async function handler(
     console.error(`Error processing apartment ${id}:`, error)
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Có lỗi xảy ra. Vui lòng thử lại.",
     })
   }
 }

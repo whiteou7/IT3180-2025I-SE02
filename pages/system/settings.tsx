@@ -103,11 +103,11 @@ export default function SystemSettingsPage() {
         if (response?.success && response.data) {
           setSettings(response.data)
         } else {
-          toast.error("Failed to load system settings")
+          toast.error("Không thể tải cài đặt hệ thống")
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to load system settings")
+        toast.error("Không thể tải cài đặt hệ thống")
       } finally {
         setIsLoadingSettings(false)
       }
@@ -117,7 +117,7 @@ export default function SystemSettingsPage() {
   }, [isAdmin])
 
   const getDatabaseUrl = () => {
-    if (!settings) return "Loading..."
+    if (!settings) return "Đang tải..."
     const url = settings.databaseUrl
     if (settings.previewMode && url) {
       // Censor credentials in preview mode
@@ -128,16 +128,16 @@ export default function SystemSettingsPage() {
         return "postgresql://***:***@host:port/dbname"
       }
     }
-    return url || "Not configured"
+    return url || "Chưa cấu hình"
   }
 
   const getStorageUrl = () => {
-    if (!settings) return "Loading..."
-    return settings.storageUrl || "Not configured"
+    if (!settings) return "Đang tải..."
+    return settings.storageUrl || "Chưa cấu hình"
   }
 
   const getStorageKey = () => {
-    if (!settings) return "Loading..."
+    if (!settings) return "Đang tải..."
     const key = settings.storageKey
     if (settings.previewMode && key) {
       // Censor key in preview mode
@@ -146,17 +146,17 @@ export default function SystemSettingsPage() {
       }
       return "sb-***...***"
     }
-    return key || "Not configured"
+    return key || "Chưa cấu hình"
   }
 
   const handleCopy = async (text: string, field: string) => {
     try {
       await navigator.clipboard.writeText(text)
       setCopiedField(field)
-      toast.success("Copied to clipboard")
+      toast.success("Đã sao chép")
       setTimeout(() => setCopiedField(null), 2000)
     } catch {
-      toast.error("Failed to copy")
+      toast.error("Không thể sao chép")
     }
   }
 
@@ -187,7 +187,7 @@ export default function SystemSettingsPage() {
         return
       }
       const url = settings.storageUrl
-      if (url && url !== "Not configured") {
+      if (url && url !== "Chưa cấu hình") {
         setStorageStatus("connected")
       } else {
         setStorageStatus("disconnected")
@@ -199,7 +199,7 @@ export default function SystemSettingsPage() {
 
   const handleDumpDatabase = async () => {
     if (!isAdmin) {
-      toast.error("Admin access required")
+      toast.error("Chỉ quản trị viên mới có quyền truy cập")
       return
     }
 
@@ -212,7 +212,7 @@ export default function SystemSettingsPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Failed to generate dump command")
+        throw new Error(response?.message ?? "Không thể tạo lệnh sao lưu")
       }
 
       if (response.data) {
@@ -225,11 +225,11 @@ export default function SystemSettingsPage() {
         }
         setDumpCommands((prev) => [newCommand, ...prev])
         setSelectedCommand(newCommand)
-        toast.success("Database dump command generated successfully")
+        toast.success("Đã tạo lệnh sao lưu")
       }
     } catch (error) {
       console.error(error)
-      toast.error("Failed to generate database dump command")
+      toast.error("Không thể tạo lệnh sao lưu")
     } finally {
       setIsDumping(false)
     }
@@ -242,9 +242,9 @@ export default function SystemSettingsPage() {
         setCopiedField(`command-${commandId}`)
         setTimeout(() => setCopiedField(null), 2000)
       }
-      toast.success("Command copied to clipboard")
+      toast.success("Đã sao chép lệnh")
     } catch {
-      toast.error("Failed to copy command")
+      toast.error("Không thể sao chép lệnh")
     }
   }
 
@@ -258,13 +258,13 @@ export default function SystemSettingsPage() {
     return (
       <>
         <Head>
-          <title>System Settings • Access Denied</title>
+          <title>Cài đặt hệ thống • Không có quyền truy cập</title>
         </Head>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
           <AuthGate
             isAuthenticated={Boolean(userId)}
-            title="Access Denied"
-            description="System settings are only accessible to administrators."
+            title="Không có quyền truy cập"
+            description="Cài đặt hệ thống chỉ dành cho quản trị viên."
           >
             <div />
           </AuthGate>
@@ -276,26 +276,26 @@ export default function SystemSettingsPage() {
   return (
     <>
       <Head>
-        <title>System Settings • System Operations</title>
+        <title>Cài đặt hệ thống • Vận hành</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>System Settings</BreadcrumbPage>
+              <BreadcrumbPage>Cài đặt hệ thống</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">System Settings</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Cài đặt hệ thống</h1>
             <p className="text-muted-foreground text-sm">
-              Manage database connections, storage, and system operations.
+              Quản lý kết nối, lưu trữ và vận hành hệ thống.
             </p>
           </div>
         </div>
@@ -303,7 +303,7 @@ export default function SystemSettingsPage() {
         <AuthGate isAuthenticated={Boolean(userId)}>
           <Tabs defaultValue="database" className="w-full">
             <TabsList>
-              <TabsTrigger value="database">Database & Storage</TabsTrigger>
+              <TabsTrigger value="database">Kết nối & Lưu trữ</TabsTrigger>
             </TabsList>
 
             <TabsContent value="database" className="space-y-6">
@@ -312,9 +312,9 @@ export default function SystemSettingsPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>Preview Mode</CardTitle>
+                      <CardTitle>Chế độ xem trước</CardTitle>
                       <CardDescription>
-                        Preview mode status (read-only, controlled by environment variable)
+                        Trạng thái (chỉ xem)
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
@@ -324,7 +324,7 @@ export default function SystemSettingsPage() {
                         <Eye className="size-4 text-muted-foreground" />
                       )}
                       <Badge variant={settings?.previewMode ? "default" : "secondary"}>
-                        {isLoadingSettings ? "Loading..." : settings?.previewMode ? "Enabled" : "Disabled"}
+                        {isLoadingSettings ? "Đang tải..." : settings?.previewMode ? "Bật" : "Tắt"}
                       </Badge>
                     </div>
                   </div>
@@ -336,18 +336,18 @@ export default function SystemSettingsPage() {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Database className="size-5" />
-                    <CardTitle>PostgreSQL Database</CardTitle>
+                    <CardTitle>Kết nối dữ liệu</CardTitle>
                   </div>
                   <CardDescription>
-                    Database connection configuration
+                    Thông tin kết nối
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Connection String</Label>
+                    <Label>Chuỗi kết nối</Label>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 rounded-md bg-muted px-3 py-2 text-sm break-all">
-                        {isLoadingSettings ? "Loading..." : getDatabaseUrl()}
+                        {isLoadingSettings ? "Đang tải..." : getDatabaseUrl()}
                       </code>
                       <Button
                         variant="outline"
@@ -370,7 +370,7 @@ export default function SystemSettingsPage() {
                       {dbStatus === "checking" ? (
                         <Loader2 className="mr-1 size-3 animate-spin" />
                       ) : null}
-                      {dbStatus === "connected" ? "Connected" : dbStatus === "disconnected" ? "Disconnected" : "Checking..."}
+                      {dbStatus === "connected" ? "Đã kết nối" : dbStatus === "disconnected" ? "Mất kết nối" : "Đang kiểm tra..."}
                     </Badge>
                     <Button
                       variant="outline"
@@ -378,7 +378,7 @@ export default function SystemSettingsPage() {
                       onClick={checkDatabaseStatus}
                       disabled={dbStatus === "checking"}
                     >
-                      Refresh Status
+                      Làm mới trạng thái
                     </Button>
                   </div>
                 </CardContent>
@@ -389,18 +389,18 @@ export default function SystemSettingsPage() {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <HardDrive className="size-5" />
-                    <CardTitle>Supabase Storage</CardTitle>
+                    <CardTitle>Lưu trữ</CardTitle>
                   </div>
                   <CardDescription>
-                    File storage configuration
+                    Thông tin lưu trữ file
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Storage URL</Label>
+                    <Label>Đường dẫn lưu trữ</Label>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 rounded-md bg-muted px-3 py-2 text-sm break-all">
-                        {isLoadingSettings ? "Loading..." : getStorageUrl()}
+                        {isLoadingSettings ? "Đang tải..." : getStorageUrl()}
                       </code>
                       <Button
                         variant="outline"
@@ -417,10 +417,10 @@ export default function SystemSettingsPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>API Key</Label>
+                    <Label>Khóa truy cập</Label>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 rounded-md bg-muted px-3 py-2 text-sm break-all">
-                        {isLoadingSettings ? "Loading..." : getStorageKey()}
+                        {isLoadingSettings ? "Đang tải..." : getStorageKey()}
                       </code>
                       <Button
                         variant="outline"
@@ -443,7 +443,7 @@ export default function SystemSettingsPage() {
                       {storageStatus === "checking" ? (
                         <Loader2 className="mr-1 size-3 animate-spin" />
                       ) : null}
-                      {storageStatus === "connected" ? "Connected" : storageStatus === "disconnected" ? "Disconnected" : "Checking..."}
+                      {storageStatus === "connected" ? "Đã kết nối" : storageStatus === "disconnected" ? "Mất kết nối" : "Đang kiểm tra..."}
                     </Badge>
                     <Button
                       variant="outline"
@@ -451,7 +451,7 @@ export default function SystemSettingsPage() {
                       onClick={checkStorageStatus}
                       disabled={storageStatus === "checking"}
                     >
-                      Refresh Status
+                      Làm mới trạng thái
                     </Button>
                   </div>
                 </CardContent>
@@ -464,16 +464,16 @@ export default function SystemSettingsPage() {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Server className="size-5" />
-                    <CardTitle>Database Dump</CardTitle>
+                    <CardTitle>Sao lưu dữ liệu</CardTitle>
                   </div>
                   <CardDescription>
-                    Export database schema and data
+                    Tạo lệnh sao lưu dữ liệu
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label>Dump Format</Label>
+                      <Label>Định dạng</Label>
                       <Select
                         value={dumpOptions.format}
                         onValueChange={(value) =>
@@ -495,9 +495,9 @@ export default function SystemSettingsPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label>Include Schema</Label>
+                        <Label>Bao gồm cấu trúc</Label>
                         <p className="text-muted-foreground text-xs">
-                          Export table structures and constraints
+                          Bao gồm thông tin cấu trúc
                         </p>
                       </div>
                       <Switch
@@ -509,9 +509,9 @@ export default function SystemSettingsPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label>Include Data</Label>
+                        <Label>Bao gồm dữ liệu</Label>
                         <p className="text-muted-foreground text-xs">
-                          Export table data rows
+                          Bao gồm nội dung dữ liệu
                         </p>
                       </div>
                       <Switch
@@ -531,12 +531,12 @@ export default function SystemSettingsPage() {
                     {isDumping ? (
                       <>
                         <Loader2 className="mr-2 size-4 animate-spin" />
-                        Generating command...
+                        Đang tạo lệnh...
                       </>
                     ) : (
                       <>
                         <FileText className="mr-2 size-4" />
-                        Generate Dump Command
+                        Tạo lệnh sao lưu
                       </>
                     )}
                   </Button>
@@ -544,7 +544,7 @@ export default function SystemSettingsPage() {
                   {selectedCommand && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label>Generated Command</Label>
+                        <Label>Lệnh đã tạo</Label>
                         <Button
                           variant="outline"
                           size="sm"
@@ -555,7 +555,7 @@ export default function SystemSettingsPage() {
                           ) : (
                             <Copy className="mr-2 size-4" />
                           )}
-                          Copy Command
+                          Sao chép lệnh
                         </Button>
                       </div>
                       <div className="rounded-md border bg-muted/50 p-4">
@@ -564,14 +564,14 @@ export default function SystemSettingsPage() {
                         </code>
                       </div>
                       <p className="text-muted-foreground text-xs">
-                        Run this command in your terminal to create the database dump file: {selectedCommand.filename}
+                        Chạy lệnh này để tạo file sao lưu: {selectedCommand.filename}
                       </p>
                     </div>
                   )}
 
                   {dumpCommands.length > 0 && (
                     <div className="space-y-2">
-                      <Label>Command History</Label>
+                      <Label>Lịch sử lệnh</Label>
                       <div className="space-y-2">
                         {dumpCommands.map((cmd) => (
                           <div
@@ -597,14 +597,14 @@ export default function SystemSettingsPage() {
                                 }}
                               >
                                 <Copy className="mr-2 size-4" />
-                                Copy
+                                Sao chép
                               </Button>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setSelectedCommand(cmd)}
                               >
-                                View
+                                Xem
                               </Button>
                             </div>
                           </div>

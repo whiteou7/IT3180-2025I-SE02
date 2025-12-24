@@ -24,7 +24,7 @@ export default async function handler(
     const postId = parsePostId(req.query.id)
 
     if (!postId) {
-      return res.status(400).json({ success: false, message: "Post ID is required" })
+      return res.status(400).json({ success: false, message: "Thiếu mã bài viết" })
     }
 
     if (req.method === "GET") {
@@ -37,10 +37,14 @@ export default async function handler(
       `
 
       if (!post) {
-        return res.status(404).json({ success: false, message: "Post not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy bài viết" })
       }
 
-      return res.status(200).json({ success: true, message: "Post fetched successfully", data: post })
+      return res.status(200).json({
+        success: true,
+        message: "Tải bài viết thành công",
+        data: post,
+      })
     } else if (req.method === "PATCH") {
       const { userId, title, content, category } = req.body as {
         userId: string;
@@ -50,7 +54,7 @@ export default async function handler(
       }
 
       if (!userId) {
-        return res.status(400).json({ success: false, message: "User ID is required" })
+        return res.status(400).json({ success: false, message: "Thiếu mã người dùng" })
       }
 
       // Check if post exists and user owns it
@@ -59,11 +63,11 @@ export default async function handler(
       `
 
       if (!existing) {
-        return res.status(404).json({ success: false, message: "Post not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy bài viết" })
       }
 
       if (existing.userId !== userId) {
-        return res.status(403).json({ success: false, message: "You can only edit your own posts" })
+        return res.status(403).json({ success: false, message: "Bạn chỉ có thể chỉnh sửa bài viết của chính mình" })
       }
 
       // Build update query - update all provided fields
@@ -86,14 +90,18 @@ export default async function handler(
         LIMIT 1;
       `
 
-      return res.status(200).json({ success: true, message: "Post updated successfully", data: updated })
+      return res.status(200).json({
+        success: true,
+        message: "Cập nhật bài viết thành công",
+        data: updated,
+      })
     } else if (req.method === "DELETE") {
       const { userId } = req.body as {
         userId: string;
       }
 
       if (!userId) {
-        return res.status(400).json({ success: false, message: "User ID is required" })
+        return res.status(400).json({ success: false, message: "Thiếu mã người dùng" })
       }
 
       // Check if post exists and user owns it
@@ -102,19 +110,19 @@ export default async function handler(
       `
 
       if (!existing) {
-        return res.status(404).json({ success: false, message: "Post not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy bài viết" })
       }
 
       if (existing.userId !== userId) {
-        return res.status(403).json({ success: false, message: "You can only delete your own posts" })
+        return res.status(403).json({ success: false, message: "Bạn chỉ có thể xóa bài viết của chính mình" })
       }
 
       await db`DELETE FROM posts WHERE post_id = ${postId}`
 
-      return res.status(200).json({ success: true, message: "Post deleted successfully", data: null })
+      return res.status(200).json({ success: true, message: "Xóa bài viết thành công", data: null })
     } else {
       res.setHeader("Allow", ["GET", "PATCH", "DELETE"])
-      return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
+      return res.status(405).json({ success: false, message: `Phương thức ${req.method} không được phép` })
     }
   } catch (error) {
     console.error("Error in /api/posts/[id]:", error)

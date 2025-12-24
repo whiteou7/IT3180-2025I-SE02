@@ -14,7 +14,7 @@ export default async function handler(
   if (!userId || typeof userId !== "string") {
     return res.status(400).json({ 
       success: false, 
-      message: "User ID is required" 
+      message: "Thiếu mã người dùng" 
     })
   }
 
@@ -22,7 +22,7 @@ export default async function handler(
     res.setHeader("Allow", ["POST"])
     return res.status(405).json({ 
       success: false, 
-      message: `Method ${req.method} Not Allowed` 
+      message: `Phương thức ${req.method} không được phép` 
     })
   }
 
@@ -35,7 +35,7 @@ export default async function handler(
     if (!user) {
       return res.status(404).json({ 
         success: false, 
-        message: "User not found" 
+        message: "Không tìm thấy người dùng" 
       })
     }
 
@@ -56,7 +56,7 @@ export default async function handler(
     if (!vehicle) {
       return res.status(404).json({ 
         success: false, 
-        message: "Vehicle not found for this user" 
+        message: "Không tìm thấy phương tiện của người dùng này" 
       })
     }
 
@@ -86,7 +86,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Vehicle entered",
+        message: "Đã ghi nhận xe vào",
         data: { time: currentTime }
       })
     } else {
@@ -99,7 +99,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Vehicle exited",
+        message: "Đã ghi nhận xe ra",
         data: { time: currentTime }
       })
     }

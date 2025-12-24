@@ -88,7 +88,7 @@ export default function VehicleCheckInDemo() {
         setCheckInStatus("success")
         setLastCheckInTime(res.data.time)
         setIsInside(!isInside)
-        toast.success(res.message || "Check-in successful!")
+        toast.success(res.message || "Ghi nhận ra/vào thành công!")
         
         // Reset status after animation
         setTimeout(() => {
@@ -96,7 +96,7 @@ export default function VehicleCheckInDemo() {
         }, 2000)
       } else {
         setCheckInStatus("error")
-        toast.error(res.message || "Check-in failed")
+        toast.error(res.message || "Ghi nhận ra/vào thất bại")
         
         // Reset status after error
         setTimeout(() => {
@@ -106,7 +106,7 @@ export default function VehicleCheckInDemo() {
     } catch (err) {
       console.error(err)
       setCheckInStatus("error")
-      toast.error("Check-in failed")
+      toast.error("Ghi nhận ra/vào thất bại")
       
       setTimeout(() => {
         setCheckInStatus("idle")
@@ -119,9 +119,9 @@ export default function VehicleCheckInDemo() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-96">
           <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground mb-4">Please log in to access vehicle check-in</p>
+            <p className="text-muted-foreground mb-4">Vui lòng đăng nhập để sử dụng tính năng ghi nhận ra/vào xe</p>
             <Button onClick={() => router.push("/login")}>
-              Go to Login
+              Đi tới đăng nhập
             </Button>
           </CardContent>
         </Card>
@@ -142,9 +142,9 @@ export default function VehicleCheckInDemo() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-96">
           <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground mb-4">No vehicle registered</p>
+            <p className="text-muted-foreground mb-4">Chưa có xe nào được đăng ký</p>
             <Button onClick={() => router.push("/")}>
-              Go to Dashboard
+              Về bảng điều khiển
             </Button>
           </CardContent>
         </Card>
@@ -158,28 +158,28 @@ export default function VehicleCheckInDemo() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Vehicle Check-In Demo
+            Mô phỏng ra/vào xe
           </h1>
           <p className="text-lg text-gray-600">
-            Simulate vehicle entry and exit with visual feedback
+            Thử mô phỏng xe vào/ra với phản hồi trực quan
           </p>
         </div>
 
         {/* Main Check-in Card */}
         <Card className="mb-8 shadow-lg">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Vehicle Check-In</CardTitle>
+            <CardTitle className="text-2xl">Ghi nhận ra/vào xe</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Vehicle Info */}
             <div className="text-center space-y-2">
               <div className="flex justify-center items-center gap-4">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">License Plate</p>
+                  <p className="text-sm text-muted-foreground">Biển số</p>
                   <p className="text-xl font-bold">{vehicleInfo.licensePlate}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">Vehicle ID</p>
+                  <p className="text-sm text-muted-foreground">Mã xe</p>
                   <p className="text-xl font-bold">{vehicleInfo.vehicleId}</p>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export default function VehicleCheckInDemo() {
                   variant={isInside ? "default" : "secondary"}
                   className="text-sm px-4 py-2"
                 >
-                  {isInside ? "Inside Property" : "Outside Property"}
+                  {isInside ? "Đang ở trong khu vực" : "Đang ở ngoài khu vực"}
                 </Badge>
               </div>
             </div>
@@ -217,14 +217,14 @@ export default function VehicleCheckInDemo() {
                   {checkInStatus === "checking" ? (
                     <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Checking In...
+                      Đang ghi nhận...
                     </div>
                   ) : checkInStatus === "success" ? (
-                    "✓ Check-In Successful!"
+                    "✓ Ghi nhận thành công!"
                   ) : checkInStatus === "error" ? (
-                    "✗ Check-In Failed"
+                    "✗ Ghi nhận thất bại"
                   ) : (
-                    isInside ? "Check Out" : "Check In"
+                    isInside ? "Ghi nhận ra" : "Ghi nhận vào"
                   )}
                 </Button>
 
@@ -238,7 +238,7 @@ export default function VehicleCheckInDemo() {
             {/* Last Check-in Time */}
             {lastCheckInTime && (
               <div className="text-center">
-                <p className="text-sm text-muted-foreground">Last Check-in:</p>
+                <p className="text-sm text-muted-foreground">Lần gần nhất:</p>
                 <p className="font-medium">
                   {new Date(lastCheckInTime).toLocaleString()}
                 </p>
@@ -250,26 +250,26 @@ export default function VehicleCheckInDemo() {
         {/* Demo Information */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="text-xl">Demo Information</CardTitle>
+            <CardTitle className="text-xl">Thông tin mô phỏng</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <h3 className="font-semibold mb-2">How it works:</h3>
+                <h3 className="font-semibold mb-2">Cách hoạt động:</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Click &quot;Check In&quot; to simulate vehicle entry</li>
-                  <li>• Click &quot;Check Out&quot; to simulate vehicle exit</li>
-                  <li>• Visual animations provide feedback</li>
-                  <li>• Status updates in real-time</li>
+                  <li>• Nhấn “Ghi nhận vào” để mô phỏng xe vào</li>
+                  <li>• Nhấn “Ghi nhận ra” để mô phỏng xe ra</li>
+                  <li>• Có hiệu ứng để báo trạng thái</li>
+                  <li>• Trạng thái được cập nhật ngay</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Real-world implementation:</h3>
+                <h3 className="font-semibold mb-2">Ứng dụng thực tế:</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• RFID/NFC card readers</li>
-                  <li>• License plate recognition</li>
-                  <li>• Mobile app integration</li>
-                  <li>• Automatic gate control</li>
+                  <li>• Quẹt thẻ ra/vào</li>
+                  <li>• Nhận diện biển số</li>
+                  <li>• Kết nối ứng dụng điện thoại</li>
+                  <li>• Tự động điều khiển cổng</li>
                 </ul>
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function VehicleCheckInDemo() {
             onClick={() => router.push("/")}
             className="px-6"
           >
-            Back to Dashboard
+            Về bảng điều khiển
           </Button>
         </div>
       </div>

@@ -35,7 +35,7 @@ export default async function handler(
   if (!serviceId) {
     return res.status(400).json({
       success: false,
-      message: "Invalid service ID",
+      message: "Mã dịch vụ không hợp lệ.",
     })
   }
 
@@ -58,13 +58,13 @@ export default async function handler(
       if (service.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Service not found",
+          message: "Không tìm thấy dịch vụ.",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Service fetched successfully.",
+        message: "Tải dịch vụ thành công.",
         data: service[0],
       })
     }
@@ -86,7 +86,7 @@ export default async function handler(
       ) {
         return res.status(400).json({
           success: false,
-          message: "Missing required body keys",
+          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
         })
       }
 
@@ -96,14 +96,14 @@ export default async function handler(
       if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
         return res.status(400).json({
           success: false,
-          message: "Price must be a non-negative number",
+          message: "Giá phải là số không âm.",
         })
       }
 
       if (!Number.isFinite(parsedTax)) {
         return res.status(400).json({
           success: false,
-          message: "Tax must be a valid number",
+          message: "Thuế phải là số hợp lệ.",
         })
       }
 
@@ -136,13 +136,13 @@ export default async function handler(
       if (updatedService.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Service not found",
+          message: "Không tìm thấy dịch vụ.",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Service updated successfully.",
+        message: "Cập nhật dịch vụ thành công.",
         data: updatedService[0],
       })
     }
@@ -153,7 +153,7 @@ export default async function handler(
       if (bodyServiceId !== serviceId) {
         return res.status(400).json({
           success: false,
-          message: "Service ID mismatch",
+          message: "Mã dịch vụ không khớp.",
         })
       }
 
@@ -171,13 +171,13 @@ export default async function handler(
       if (deletedService.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "Service not found",
+          message: "Không tìm thấy dịch vụ.",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Service deleted successfully.",
+        message: "Xóa dịch vụ thành công.",
         data: null,
       })
     }
@@ -185,13 +185,13 @@ export default async function handler(
     res.setHeader("Allow", ["GET", "PUT", "DELETE"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error handling service request:", error)
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Có lỗi xảy ra. Vui lòng thử lại.",
     })
   }
 }

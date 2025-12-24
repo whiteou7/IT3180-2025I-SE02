@@ -20,7 +20,7 @@ export default async function handler(
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({
           success: false,
-          message: "User ID is required",
+          message: "Thiếu mã người dùng",
         })
       }
 
@@ -103,7 +103,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Chats fetched successfully",
+        message: "Tải danh sách cuộc trò chuyện thành công",
         data: chatsWithDetails,
       })
     }
@@ -117,14 +117,14 @@ export default async function handler(
       if (!userId || !otherUserId) {
         return res.status(400).json({
           success: false,
-          message: "User ID and other user ID are required",
+          message: "Thiếu thông tin người dùng",
         })
       }
 
       if (userId === otherUserId) {
         return res.status(400).json({
           success: false,
-          message: "Cannot create chat with yourself",
+          message: "Bạn không thể tự tạo cuộc trò chuyện với chính mình",
         })
       }
 
@@ -139,7 +139,7 @@ export default async function handler(
       if (!user1 || !user2) {
         return res.status(404).json({
           success: false,
-          message: "One or both users not found",
+          message: "Không tìm thấy một trong hai người dùng",
         })
       }
 
@@ -149,7 +149,7 @@ export default async function handler(
         if (user2.role !== "admin") {
           return res.status(403).json({
             success: false,
-            message: "You can only chat with admin users",
+            message: "Bạn chỉ có thể trò chuyện với quản trị viên",
           })
         }
       }
@@ -166,7 +166,7 @@ export default async function handler(
       if (existingChat) {
         return res.status(200).json({
           success: true,
-          message: "Chat already exists",
+          message: "Cuộc trò chuyện đã tồn tại",
           data: existingChat,
         })
       }
@@ -204,7 +204,7 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Chat created successfully",
+        message: "Tạo cuộc trò chuyện thành công",
         data: chatWithDetails,
       })
     }
@@ -212,7 +212,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET", "POST"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error in /api/chats:", error)

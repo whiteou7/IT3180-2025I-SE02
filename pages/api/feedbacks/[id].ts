@@ -23,7 +23,7 @@ export default async function handler(
     const feedbackId = parseFeedbackId(req.query.id)
 
     if (!feedbackId) {
-      return res.status(400).json({ success: false, message: "Feedback ID is required" })
+      return res.status(400).json({ success: false, message: "Mã phản hồi là bắt buộc" })
     }
 
     if (req.method === "GET") {
@@ -44,10 +44,10 @@ export default async function handler(
       `
 
       if (!feedback) {
-        return res.status(404).json({ success: false, message: "Feedback not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy phản hồi" })
       }
 
-      return res.status(200).json({ success: true, message: "Feedback fetched successfully", data: feedback })
+      return res.status(200).json({ success: true, message: "Tải phản hồi thành công", data: feedback })
     } else if (req.method === "PATCH") {
       const { status, tags } = req.body as {
         status?: FeedbackStatus;
@@ -55,7 +55,10 @@ export default async function handler(
       }
 
       if (!status && !tags) {
-        return res.status(400).json({ success: false, message: "At least one field (status or tags) must be provided" })
+        return res.status(400).json({
+          success: false,
+          message: "Vui lòng chọn ít nhất một nội dung cần cập nhật",
+        })
       }
 
       if (status && tags) {
@@ -95,14 +98,14 @@ export default async function handler(
         LIMIT 1;
       `
 
-      return res.status(200).json({ success: true, message: "Feedback updated successfully", data: updated })
+      return res.status(200).json({ success: true, message: "Cập nhật phản hồi thành công", data: updated })
     } else if (req.method === "DELETE") {
       const { userId } = req.body as {
         userId: string;
       }
 
       if (!userId) {
-        return res.status(400).json({ success: false, message: "User ID is required" })
+        return res.status(400).json({ success: false, message: "Mã người dùng là bắt buộc" })
       }
 
       // Check if feedback exists and user owns it
@@ -111,19 +114,19 @@ export default async function handler(
       `
 
       if (!existing) {
-        return res.status(404).json({ success: false, message: "Feedback not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy phản hồi" })
       }
 
       if (existing.userId !== userId) {
-        return res.status(403).json({ success: false, message: "You can only delete your own feedbacks" })
+        return res.status(403).json({ success: false, message: "Bạn chỉ có thể xóa phản hồi của chính mình" })
       }
 
       await db`DELETE FROM feedbacks WHERE feedback_id = ${feedbackId}`
 
-      return res.status(200).json({ success: true, message: "Feedback deleted successfully", data: null })
+      return res.status(200).json({ success: true, message: "Xóa phản hồi thành công", data: null })
     } else {
       res.setHeader("Allow", ["GET", "PATCH", "DELETE"])
-      return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
+      return res.status(405).json({ success: false, message: `Phương thức ${req.method} không được phép` })
     }
   } catch (error) {
     console.error("Error in /api/feedbacks/[id]:", error)

@@ -91,10 +91,10 @@ export function ResidentFilters({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">
-            Resident directory filters
+            Bộ lọc danh sách cư dân
           </p>
           <p className="text-muted-foreground text-xs">
-            Combine search, assignment, and role filters to narrow the list.
+            Kết hợp tìm kiếm, tình trạng gán và vai trò để lọc nhanh danh sách.
           </p>
         </div>
         <Button
@@ -109,12 +109,12 @@ export function ResidentFilters({
             })
           }
         >
-          Reset
+          Đặt lại
         </Button>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <Input
-          placeholder="Search by name, email, or apartment..."
+          placeholder="Tìm theo tên, email hoặc căn hộ..."
           value={filters.search}
           disabled={isLoading}
           onChange={(event) => setFilter({ search: event.target.value })}
@@ -127,12 +127,12 @@ export function ResidentFilters({
           disabled={isLoading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Assignment status" />
+            <SelectValue placeholder="Tình trạng gán căn hộ" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All residents</SelectItem>
-            <SelectItem value="assigned">Assigned</SelectItem>
-            <SelectItem value="unassigned">Unassigned</SelectItem>
+            <SelectItem value="all">Tất cả cư dân</SelectItem>
+            <SelectItem value="assigned">Đã gán</SelectItem>
+            <SelectItem value="unassigned">Chưa gán</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -143,12 +143,12 @@ export function ResidentFilters({
           disabled={isLoading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Role" />
+            <SelectValue placeholder="Vai trò" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All roles</SelectItem>
-            <SelectItem value="tenant">Resident</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="all">Tất cả vai trò</SelectItem>
+            <SelectItem value="tenant">Cư dân</SelectItem>
+            <SelectItem value="admin">Quản trị</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -190,18 +190,18 @@ export function ResidentProfilesTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Resident</TableHead>
-          <TableHead>Apartment</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Birth year</TableHead>
+          <TableHead>Cư dân</TableHead>
+          <TableHead>Căn hộ</TableHead>
+          <TableHead>Trạng thái</TableHead>
+          <TableHead>Vai trò</TableHead>
+          <TableHead>Năm sinh</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {residents.length === 0 ? (
           <TableRow>
             <TableCell colSpan={5} className="h-24 text-center">
-                  No residents found for the current filters.
+              Không tìm thấy cư dân phù hợp với bộ lọc hiện tại.
             </TableCell>
           </TableRow>
         ) : (
@@ -211,7 +211,7 @@ export function ResidentProfilesTable({
                     ? `B${resident.buildingId} • #${resident.apartmentNumber}`
                     : resident.apartmentNumber
                       ? `#${resident.apartmentNumber}`
-                      : "Unassigned"
+                      : "Chưa gán"
             return (
               <TableRow
                 key={resident.userId}
@@ -233,7 +233,13 @@ export function ResidentProfilesTable({
                   <StatusBadge status={resident.status} />
                 </TableCell>
                 <TableCell className="capitalize">
-                  {resident.role === "tenant" ? "Resident" : resident.role === "admin" ? "Admin" : resident.role === "police" ? "Police" : "Accountant"}
+                  {resident.role === "tenant"
+                    ? "Cư dân"
+                    : resident.role === "admin"
+                      ? "Quản trị"
+                      : resident.role === "police"
+                        ? "An ninh"
+                        : "Kế toán"}
                 </TableCell>
                 <TableCell>
                   {resident.yearOfBirth ?? "—"}
@@ -248,8 +254,8 @@ export function ResidentProfilesTable({
 }
 
 const statusLabel: Record<ResidentStatus, string> = {
-  assigned: "Assigned",
-  unassigned: "Unassigned",
+  assigned: "Đã gán",
+  unassigned: "Chưa gán",
 }
 
 const statusVariant: Record<ResidentStatus, "default" | "outline"> = {
@@ -341,36 +347,49 @@ export function ResidentProfileDrawer({
       ? `B${resident.buildingId} • #${resident.apartmentNumber}`
       : resident?.apartmentNumber
         ? `#${resident.apartmentNumber}`
-        : "Not assigned"
+        : "Chưa gán"
 
   return (
     <div>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="flex flex-col gap-6 overflow-y-auto sm:max-w-xl">
           <SheetHeader>
-            <SheetTitle>{resident?.fullName ?? (isSpecialAccount ? "Special Account Details" : "Resident details")}</SheetTitle>
+            <SheetTitle>
+              {resident?.fullName ??
+                (isSpecialAccount ? "Chi tiết tài khoản đặc biệt" : "Chi tiết cư dân")}
+            </SheetTitle>
             <SheetDescription>
               {isSpecialAccount 
-                ? "Review and update special account profile using persisted database fields."
-                : "Review and update resident profile using persisted database fields."}
+                ? "Xem và cập nhật thông tin tài khoản đặc biệt."
+                : "Xem và cập nhật thông tin cư dân."}
             </SheetDescription>
           </SheetHeader>
 
           {resident ? (
             <div className="space-y-2 rounded-xl border bg-muted/20 p-4 mx-4 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">{isSpecialAccount ? "Account ID" : "Resident ID"}</span>
+                <span className="text-muted-foreground">
+                  {isSpecialAccount ? "Mã tài khoản" : "Mã cư dân"}
+                </span>
                 <span className="font-mono text-xs">{resident.userId}</span>
               </div>
               {!isSpecialAccount && (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Apartment</span>
+                  <span className="text-muted-foreground">Căn hộ</span>
                   <span className="font-medium">{apartmentLabel}</span>
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Role</span>
-                <span className="capitalize">{resident.role === "tenant" ? "Resident" : resident.role === "admin" ? "Admin" : resident.role === "police" ? "Police" : "Accountant"}</span>
+                <span className="text-muted-foreground">Vai trò</span>
+                <span className="capitalize">
+                  {resident.role === "tenant"
+                    ? "Cư dân"
+                    : resident.role === "admin"
+                      ? "Quản trị"
+                      : resident.role === "police"
+                        ? "An ninh"
+                        : "Kế toán"}
+                </span>
               </div>
             </div>
           ) : null}
@@ -388,7 +407,7 @@ export function ResidentProfileDrawer({
                   name="fullName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full name</FormLabel>
+                      <FormLabel>Họ và tên</FormLabel>
                       <FormControl>
                         <Input placeholder="Nguyen Van A" {...field} />
                       </FormControl>
@@ -414,7 +433,7 @@ export function ResidentProfileDrawer({
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone number</FormLabel>
+                      <FormLabel>Số điện thoại</FormLabel>
                       <FormControl>
                         <Input type="tel" placeholder="+1234567890" {...field} />
                       </FormControl>
@@ -455,12 +474,12 @@ export function ResidentProfileDrawer({
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select gender" />
+                              <SelectValue placeholder="Chọn giới tính" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
+                            <SelectItem value="male">Nam</SelectItem>
+                            <SelectItem value="female">Nữ</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -475,18 +494,18 @@ export function ResidentProfileDrawer({
                     name="role"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Role</FormLabel>
+                        <FormLabel>Vai trò</FormLabel>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select role" />
+                              <SelectValue placeholder="Chọn vai trò" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="tenant">Resident</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="police">Police</SelectItem>
-                            <SelectItem value="accountant">Accountant</SelectItem>
+                            <SelectItem value="tenant">Cư dân</SelectItem>
+                            <SelectItem value="admin">Quản trị</SelectItem>
+                            <SelectItem value="police">An ninh</SelectItem>
+                            <SelectItem value="accountant">Kế toán</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -502,10 +521,10 @@ export function ResidentProfileDrawer({
                   variant="outline"
                   onClick={() => onOpenChange(false)}
                 >
-                Cancel
+                  Hủy
                 </Button>
                 <Button type="submit" disabled={isSaving}>
-                  {isSaving ? "Saving..." : "Save changes"}
+                  {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
                 </Button>
               </SheetFooter>
             </form>
@@ -552,7 +571,7 @@ export function useResidentSearch(residents: ResidentProfile[], filters: Residen
 
 export function ResidentEmptyState({
   className,
-  message = "No residents found.",
+  message = "Không tìm thấy cư dân.",
 }: { className?: string; message?: string }) {
   return (
     <div
@@ -605,18 +624,18 @@ export function SpecialAccountsTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
+          <TableHead>Họ tên</TableHead>
           <TableHead>Email</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Phone</TableHead>
-          <TableHead>Birth year</TableHead>
+          <TableHead>Vai trò</TableHead>
+          <TableHead>Số điện thoại</TableHead>
+          <TableHead>Năm sinh</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {accounts.length === 0 ? (
           <TableRow>
             <TableCell colSpan={5} className="h-24 text-center">
-                  No special accounts found.
+              Không tìm thấy tài khoản đặc biệt.
             </TableCell>
           </TableRow>
         ) : (
@@ -637,7 +656,7 @@ export function SpecialAccountsTable({
                 </span>
               </TableCell>
               <TableCell className="capitalize">
-                {account.role === "police" ? "Police" : "Accountant"}
+                {account.role === "police" ? "Công An" : "Kế Toán"}
               </TableCell>
               <TableCell>
                 {account.phoneNumber ?? "—"}
@@ -672,9 +691,9 @@ export function useSpecialAccountSearch(
 }
 
 const createUserSchema = z.object({
-  fullName: z.string().min(3, "Full name must be at least 3 characters"),
-  email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  fullName: z.string().min(3, "Họ và tên phải có ít nhất 3 ký tự"),
+  email: z.email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
   role: z.enum(["tenant", "admin", "police", "accountant"] as const),
   yearOfBirth: z.string().optional(),
   gender: z.enum(["male", "female"] as const).optional(),
@@ -727,9 +746,9 @@ export function CreateUserDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Create new user</DialogTitle>
+          <DialogTitle>Tạo người dùng mới</DialogTitle>
           <DialogDescription>
-            Add a new resident or admin account to the system.
+            Thêm cư dân hoặc tài khoản quản trị vào hệ thống.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -739,7 +758,7 @@ export function CreateUserDialog({
               name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>Họ và tên</FormLabel>
                   <FormControl>
                     <Input placeholder="Nguyen Van A" {...field} />
                   </FormControl>
@@ -765,7 +784,7 @@ export function CreateUserDialog({
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone number</FormLabel>
+                  <FormLabel>Số điện thoại</FormLabel>
                   <FormControl>
                     <Input type="tel" placeholder="+1234567890" {...field} />
                   </FormControl>
@@ -796,14 +815,14 @@ export function CreateUserDialog({
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select role" />
+                          <SelectValue placeholder="Chọn vai trò" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="tenant">Resident</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="police">Police</SelectItem>
-                        <SelectItem value="accountant">Accountant</SelectItem>
+                        <SelectItem value="tenant">Cư dân</SelectItem>
+                        <SelectItem value="admin">Quản trị</SelectItem>
+                        <SelectItem value="police">An ninh</SelectItem>
+                        <SelectItem value="accountant">Kế toán</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -815,7 +834,7 @@ export function CreateUserDialog({
                 name="yearOfBirth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Year of birth</FormLabel>
+                    <FormLabel>Năm sinh</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -834,19 +853,19 @@ export function CreateUserDialog({
               name="gender"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gender</FormLabel>
+                  <FormLabel>Giới tính</FormLabel>
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
+                        <SelectValue placeholder="Chọn giới tính" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="male">Nam</SelectItem>
+                      <SelectItem value="female">Nữ</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -859,10 +878,10 @@ export function CreateUserDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isCreating}>
-                {isCreating ? "Creating..." : "Create user"}
+                {isCreating ? "Đang tạo..." : "Tạo người dùng"}
               </Button>
             </DialogFooter>
           </form>

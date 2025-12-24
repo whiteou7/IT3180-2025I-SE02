@@ -20,7 +20,7 @@ export default async function handler(
     res.setHeader("Allow", ["POST"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -30,7 +30,7 @@ export default async function handler(
     if (!options.includeSchema && !options.includeData) {
       return res.status(400).json({
         success: false,
-        message: "At least one of includeSchema or includeData must be true",
+        message: "Vui lòng chọn ít nhất một mục để xuất (cấu trúc hoặc dữ liệu).",
       })
     }
 
@@ -40,7 +40,7 @@ export default async function handler(
     if (!databaseUrl) {
       return res.status(400).json({
         success: false,
-        message: "Database URL not configured",
+        message: "Chưa cấu hình địa chỉ kết nối dữ liệu.",
       })
     }
 
@@ -51,7 +51,7 @@ export default async function handler(
     } catch {
       return res.status(400).json({
         success: false,
-        message: "Invalid database URL format",
+        message: "Địa chỉ kết nối không đúng định dạng.",
       })
     }
 
@@ -111,7 +111,7 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Database dump command generated successfully",
+      message: "Đã tạo lệnh xuất dữ liệu thành công",
       data: {
         command: fullCommand,
         filename,

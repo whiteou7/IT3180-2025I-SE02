@@ -33,7 +33,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Properties fetched successfully",
+        message: "Tải danh sách tài sản thành công",
         data: properties,
       })
     }
@@ -41,7 +41,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error in /api/properties:", error)

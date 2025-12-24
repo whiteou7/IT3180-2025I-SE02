@@ -26,7 +26,7 @@ export default async function handler(
   if (!userId) {
     return res.status(400).json({
       success: false,
-      message: "User ID is required",
+      message: "Thiếu mã người dùng",
     })
   }
 
@@ -45,7 +45,7 @@ export default async function handler(
         console.error("Error listing documents:", error)
         return res.status(500).json({
           success: false,
-          message: error.message || "Failed to list documents",
+          message: error.message || "Không thể tải danh sách tài liệu",
         })
       }
 
@@ -59,7 +59,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Documents fetched successfully",
+        message: "Tải danh sách tài liệu thành công",
         data: documents,
       })
     }
@@ -67,7 +67,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error in /api/users/[id]/documents:", error)

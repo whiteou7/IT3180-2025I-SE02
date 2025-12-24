@@ -62,8 +62,10 @@ export default function ResidenceStatusPage() {
           ofetch("/api/users", { ignoreResponseError: true }),
           ofetch("/api/apartments", { ignoreResponseError: true }),
         ])
-        if (!usersResponse?.success) throw new Error(usersResponse?.message ?? "Unable to fetch residents")
-        if (!apartmentsResponse?.success) throw new Error(apartmentsResponse?.message ?? "Unable to fetch apartments")
+        if (!usersResponse?.success)
+          throw new Error(usersResponse?.message ?? "Không thể tải danh sách cư dân")
+        if (!apartmentsResponse?.success)
+          throw new Error(apartmentsResponse?.message ?? "Không thể tải danh sách căn hộ")
 
         const apartmentsPayload = (apartmentsResponse.data as Apartment[]) ?? []
         const apartmentLookup = new Map(
@@ -78,7 +80,7 @@ export default function ResidenceStatusPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to load residence status data")
+        toast.error("Không thể tải dữ liệu trạng thái cư trú")
       } finally {
         if (active) setIsLoading(false)
       }
@@ -117,7 +119,7 @@ export default function ResidenceStatusPage() {
         return apartment
       }
     } catch (error) {
-      console.error("Failed to fetch apartment details", error)
+      console.error("Không thể tải chi tiết căn hộ", error)
     }
     return undefined
   }
@@ -132,7 +134,7 @@ export default function ResidenceStatusPage() {
           ignoreResponseError: true,
         })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to unassign apartment")
+          throw new Error(response?.message ?? "Không thể gỡ gán căn hộ")
         }
         setRecords((prev) =>
           prev.map((record) =>
@@ -149,7 +151,7 @@ export default function ResidenceStatusPage() {
         )
       } else {
         if (!payload.apartmentId) {
-          toast.error("Apartment ID is required for assignment")
+          toast.error("Vui lòng chọn căn hộ để gán")
           return
         }
         const response = await ofetch(`/api/users/${selectedRecord.userId}/apartments`, {
@@ -158,7 +160,7 @@ export default function ResidenceStatusPage() {
           ignoreResponseError: true,
         })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to assign apartment")
+          throw new Error(response?.message ?? "Không thể gán căn hộ")
         }
         let apartment = apartmentMap.get(payload.apartmentId)
         if (!apartment) {
@@ -178,11 +180,11 @@ export default function ResidenceStatusPage() {
           )
         )
       }
-      toast.success("Assignment updated successfully")
+      toast.success("Đã cập nhật trạng thái gán thành công")
       setDialogOpen(false)
     } catch (error) {
       console.error(error)
-      toast.error((error as Error).message ?? "Failed to update status")
+      toast.error((error as Error).message ?? "Không thể cập nhật trạng thái")
     } finally {
       setIsSaving(false)
     }
@@ -191,29 +193,29 @@ export default function ResidenceStatusPage() {
   return (
     <>
       <Head>
-        <title>Residence Status • Resident Management</title>
+        <title>Trạng thái cư trú • Quản lý cư dân</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/residents/profiles">Resident Management</BreadcrumbLink>
+              <BreadcrumbLink href="/residents/profiles">Quản lý cư dân</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Residence Status</BreadcrumbPage>
+              <BreadcrumbPage>Trạng thái cư trú</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Residence status</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Trạng thái cư trú</h1>
           <p className="text-muted-foreground text-sm">
-            Monitor apartment assignments using live data from the schema.
+            Theo dõi việc gán căn hộ cho cư dân theo dữ liệu cập nhật.
           </p>
         </div>
 
@@ -226,9 +228,9 @@ export default function ResidenceStatusPage() {
         <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Assignment list</h2>
+              <h2 className="text-lg font-semibold">Danh sách gán căn hộ</h2>
               <p className="text-muted-foreground text-sm">
-                Use the drawer to assign or remove apartments for each resident.
+                Mở khung chi tiết để gán hoặc gỡ căn hộ cho từng cư dân.
               </p>
             </div>
           </div>

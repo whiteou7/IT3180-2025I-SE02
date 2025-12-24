@@ -29,7 +29,7 @@ export default async function handler(
         status === undefined &&
         issuerId === undefined
       ) {
-        return res.status(400).json({ success: false, message: "No updatable fields provided" })
+        return res.status(400).json({ success: false, message: "Không có thay đổi nào để cập nhật" })
       }
 
       const [reportMeta] = await db<{ propertyId: number | null; propertyOwnerId: string | null }[]>`
@@ -40,14 +40,14 @@ export default async function handler(
       `
 
       if (!reportMeta) {
-        return res.status(404).json({ success: false, message: "Property report not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy báo cáo" })
       }
 
       let updated: PropertyReport | null = null
 
       if (approved !== undefined) {
         if (!issuerId) {
-          return res.status(400).json({ success: false, message: "issuerId is required to approve reports" })
+          return res.status(400).json({ success: false, message: "Vui lòng chọn người duyệt trước" })
         }
 
         const [actor] = await db<{ role: UserRole }[]>`
@@ -55,14 +55,14 @@ export default async function handler(
         `
 
         if (!actor) {
-          return res.status(404).json({ success: false, message: "Approver not found" })
+          return res.status(404).json({ success: false, message: "Không tìm thấy người duyệt" })
         }
 
         const isAdmin = actor.role === "admin"
         const isOwner = issuerId === reportMeta.propertyOwnerId
 
         if (!isAdmin && !isOwner) {
-          return res.status(403).json({ success: false, message: "You are not allowed to approve this report" })
+          return res.status(403).json({ success: false, message: "Bạn không có quyền duyệt báo cáo này" })
         }
 
         const [row] = await db<PropertyReport[]>`
@@ -130,10 +130,10 @@ export default async function handler(
       }
 
       if (!updated) {
-        return res.status(404).json({ success: false, message: "Property report not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy báo cáo" })
       }
 
-      return res.status(200).json({ success: true, message: "Report updated", data: updated })
+      return res.status(200).json({ success: true, message: "Đã cập nhật báo cáo", data: updated })
     }
 
     else if (req.method === "DELETE") {
@@ -144,7 +144,7 @@ export default async function handler(
       `
 
       if (!deleted) {
-        return res.status(404).json({ success: false, message: "Report not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy báo cáo" })
       }
 
       if (deleted.propertyId) {
@@ -164,15 +164,15 @@ export default async function handler(
         `
       }
 
-      return res.status(200).json({ success: true, message: "Report deleted", data: null })
+      return res.status(200).json({ success: true, message: "Đã xóa báo cáo", data: null })
     }
 
     else {
       res.setHeader("Allow", ["PATCH", "DELETE"])
-      return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
+      return res.status(405).json({ success: false, message: `Phương thức ${req.method} không được phép` })
     }
   } catch (error) {
     console.error(`Error processing property report ${id}:`, error)
-    return res.status(500).json({ success: false, message: "Internal Server Error" })
+    return res.status(500).json({ success: false, message: "Có lỗi xảy ra. Vui lòng thử lại." })
   }
 }

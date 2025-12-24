@@ -57,27 +57,27 @@ type ReportTemplate = {
 const prebuiltTemplates: ReportTemplate[] = [
   {
     id: "resident-report",
-    name: "Resident Report",
+    name: "Báo cáo cư dân",
     dataSource: "residents",
-    description: "Complete list of all residents with their details",
+    description: "Danh sách cư dân và thông tin cơ bản",
   },
   {
     id: "apartment-occupancy",
-    name: "Apartment Occupancy",
+    name: "Tình trạng căn hộ",
     dataSource: "apartments",
-    description: "Occupancy status and resident assignments",
+    description: "Tình trạng sử dụng và gán cư dân",
   },
   {
     id: "service-usage",
-    name: "Service Usage",
+    name: "Sử dụng dịch vụ",
     dataSource: "services",
-    description: "Service usage statistics and trends",
+    description: "Thống kê và xu hướng sử dụng dịch vụ",
   },
   {
     id: "document-inventory",
-    name: "Document Inventory",
+    name: "Danh sách tài liệu",
     dataSource: "documents",
-    description: "All documents in the system",
+    description: "Tổng hợp tài liệu trong hệ thống",
   },
 ]
 
@@ -92,7 +92,7 @@ export default function GeneralReportsPage() {
 
   const generateReport = useCallback(async () => {
     if (!isAdmin) {
-      toast.error("Admin access required")
+      toast.error("Chỉ quản trị viên mới có quyền truy cập")
       return
     }
 
@@ -113,7 +113,7 @@ export default function GeneralReportsPage() {
           endpoint = "/api/billings"
           break
         default:
-          toast.error("Invalid data source")
+          toast.error("Nguồn dữ liệu không hợp lệ")
           return
       }
 
@@ -122,14 +122,14 @@ export default function GeneralReportsPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to generate report")
+        throw new Error(response?.message ?? "Không thể tạo báo cáo")
       }
 
       setReportData(response.data || [])
-      toast.success("Report generated successfully")
+      toast.success("Tạo báo cáo thành công")
     } catch (error) {
       console.error(error)
-      toast.error("Failed to generate report")
+      toast.error("Không thể tạo báo cáo")
     } finally {
       setIsLoading(false)
     }
@@ -157,7 +157,7 @@ export default function GeneralReportsPage() {
 
   const handleExportCSV = async () => {
     if (reportData.length === 0) {
-      toast.error("Please generate a report first")
+      toast.error("Vui lòng tạo báo cáo trước")
       return
     }
     try {
@@ -168,15 +168,15 @@ export default function GeneralReportsPage() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `${dataSource}-report-${timestamp}.csv`
+      a.download = `bao-cao-${dataSource}-${timestamp}.csv`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      toast.success("CSV exported successfully")
+      toast.success("Xuất file CSV thành công")
     } catch (error) {
       console.error(error)
-      toast.error("Failed to export CSV")
+      toast.error("Không thể xuất file CSV")
     }
   }
 
@@ -184,13 +184,13 @@ export default function GeneralReportsPage() {
     return (
       <>
         <Head>
-          <title>General Reports • Access Denied</title>
+          <title>Báo cáo tổng hợp • Không có quyền truy cập</title>
         </Head>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
           <AuthGate
             isAuthenticated={Boolean(userId)}
-            title="Access Denied"
-            description="General reports are only accessible to administrators."
+            title="Không có quyền truy cập"
+            description="Báo cáo tổng hợp chỉ dành cho quản trị viên."
           >
             <div />
           </AuthGate>
@@ -202,26 +202,26 @@ export default function GeneralReportsPage() {
   return (
     <>
       <Head>
-        <title>General Reports • Reports & Analytics</title>
+        <title>Báo cáo tổng hợp • Báo cáo & Phân tích</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>General Reports</BreadcrumbPage>
+              <BreadcrumbPage>Báo cáo tổng hợp</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">General Reports</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Báo cáo tổng hợp</h1>
             <p className="text-muted-foreground text-sm">
-              Build custom reports from various data sources.
+              Tạo báo cáo từ nhiều nguồn dữ liệu khác nhau.
             </p>
           </div>
         </div>
@@ -230,15 +230,15 @@ export default function GeneralReportsPage() {
           {/* Report Builder */}
           <Card>
             <CardHeader>
-              <CardTitle>Report Builder</CardTitle>
+              <CardTitle>Tạo báo cáo</CardTitle>
               <CardDescription>
-                    Configure your custom report
+                Cấu hình báo cáo theo nhu cầu
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Data Source</Label>
+                  <Label>Nguồn dữ liệu</Label>
                   <Select
                     value={dataSource}
                     onValueChange={(value) => setDataSource(value as DataSource)}
@@ -247,11 +247,11 @@ export default function GeneralReportsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="residents">Residents</SelectItem>
-                      <SelectItem value="apartments">Apartments</SelectItem>
-                      <SelectItem value="services">Services</SelectItem>
-                      <SelectItem value="documents">Documents</SelectItem>
-                      <SelectItem value="billings">Billings</SelectItem>
+                      <SelectItem value="residents">Cư dân</SelectItem>
+                      <SelectItem value="apartments">Căn hộ</SelectItem>
+                      <SelectItem value="services">Dịch vụ</SelectItem>
+                      <SelectItem value="documents">Tài liệu</SelectItem>
+                      <SelectItem value="billings">Hóa đơn</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -259,7 +259,7 @@ export default function GeneralReportsPage() {
 
               <Button onClick={generateReport} disabled={isLoading} className="w-full sm:w-auto">
                 <BarChart3 className="mr-2 size-4" />
-                {isLoading ? "Generating..." : "Generate Report"}
+                {isLoading ? "Đang tạo..." : "Tạo báo cáo"}
               </Button>
             </CardContent>
           </Card>
@@ -270,14 +270,14 @@ export default function GeneralReportsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Report Preview</CardTitle>
+                    <CardTitle>Xem trước báo cáo</CardTitle>
                     <CardDescription>
-                      {reportData.length} records found
+                      Tìm thấy {reportData.length} dòng dữ liệu
                     </CardDescription>
                   </div>
                   <Button variant="outline" onClick={handleExportCSV}>
                     <Download className="mr-2 size-4" />
-                        Export CSV
+                    Xuất CSV
                   </Button>
                 </div>
               </CardHeader>
@@ -304,7 +304,7 @@ export default function GeneralReportsPage() {
                 </Table>
                 {reportData.length > 100 && (
                   <div className="mt-4 text-center text-sm text-muted-foreground">
-                          Showing first 100 of {reportData.length} records
+                    Đang hiển thị 100 dòng đầu trong tổng số {reportData.length} dòng
                   </div>
                 )}
               </CardContent>

@@ -18,7 +18,7 @@ export default async function handler(
   if (!userId || !propertyId) {
     return res.status(400).json({
       success: false,
-      message: "User ID and Property ID are required",
+      message: "Thiếu mã người dùng hoặc mã tài sản",
     })
   }
 
@@ -43,13 +43,13 @@ export default async function handler(
       if (!property) {
         return res.status(404).json({
           success: false,
-          message: "Property not found",
+          message: "Không tìm thấy tài sản",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Property fetched successfully",
+        message: "Tải tài sản thành công",
         data: property,
       })
     }
@@ -72,7 +72,7 @@ export default async function handler(
       ) {
         return res.status(400).json({
           success: false,
-          message: "At least one field must be provided",
+          message: "Vui lòng cung cấp ít nhất một thông tin cần cập nhật",
         })
       }
 
@@ -95,7 +95,7 @@ export default async function handler(
       if (!existingProperty) {
         return res.status(404).json({
           success: false,
-          message: "Property not found",
+          message: "Không tìm thấy tài sản",
         })
       }
 
@@ -106,7 +106,7 @@ export default async function handler(
       if (!ownerRecord) {
         return res.status(404).json({
           success: false,
-          message: "Owner not found",
+          message: "Không tìm thấy chủ sở hữu",
         })
       }
 
@@ -116,7 +116,7 @@ export default async function handler(
       ) {
         return res.status(400).json({
           success: false,
-          message: "Property type cannot be changed",
+          message: "Không thể thay đổi loại tài sản",
         })
       }
 
@@ -127,7 +127,7 @@ export default async function handler(
       ) {
         return res.status(403).json({
           success: false,
-          message: "Only administrators can mark properties as public",
+          message: "Chỉ quản trị viên mới có thể đặt tài sản là công khai",
         })
       }
 
@@ -155,7 +155,7 @@ export default async function handler(
       if (!updatedProperty) {
         return res.status(404).json({
           success: false,
-          message: "Property not found",
+          message: "Không tìm thấy tài sản",
         })
       }
 
@@ -177,7 +177,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Property updated successfully",
+        message: "Cập nhật tài sản thành công",
         data: responseData,
       })
     }
@@ -193,13 +193,13 @@ export default async function handler(
       if (!deletedProperty) {
         return res.status(404).json({
           success: false,
-          message: "Property not found",
+          message: "Không tìm thấy tài sản",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Property deleted successfully",
+        message: "Xóa tài sản thành công",
         data: deletedProperty,
       })
     }
@@ -207,7 +207,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET", "PUT", "DELETE"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error in /api/users/[id]/properties/[propertyId]:", error)

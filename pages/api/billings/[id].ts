@@ -9,7 +9,7 @@ export default async function handler(
 ) {
   const { id } = req.query
 
-  if (!id) return res.status(400).json({ success: false, message: "Billing ID is required" })
+  if (!id) return res.status(400).json({ success: false, message: "Mã thanh toán là bắt buộc" })
 
   try {
     if (req.method === "GET") {
@@ -36,7 +36,7 @@ export default async function handler(
       `
 
       if (result.length === 0) {
-        return res.status(404).json({ success: false, message: "Billing not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy thanh toán" })
       }
 
       const firstRow = result[0]
@@ -69,7 +69,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Billing details fetched successfully.",
+        message: "Tải chi tiết thanh toán thành công.",
         data: billingData,
       })
     }
@@ -84,23 +84,23 @@ export default async function handler(
       `
 
       if (updated.length === 0) {
-        return res.status(404).json({ success: false, message: "Billing not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy thanh toán" })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Billing paid successfully.",
+        message: "Thanh toán thành công.",
         data: null,
       })
     }
     
     else {
       res.setHeader("Allow", ["GET", "PUT"])
-      return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
+      return res.status(405).json({ success: false, message: `Phương thức ${req.method} không được phép` })
     }
 
   } catch (error: unknown) {
     console.error("Error processing billing:", error)
-    return res.status(500).json({ success: false, message: "Internal Server Error" })
+    return res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ" })
   }
 }

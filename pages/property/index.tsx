@@ -54,19 +54,19 @@ export default function PropertiesPage() {
       const response = await ofetch(endpoint, { ignoreResponseError: true })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to load properties")
+        throw new Error(response?.message ?? "Không thể tải danh sách tài sản")
       }
 
       const data = response.data as PropertySummary[]
       setProperties(
         data.map((item) => ({
           ...item,
-          ownerName: item.ownerName ?? (item.userId === userId ? "You" : item.ownerName),
+          ownerName: item.ownerName ?? (item.userId === userId ? "Bạn" : item.ownerName),
         }))
       )
     } catch (error) {
       console.error(error)
-      toast.error("Failed to load properties")
+      toast.error("Không thể tải danh sách tài sản")
     } finally {
       setIsLoading(false)
     }
@@ -141,15 +141,15 @@ export default function PropertiesPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to create property")
+        throw new Error(response?.message ?? "Không thể đăng ký tài sản")
       }
 
-      toast.success("Property registered successfully")
+      toast.success("Đăng ký tài sản thành công")
       setIsFormOpen(false)
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to register property")
+      toast.error("Không thể đăng ký tài sản")
     } finally {
       setIsSubmitting(false)
     }
@@ -180,16 +180,16 @@ export default function PropertiesPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to save property")
+        throw new Error(response?.message ?? "Không thể lưu tài sản")
       }
 
-      toast.success("Property updated")
+      toast.success("Đã cập nhật tài sản")
       setEditingProperty(null)
       setIsFormOpen(false)
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Unable to update property")
+      toast.error("Không thể cập nhật tài sản")
     } finally {
       setIsSubmitting(false)
     }
@@ -202,11 +202,11 @@ export default function PropertiesPage() {
         method: "DELETE",
         ignoreResponseError: true,
       })
-      toast.success("Property deleted")
+      toast.success("Đã xóa tài sản")
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to delete property")
+      toast.error("Không thể xóa tài sản")
     }
   }
 
@@ -218,11 +218,11 @@ export default function PropertiesPage() {
         body: { status },
         ignoreResponseError: true,
       })
-      toast.success(`Property marked as ${formatStatusLabel(status)}`)
+      toast.success(`Đã chuyển trạng thái: ${formatStatusLabel(status)}`)
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Unable to update status")
+      toast.error("Không thể cập nhật trạng thái")
     }
   }
 
@@ -247,39 +247,39 @@ export default function PropertiesPage() {
   return (
     <>
       <Head>
-        <title>Properties • Property Management</title>
+        <title>Tài sản • Quản lý tài sản</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Property Management</BreadcrumbPage>
+              <BreadcrumbPage>Quản lý tài sản</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Property registry</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Danh sách tài sản</h1>
             <p className="text-muted-foreground text-sm">
-              Track all assets registered by residents and monitor their status.
+              Theo dõi tài sản cư dân đã đăng ký và trạng thái hiện tại.
             </p>
           </div>
           {creationEnabled && (
             <Button onClick={() => setIsFormOpen(true)}>
               <Plus className="mr-2 size-4" />
-              Register property
+              Đăng ký tài sản
             </Button>
           )}
         </div>
 
         <AuthGate
           isAuthenticated={Boolean(userId)}
-          description="Sign in to review building property registrations."
+          description="Vui lòng đăng nhập để xem danh sách tài sản đã đăng ký."
         >
           <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
             <PropertyFilters filters={filters} onChange={setFilters} isLoading={isLoading} />

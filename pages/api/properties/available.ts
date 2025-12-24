@@ -16,7 +16,7 @@ export default async function handler(
   if (!userId) {
     return res.status(400).json({
       success: false,
-      message: "User ID is required",
+      message: "Thiếu mã người dùng",
     })
   }
 
@@ -61,7 +61,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Available properties fetched successfully",
+        message: "Tải danh sách tài sản có thể báo cáo thành công",
         data: properties,
       })
     }
@@ -69,7 +69,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error in /api/properties/available:", error)

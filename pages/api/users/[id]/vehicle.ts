@@ -13,7 +13,7 @@ export default async function handler(
   const { id: userId } = req.query
 
   if (!userId) {
-    return res.status(400).json({ success: false, message: "User ID is required" })
+    return res.status(400).json({ success: false, message: "Thiếu mã người dùng" })
   }
 
   try {
@@ -25,7 +25,7 @@ export default async function handler(
       if (!licensePlate) {
         return res.status(400).json({
           success: false,
-          message: "License plate is required",
+          message: "Vui lòng nhập biển số xe",
         })
       }
 
@@ -35,7 +35,7 @@ export default async function handler(
       `
 
       if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" })
+        return res.status(404).json({ success: false, message: "Không tìm thấy người dùng" })
       }
 
       // Ensure license plate is unique
@@ -44,7 +44,7 @@ export default async function handler(
       `
 
       if (existingVehicle) {
-        return res.status(409).json({ success: false, message: "License plate already registered" })
+        return res.status(409).json({ success: false, message: "Biển số xe này đã được đăng ký" })
       }
 
       // Ensure each user only have one vehicle
@@ -62,7 +62,7 @@ export default async function handler(
       `
 
       if (existingUserVehicle) {
-        return res.status(409).json({ success: false, message: "User already has a vehicle" })
+        return res.status(409).json({ success: false, message: "Người dùng này đã có phương tiện" })
       }
 
       // Create property
@@ -73,7 +73,7 @@ export default async function handler(
       `
 
       if (!createdProperty) {
-        return res.status(500).json({ success: false, message: "Failed to create property" })
+        return res.status(500).json({ success: false, message: "Không thể tạo tài sản. Vui lòng thử lại." })
       }
 
       // Create vehicle linked to property
@@ -85,7 +85,7 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Property and vehicle created successfully",
+        message: "Đã tạo phương tiện thành công",
         data: {
           vehicleId: createdVehicle.vehicleId,
           propertyId: createdProperty.propertyId,
@@ -95,7 +95,7 @@ export default async function handler(
     }
 
     res.setHeader("Allow", ["POST"])
-    return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
+    return res.status(405).json({ success: false, message: `Phương thức ${req.method} không được phép` })
   } catch (error) {
     console.error("Error in /api/users/[id]/vehicle:", error)
     return res.status(500).json({ success: false, message: (error as Error).message })

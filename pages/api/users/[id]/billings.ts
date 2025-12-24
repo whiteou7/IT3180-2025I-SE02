@@ -19,7 +19,7 @@ export default async function handler(
 
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"])
-    return res.status(405).json({ success: false, message: "Method Not Allowed" })
+    return res.status(405).json({ success: false, message: "Phương thức không được phép" })
   }
 
   try {
@@ -83,13 +83,13 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "User billings fetched successfully.",
+      message: "Tải danh sách hóa đơn của cư dân thành công.",
       data: billings,
     })
 
   } catch (error: unknown) {
     console.error("Error fetching user billings:", error)
-    const errorMessage = error instanceof Error ? error.message : "Internal Server Error"
+    const errorMessage = error instanceof Error ? error.message : "Có lỗi xảy ra. Vui lòng thử lại."
     return res.status(500).json({ 
       success: false, 
       message: errorMessage

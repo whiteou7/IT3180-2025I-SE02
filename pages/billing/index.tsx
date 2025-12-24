@@ -53,9 +53,9 @@ import type { BillingStatus } from "@/types/enum"
 import type { User } from "@/types/users"
 
 const statusBadges: Record<BillingStatus, { label: string; variant: "default" | "secondary" | "outline" }> = {
-  unpaid: { label: "Unpaid", variant: "secondary" },
-  paid: { label: "Paid", variant: "default" },
-  deleted: { label: "Voided", variant: "outline" },
+  unpaid: { label: "Chưa thanh toán", variant: "secondary" },
+  paid: { label: "Đã thanh toán", variant: "default" },
+  deleted: { label: "Đã hủy", variant: "outline" },
 }
 
 export default function BillingCenterPage() {
@@ -101,7 +101,7 @@ export default function BillingCenterPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to fetch billings")
+        throw new Error(response?.message ?? "Không thể tải danh sách thanh toán")
       }
       const normalized = (response.data as BillingSummary[]).map((billing) => ({
         ...billing,
@@ -110,7 +110,7 @@ export default function BillingCenterPage() {
       setBillings(normalized)
     } catch (error) {
       console.error(error)
-      toast.error("Failed to load billings")
+      toast.error("Tải danh sách thanh toán thất bại")
     } finally {
       setIsLoading(false)
     }
@@ -130,7 +130,7 @@ export default function BillingCenterPage() {
     ofetch(`/api/billings/${detailId}`, { ignoreResponseError: true })
       .then((response) => {
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to fetch billing detail")
+          throw new Error(response?.message ?? "Không thể tải chi tiết thanh toán")
         }
         if (mounted) {
           const payload = response.data as BillingDetail
@@ -140,7 +140,7 @@ export default function BillingCenterPage() {
       })
       .catch((error) => {
         console.error(error)
-        toast.error("Failed to load billing detail")
+        toast.error("Tải chi tiết thanh toán thất bại")
       })
       .finally(() => {
         if (mounted) setIsDetailLoading(false)
@@ -186,10 +186,10 @@ export default function BillingCenterPage() {
 
   const handleExport = () => {
     if (!billings.length) {
-      toast.error("No data to export")
+      toast.error("Không có dữ liệu để xuất")
       return
     }
-    const header = ["Billing ID", "Resident", "Services", "Amount", "Due Date", "Status"]
+    const header = ["Mã thanh toán", "Cư dân", "Dịch vụ", "Số tiền", "Ngày đến hạn", "Trạng thái"]
     const rows = billings.map((billing) => [
       billing.billingId,
       billing.fullName,
@@ -215,9 +215,9 @@ export default function BillingCenterPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to update billing")
+        throw new Error(response?.message ?? "Không thể cập nhật thanh toán")
       }
-      toast.success("Billing marked as paid")
+      toast.success("Đánh dấu thanh toán đã được trả")
       await fetchBillings()
       setDetail((prev) =>
         prev && prev.billingId === billingId
@@ -230,7 +230,7 @@ export default function BillingCenterPage() {
       )
     } catch (error) {
       console.error(error)
-      toast.error("Failed to mark billing as paid")
+      toast.error("Đánh dấu thanh toán thất bại")
     } finally {
       setIsPaying(false)
     }
@@ -242,7 +242,7 @@ export default function BillingCenterPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to generate invoice")
+        throw new Error(response?.message ?? "Không thể tạo hóa đơn")
       }
       const payload = response.data
       const link = document.createElement("a")
@@ -251,39 +251,39 @@ export default function BillingCenterPage() {
       link.click()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to download invoice")
+      toast.error("Tải hóa đơn thất bại")
     }
   }
 
   return (
     <>
       <Head>
-        <title>Billing center • Fee collection</title>
+        <title>Trung tâm Thanh toán • Thu phí</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Billing center</BreadcrumbPage>
+              <BreadcrumbPage>Trung tâm Thanh toán</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Billing & invoices</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Thanh toán & Hóa đơn</h1>
             <p className="text-muted-foreground text-sm">
-              Keep every service charge organized with quick payment actions.
+              Giữ mọi phí dịch vụ được tổ chức với các hành động thanh toán nhanh chóng.
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleExport} disabled={!billings.length || !userId}>
               <Download className="mr-2 size-4" />
-              Export CSV
+              Xuất CSV
             </Button>
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function BillingCenterPage() {
           <div className="grid gap-4 md:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Total outstanding</CardTitle>
+                <CardTitle className="text-sm font-medium">Tổng chưa thanh toán</CardTitle>
                 <Wallet className="text-muted-foreground size-4" />
               </CardHeader>
               <CardContent>
@@ -301,18 +301,18 @@ export default function BillingCenterPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Next due date</CardTitle>
+                <CardTitle className="text-sm font-medium">Ngày đến hạn tiếp theo</CardTitle>
                 <CalendarDays className="text-muted-foreground size-4" />
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-semibold">
-                  {totals.earliestDue ? totals.earliestDue.toLocaleDateString() : "No pending"}
+                  {totals.earliestDue ? totals.earliestDue.toLocaleDateString() : "Không có"}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Paid this month</CardTitle>
+                <CardTitle className="text-sm font-medium">Đã thanh toán tháng này</CardTitle>
                 <BadgeCheck className="text-muted-foreground size-4" />
               </CardHeader>
               <CardContent>
@@ -323,31 +323,31 @@ export default function BillingCenterPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Bill list</CardTitle>
-              <CardDescription>Bulk select, review, and settle outstanding balances.</CardDescription>
+              <CardTitle>Danh sách Hóa đơn</CardTitle>
+              <CardDescription>Chọn nhiều, xem xét và thanh toán các khoản chưa thanh toán.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div className="flex gap-3">
                   <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}>
                     <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Status" />
+                      <SelectValue placeholder="Trạng thái" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All statuses</SelectItem>
-                      <SelectItem value="unpaid">Unpaid</SelectItem>
-                      <SelectItem value="paid">Paid</SelectItem>
-                      <SelectItem value="deleted">Voided</SelectItem>
+                      <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                      <SelectItem value="unpaid">Chưa thanh toán</SelectItem>
+                      <SelectItem value="paid">Đã thanh toán</SelectItem>
+                      <SelectItem value="deleted">Đã hủy</SelectItem>
                     </SelectContent>
                   </Select>
 
                   {hasAllowedRole && (
                     <Select value={selectedUser} onValueChange={setSelectedUser}>
                       <SelectTrigger className="w-52">
-                        <SelectValue placeholder="All residents" />
+                        <SelectValue placeholder="Tất cả cư dân" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All residents</SelectItem>
+                        <SelectItem value="all">Tất cả cư dân</SelectItem>
                         {users.map((user) => (
                           <SelectItem key={user.userId} value={user.userId}>
                             {user.fullName}
@@ -358,7 +358,7 @@ export default function BillingCenterPage() {
                   )}
                 </div>
                 <Button variant="ghost" size="sm" onClick={fetchBillings}>
-                  Refresh list
+                  Làm mới danh sách
                 </Button>
               </div>
 
@@ -366,13 +366,13 @@ export default function BillingCenterPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Billing</TableHead>
-                      <TableHead>Resident</TableHead>
-                      <TableHead>Services</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Due date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
+                      <TableHead>Thanh toán</TableHead>
+                      <TableHead>Cư dân</TableHead>
+                      <TableHead>Dịch vụ</TableHead>
+                      <TableHead>Số tiền</TableHead>
+                      <TableHead>Ngày đến hạn</TableHead>
+                      <TableHead>Trạng thái</TableHead>
+                      <TableHead className="text-right">Hành động</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -401,7 +401,7 @@ export default function BillingCenterPage() {
                               variant="outline"
                               onClick={() => setDetailId(billing.billingId)}
                             >
-                              View
+                              Xem
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -409,7 +409,7 @@ export default function BillingCenterPage() {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
-                          No bills found.
+                          Không tìm thấy hóa đơn.
                         </TableCell>
                       </TableRow>
                     )}
@@ -421,8 +421,8 @@ export default function BillingCenterPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Invoice history</CardTitle>
-              <CardDescription>Paid invoices ready for download.</CardDescription>
+              <CardTitle>Lịch sử Hóa đơn</CardTitle>
+              <CardDescription>Hóa đơn đã thanh toán sẵn sàng để tải xuống.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               {invoiceHistory.length ? (
@@ -431,7 +431,7 @@ export default function BillingCenterPage() {
                     <div>
                       <p className="font-medium">{billing.billingId.slice(0, 8).toUpperCase()}</p>
                       <p className="text-muted-foreground text-xs">
-                        Paid {billing.paidAt ? new Date(billing.paidAt).toLocaleDateString() : "—"}
+                        Đã thanh toán {billing.paidAt ? new Date(billing.paidAt).toLocaleDateString() : "—"}
                       </p>
                     </div>
                     <Button
@@ -446,7 +446,7 @@ export default function BillingCenterPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-muted-foreground text-sm">No invoice history to display.</p>
+                <p className="text-muted-foreground text-sm">Không có lịch sử hóa đơn để hiển thị.</p>
               )}
             </CardContent>
           </Card>
@@ -456,8 +456,8 @@ export default function BillingCenterPage() {
       <Sheet open={Boolean(detailId)} onOpenChange={(open) => setDetailId(open ? detailId : null)}>
         <SheetContent className="flex w-full flex-col gap-4 overflow-y-auto sm:max-w-lg">
           <SheetHeader>
-            <SheetTitle>Billing detail</SheetTitle>
-            <SheetDescription>Charge breakdown, payment actions, and invoice controls.</SheetDescription>
+            <SheetTitle>Chi tiết Thanh toán</SheetTitle>
+            <SheetDescription>Phân tích chi phí, hành động thanh toán và điều khiển hóa đơn.</SheetDescription>
           </SheetHeader>
 
           {isDetailLoading || !detail ? (
@@ -469,7 +469,7 @@ export default function BillingCenterPage() {
               <div className="rounded-xl border mx-4 p-4 text-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">Billing ID</p>
+                    <p className="text-xs text-muted-foreground">Mã thanh toán</p>
                     <p className="font-semibold">{detail.billingId}</p>
                   </div>
                   <Badge variant={statusBadges[detail.billingStatus].variant}>
@@ -479,15 +479,15 @@ export default function BillingCenterPage() {
                 <Separator className="my-4" />
                 <div className="grid gap-3">
                   <p>
-                    <span className="text-muted-foreground">Resident:</span> {detail.fullName}
+                    <span className="text-muted-foreground">Cư dân:</span> {detail.fullName}
                   </p>
                   <p>
-                    <span className="text-muted-foreground">Period:</span>{" "}
+                    <span className="text-muted-foreground">Kỳ:</span>{" "}
                     {new Date(detail.periodStart).toLocaleDateString()} –{" "}
                     {new Date(detail.periodEnd).toLocaleDateString()}
                   </p>
                   <p>
-                    <span className="text-muted-foreground">Due date:</span>{" "}
+                    <span className="text-muted-foreground">Ngày đến hạn:</span>{" "}
                     {new Date(detail.dueDate).toLocaleDateString()}
                   </p>
                   <p className="text-lg font-semibold">${detail.totalPrice.toFixed(2)}</p>
@@ -495,14 +495,14 @@ export default function BillingCenterPage() {
               </div>
 
               <div className="space-y-3 mx-4">
-                <h3 className="text-sm font-semibold">Services</h3>
+                <h3 className="text-sm font-semibold">Dịch vụ</h3>
                 {detail.services.map((service) => (
                   <div key={service.serviceId} className="rounded-lg border p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">{service.serviceName}</p>
                         <p className="text-muted-foreground text-xs">
-                          ${service.price.toFixed(2)} • Tax {service.tax}%
+                          ${service.price.toFixed(2)} • Thuế {service.tax}%
                         </p>
                       </div>
                       <span className="font-semibold">
@@ -522,19 +522,19 @@ export default function BillingCenterPage() {
                   className="gap-2 mx-4"
                 >
                   <FileText className="size-4" />
-                  Generate invoice
+                  Tạo hóa đơn
                 </Button>
                 {detail.billingStatus === "unpaid" && (
                   <Button onClick={() => handleMarkPaid(detail.billingId)} disabled={isPaying} className="gap-2 mx-4">
                     {isPaying ? (
                       <>
                         <Loader2 className="size-4 animate-spin" />
-                        Processing…
+                        Đang xử lý…
                       </>
                     ) : (
                       <>
                         <ShieldCheck className="size-4" />
-                        Pay bill
+                        Thanh toán hóa đơn
                       </>
                     )}
                   </Button>

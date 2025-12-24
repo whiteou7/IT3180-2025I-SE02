@@ -20,7 +20,7 @@ export default async function handler(
   if (!userId || !vehicleId) {
     return res.status(400).json({
       success: false,
-      message: "User ID and Vehicle ID are required",
+      message: "Thiếu mã người dùng hoặc mã phương tiện",
     })
   }
 
@@ -28,7 +28,7 @@ export default async function handler(
     res.setHeader("Allow", ["PUT"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -40,7 +40,7 @@ export default async function handler(
     if (!licensePlate) {
       return res.status(400).json({
         success: false,
-        message: "licensePlate is required",
+        message: "Vui lòng nhập biển số xe",
       })
     }
 
@@ -55,13 +55,13 @@ export default async function handler(
     if (!updatedVehicle) {
       return res.status(404).json({
         success: false,
-        message: "Vehicle not found",
+        message: "Không tìm thấy phương tiện",
       })
     }
 
     return res.status(200).json({
       success: true,
-      message: "License plate updated successfully",
+      message: "Cập nhật biển số xe thành công",
       data: updatedVehicle,
     })
   } catch (error) {

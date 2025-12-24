@@ -92,10 +92,10 @@ export default function ResidentProfilesPage() {
         ])
 
         if (!usersResponse?.success) {
-          throw new Error(usersResponse?.message ?? "Unable to load residents")
+          throw new Error(usersResponse?.message ?? "Không thể tải danh sách cư dân")
         }
         if (!apartmentsResponse?.success) {
-          throw new Error(apartmentsResponse?.message ?? "Unable to load apartments")
+          throw new Error(apartmentsResponse?.message ?? "Không thể tải danh sách căn hộ")
         }
 
         const apartments = (apartmentsResponse.data as Apartment[]) ?? []
@@ -137,7 +137,7 @@ export default function ResidentProfilesPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to load residents. Please try again.")
+        toast.error("Không thể tải dữ liệu. Vui lòng thử lại.")
       } finally {
         if (active) {
           setIsLoading(false)
@@ -199,7 +199,7 @@ export default function ResidentProfilesPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to save user")
+        throw new Error(response?.message ?? "Không thể lưu thông tin")
       }
       
       if (selectedResident) {
@@ -218,7 +218,7 @@ export default function ResidentProfilesPage() {
               : resident
           )
         )
-        toast.success("Resident profile updated")
+        toast.success("Đã cập nhật hồ sơ cư dân")
       } else if (selectedAccount) {
         setSpecialAccounts((prev) =>
           prev.map((account) =>
@@ -235,12 +235,12 @@ export default function ResidentProfilesPage() {
               : account
           )
         )
-        toast.success("Special account updated")
+        toast.success("Đã cập nhật tài khoản đặc biệt")
       }
       setDrawerOpen(false)
     } catch (error) {
       console.error(error)
-      toast.error("Failed to save user")
+      toast.error("Không thể lưu thông tin")
     } finally {
       setIsSaving(false)
     }
@@ -263,9 +263,9 @@ export default function ResidentProfilesPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to create user")
+        throw new Error(response?.message ?? "Không thể tạo người dùng")
       }
-      toast.success("User created successfully")
+      toast.success("Tạo người dùng thành công")
       setCreateDialogOpen(false)
       // Reload residents
       const [usersResponse, apartmentsResponse] = await Promise.all([
@@ -307,7 +307,7 @@ export default function ResidentProfilesPage() {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Failed to create user")
+      toast.error("Không thể tạo người dùng")
     } finally {
       setIsCreating(false)
     }
@@ -316,36 +316,36 @@ export default function ResidentProfilesPage() {
   return (
     <>
       <Head>
-        <title>Resident Profiles • Apartment Management</title>
+        <title>Hồ sơ cư dân • Quản lý chung cư</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/residents/profiles">Resident Management</BreadcrumbLink>
+              <BreadcrumbLink href="/residents/profiles">Quản lý cư dân</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Resident Profiles</BreadcrumbPage>
+              <BreadcrumbPage>Hồ sơ cư dân</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Resident profiles</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Hồ sơ cư dân</h1>
             <p className="text-muted-foreground text-sm">
-              Search, filter, and edit resident records backed directly by the database schema.
+              Tìm kiếm, lọc và cập nhật thông tin cư dân.
             </p>
           </div>
           {isAdmin && (
             <Button onClick={() => setCreateDialogOpen(true)}>
               <Plus className="mr-2 size-4" />
-              Add user
+              Thêm người dùng
             </Button>
           )}
         </div>
@@ -354,37 +354,37 @@ export default function ResidentProfilesPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Total residents</CardDescription>
+                <CardDescription>Tổng số cư dân</CardDescription>
                 <CardTitle className="text-2xl">{assignmentStats.total}</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-foreground text-xs">
-              Count of all users returned from `/api/users`.
+                Tổng số cư dân trong hệ thống.
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Assigned</CardDescription>
+                <CardDescription>Đã gán</CardDescription>
                 <CardTitle className="text-2xl">{assignmentStats.assigned}</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-foreground text-xs">
-              Residents with an `apartment_id`.
+                Cư dân đã được gán căn hộ.
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Unassigned</CardDescription>
+                <CardDescription>Chưa gán</CardDescription>
                 <CardTitle className="text-2xl">{assignmentStats.unassigned}</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-foreground text-xs">
-              Residents awaiting placement.
+                Cư dân chưa được gán căn hộ.
               </CardContent>
             </Card>
           </div>
         )}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList>
-            <TabsTrigger value="residents">Residents</TabsTrigger>
-            {isAdmin && <TabsTrigger value="special-accounts">Special Accounts</TabsTrigger>}
+            <TabsTrigger value="residents">Cư dân</TabsTrigger>
+            {isAdmin && <TabsTrigger value="special-accounts">Tài khoản đặc biệt</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="residents" className="space-y-6">
@@ -401,7 +401,7 @@ export default function ResidentProfilesPage() {
                 />
               </div>
             ) : isLoading ? null : (
-              <ResidentEmptyState className="py-20" message="No resident matches the selected filters." />
+              <ResidentEmptyState className="py-20" message="Không có cư dân nào phù hợp với bộ lọc." />
             )}
           </TabsContent>
 
@@ -411,10 +411,10 @@ export default function ResidentProfilesPage() {
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Search special accounts
+                      Tìm tài khoản đặc biệt
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      Search by name, email, or phone number.
+                      Tìm theo tên, email hoặc số điện thoại.
                     </p>
                   </div>
                   <Button
@@ -423,11 +423,11 @@ export default function ResidentProfilesPage() {
                     disabled={isLoading}
                     onClick={() => setSpecialAccountSearch("")}
                   >
-                    Reset
+                    Đặt lại
                   </Button>
                 </div>
                 <Input
-                  placeholder="Search by name, email, or phone..."
+                  placeholder="Tìm theo tên, email hoặc số điện thoại..."
                   value={specialAccountSearch}
                   disabled={isLoading}
                   onChange={(event) => setSpecialAccountSearch(event.target.value)}
@@ -444,7 +444,7 @@ export default function ResidentProfilesPage() {
                 />
               </div>
             ) : isLoading ? null : (
-              <ResidentEmptyState className="py-20" message="No special accounts found." />
+              <ResidentEmptyState className="py-20" message="Không tìm thấy tài khoản đặc biệt." />
             )}
           </TabsContent>
         </Tabs>

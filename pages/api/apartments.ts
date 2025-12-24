@@ -30,7 +30,7 @@ export default async function handler(
       ) {
         return res.status(400).json({
           success: false,
-          message: "Missing required body keys",
+          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
         })
       }
 
@@ -42,7 +42,7 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Apartment created successfully.",
+        message: "Tạo căn hộ thành công.",
         data: { apartmentId: newApartment.apartmentId }
       })
 
@@ -50,7 +50,7 @@ export default async function handler(
       console.error("Error creating apartment:", error)
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: "Có lỗi xảy ra. Vui lòng thử lại.",
       })
     }
   }
@@ -88,14 +88,14 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Apartments fetched successfully.",
+        message: "Tải danh sách căn hộ thành công.",
         data: apartmentsWithMembers,
       })
     } catch (error) {
       console.error("Error fetching apartments:", error)
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: "Có lỗi xảy ra. Vui lòng thử lại.",
       })
     }
   }
@@ -103,6 +103,6 @@ export default async function handler(
   res.setHeader("Allow", ["POST", "GET"])
   return res.status(405).json({
     success: false,
-    message: `Method ${req.method} Not Allowed`,
+    message: `Phương thức ${req.method} không được phép`,
   })
 }

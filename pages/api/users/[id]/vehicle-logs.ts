@@ -20,7 +20,7 @@ export default async function handler(
   if (!userId) {
     return res.status(400).json({
       success: false,
-      message: "User ID is required",
+      message: "Thiếu mã người dùng",
     })
   }
 
@@ -28,7 +28,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -56,7 +56,7 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Vehicle logs fetched successfully",
+      message: "Tải nhật ký ra vào thành công",
       data: logs,
     })
   } catch (error) {

@@ -47,7 +47,7 @@ export function LoginForm({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!email || !password) {
-      toast.error("Please provide both email and password.")
+      toast.error("Vui lòng cung cấp cả email và mật khẩu.")
       return
     }
 
@@ -60,18 +60,18 @@ export function LoginForm({
       })
 
       if (!response.success) {
-        toast.error(response.message ?? "Login failed.")
+        toast.error(response.message ?? "Đăng nhập thất bại.")
         return
       }
 
       const { userId, role, fullName } = response.data
 
       setUser(userId, role, fullName)
-      toast.success(response.message ?? "Login successful.")
+      toast.success(response.message ?? "Đăng nhập thành công.")
       router.push("/dashboard")
     } catch (error) {
       console.error(error)
-      toast.error("Unable to login. Please try again.")
+      toast.error("Không thể đăng nhập. Vui lòng thử lại.")
     } finally {
       setIsLoading(false)
     }
@@ -79,12 +79,12 @@ export function LoginForm({
 
   const handleForgotPassword = async () => {
     if (!forgotEmail || !forgotPhoneNumber || !newPassword) {
-      toast.error("Please provide email, phone number, and new password.")
+      toast.error("Vui lòng cung cấp email, số điện thoại và mật khẩu mới.")
       return
     }
 
     if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters.")
+      toast.error("Mật khẩu phải có ít nhất 6 ký tự.")
       return
     }
 
@@ -101,18 +101,18 @@ export function LoginForm({
       })
 
       if (!response.success) {
-        toast.error(response.message ?? "Failed to reset password.")
+        toast.error(response.message ?? "Đặt lại mật khẩu thất bại.")
         return
       }
 
-      toast.success(response.message ?? "Password reset successfully.")
+      toast.success(response.message ?? "Đặt lại mật khẩu thành công.")
       setIsForgotPasswordOpen(false)
       setForgotEmail("")
       setForgotPhoneNumber("")
       setNewPassword("")
     } catch (error) {
       console.error(error)
-      toast.error("Unable to reset password. Please try again.")
+      toast.error("Không thể đặt lại mật khẩu. Vui lòng thử lại.")
     } finally {
       setIsResetting(false)
     }
@@ -131,37 +131,37 @@ export function LoginForm({
       })
 
       if (!response.success) {
-        toast.error(response.message ?? "Login failed.")
+        toast.error(response.message ?? "Đăng nhập thất bại.")
         return
       }
 
       const { userId, role, fullName } = response.data
 
       setUser(userId, role, fullName)
-      toast.success(response.message ?? "Login successful.")
+      toast.success(response.message ?? "Đăng nhập thành công.")
       router.push("/dashboard")
     } catch (error) {
       console.error(error)
-      toast.error("Unable to login. Please try again.")
+      toast.error("Không thể đăng nhập. Vui lòng thử lại.")
     } finally {
       setIsLoading(false)
     }
   }
 
   const demoAccounts = [
-    { role: "Admin", email: "admin@gmail.com", password: "admin" },
-    { role: "Tenant", email: "tenant@gmail.com", password: "tenant" },
-    { role: "Police", email: "police@gmail.com", password: "police" },
-    { role: "Accountant", email: "accountant@gmail.com", password: "accountant" },
+    { role: "Quản trị viên", email: "admin@gmail.com", password: "admin" },
+    { role: "Cư dân", email: "tenant@gmail.com", password: "tenant" },
+    { role: "An ninh", email: "police@gmail.com", password: "police" },
+    { role: "Kế toán", email: "accountant@gmail.com", password: "accountant" },
   ]
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle>Đăng nhập tài khoản</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Nhập email của bạn để đăng nhập vào tài khoản
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -180,7 +180,7 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <FieldLabel htmlFor="password">Mật khẩu</FieldLabel>
                 <Input
                   id="password"
                   type="password"
@@ -192,7 +192,7 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                 </Button>
                 <FieldDescription className="text-center">
                   <button
@@ -200,7 +200,7 @@ export function LoginForm({
                     onClick={() => setIsForgotPasswordOpen(true)}
                     className="text-primary hover:underline"
                   >
-                    Forgot password?
+                    Quên mật khẩu?
                   </button>
                 </FieldDescription>
               </Field>
@@ -211,9 +211,9 @@ export function LoginForm({
 
       <Card>
         <CardHeader>
-          <CardTitle>Demo Accounts</CardTitle>
+          <CardTitle>Tài khoản demo</CardTitle>
           <CardDescription>
-            Click a button below to login as a demo account
+            Nhấp vào nút bên dưới để đăng nhập với tài khoản demo
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -227,7 +227,7 @@ export function LoginForm({
                 disabled={isLoading}
                 className="w-full"
               >
-                Login as {account.role}
+                Đăng nhập với {account.role}
               </Button>
             ))}
           </div>
@@ -237,9 +237,9 @@ export function LoginForm({
       <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
+            <DialogTitle>Đặt lại mật khẩu</DialogTitle>
             <DialogDescription>
-              Enter your email and phone number to reset your password. Both must match your account.
+              Nhập email và số điện thoại của bạn để đặt lại mật khẩu. Cả hai phải khớp với tài khoản của bạn.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -256,7 +256,7 @@ export function LoginForm({
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="forgot-phone">Phone Number</FieldLabel>
+              <FieldLabel htmlFor="forgot-phone">Số điện thoại</FieldLabel>
               <Input
                 id="forgot-phone"
                 type="tel"
@@ -268,7 +268,7 @@ export function LoginForm({
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="new-password">New Password</FieldLabel>
+              <FieldLabel htmlFor="new-password">Mật khẩu mới</FieldLabel>
               <Input
                 id="new-password"
                 type="password"
@@ -287,14 +287,14 @@ export function LoginForm({
               onClick={() => setIsForgotPasswordOpen(false)}
               disabled={isResetting}
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               type="button"
               onClick={handleForgotPassword}
               disabled={isResetting}
             >
-              {isResetting ? "Resetting..." : "Reset Password"}
+              {isResetting ? "Đang đặt lại..." : "Đặt lại mật khẩu"}
             </Button>
           </DialogFooter>
         </DialogContent>

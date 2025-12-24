@@ -17,7 +17,7 @@ export default async function handler(
   if (!userId) {
     return res.status(400).json({
       success: false, 
-      message: "User ID is required" 
+      message: "Thiếu mã người dùng" 
     })
   }
 
@@ -30,7 +30,7 @@ export default async function handler(
       if (!apartmentId) {
         return res.status(400).json({
           success: false,
-          message: "Missing apartmentId in request body",
+          message: "Vui lòng chọn căn hộ",
         })
       }
 
@@ -46,13 +46,13 @@ export default async function handler(
       if (!updatedUser) {
         return res.status(404).json({
           success: false,
-          message: "User not found",
+          message: "Không tìm thấy người dùng",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "User added to apartment successfully",
+        message: "Đã gán căn hộ cho cư dân",
         data: updatedUser,
       })
     }
@@ -65,7 +65,7 @@ export default async function handler(
       if (!user) {
         return res.status(404).json({
           success: false,
-          message: "User not found",
+          message: "Không tìm thấy người dùng",
         })
       }
 
@@ -77,7 +77,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "User removed from apartment successfully",
+        message: "Đã gỡ cư dân khỏi căn hộ",
         data: null,
       })
     }
@@ -90,14 +90,14 @@ export default async function handler(
       if (!user) {
         return res.status(404).json({
           success: false,
-          message: "User not found",
+          message: "Không tìm thấy người dùng",
         })
       }
 
       if (!user.apartmentId) {
         return res.status(200).json({
           success: true,
-          message: "User is not assigned to an apartment",
+          message: "Cư dân chưa được gán căn hộ",
           data: null,
         })
       }
@@ -125,7 +125,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Apartment fetched successfully",
+        message: "Tải thông tin căn hộ thành công",
         data: apartmentWithMembers,
       })
     }
@@ -134,14 +134,14 @@ export default async function handler(
       res.setHeader("Allow", ["PUT", "DELETE", "GET"])
       return res.status(405).json({
         success: false,
-        message: `Method ${req.method} Not Allowed`,
+        message: `Phương thức ${req.method} không được phép`,
       })
     }
   } catch (error) {
     console.error("Error in /api/users/[id]/apartments:", error)
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Có lỗi xảy ra. Vui lòng thử lại.",
     })
   }
 }

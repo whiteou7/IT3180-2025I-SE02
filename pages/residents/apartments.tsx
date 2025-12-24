@@ -59,7 +59,7 @@ export default function ApartmentDirectoryPage() {
 
         const response = await ofetch("/api/apartments", { ignoreResponseError: true })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to fetch apartments")
+          throw new Error(response?.message ?? "Không thể tải danh sách căn hộ")
         }
         if (mounted) {
           let apartmentsList = response.data as Apartment[]
@@ -73,7 +73,7 @@ export default function ApartmentDirectoryPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to load apartments")
+        toast.error("Không thể tải danh sách căn hộ")
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -136,9 +136,9 @@ export default function ApartmentDirectoryPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to create apartment")
+        throw new Error(response?.message ?? "Không thể tạo căn hộ")
       }
-      toast.success("Apartment created successfully")
+      toast.success("Đã tạo căn hộ thành công")
       setCreateDialogOpen(false)
       // Reload apartments
       const apartmentsResponse = await ofetch("/api/apartments", {
@@ -149,7 +149,7 @@ export default function ApartmentDirectoryPage() {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Failed to create apartment")
+      toast.error("Không thể tạo căn hộ")
     } finally {
       setIsCreating(false)
     }
@@ -170,9 +170,9 @@ export default function ApartmentDirectoryPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to save apartment")
+        throw new Error(response?.message ?? "Không thể lưu căn hộ")
       }
-      toast.success("Apartment updated successfully")
+      toast.success("Đã cập nhật căn hộ thành công")
       setEditDialogOpen(false)
       // Reload apartments
       const apartmentsResponse = await ofetch("/api/apartments", {
@@ -183,7 +183,7 @@ export default function ApartmentDirectoryPage() {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Failed to save apartment")
+      toast.error("Không thể lưu căn hộ")
     } finally {
       setIsSaving(false)
     }
@@ -192,36 +192,36 @@ export default function ApartmentDirectoryPage() {
   return (
     <>
       <Head>
-        <title>Apartment Directory • Resident Management</title>
+        <title>Danh bạ căn hộ • Quản lý cư dân</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/residents/profiles">Resident Management</BreadcrumbLink>
+              <BreadcrumbLink href="/residents/profiles">Quản lý cư dân</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Apartment Directory</BreadcrumbPage>
+              <BreadcrumbPage>Danh bạ căn hộ</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Apartment directory</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Danh bạ căn hộ</h1>
             <p className="text-muted-foreground text-sm">
-              Browse real-time occupancy by building, floor, and apartment number.
+              Xem tình trạng ở theo tòa nhà, tầng và số căn hộ.
             </p>
           </div>
           {isAdmin && (
             <Button onClick={() => setCreateDialogOpen(true)}>
               <Plus className="mr-2 size-4" />
-              Add apartment
+              Thêm căn hộ
             </Button>
           )}
         </div>

@@ -50,12 +50,12 @@ import { useUserStore } from "@/store/userStore"
 type CartMap = Record<number, number>
 
 const CATEGORY_TABS: { label: string; value: ServiceCategory | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Cleaning", value: "cleaning" },
-  { label: "Maintenance", value: "maintenance" },
-  { label: "Utilities", value: "utilities" },
-  { label: "Amenities", value: "amenities" },
-  { label: "Other", value: "other" },
+  { label: "Tất cả", value: "all" },
+  { label: "Dọn dẹp", value: "cleaning" },
+  { label: "Bảo trì", value: "maintenance" },
+  { label: "Tiện ích", value: "utilities" },
+  { label: "Tiện nghi", value: "amenities" },
+  { label: "Khác", value: "other" },
 ]
 
 export default function ServiceCatalogPage() {
@@ -95,7 +95,7 @@ export default function ServiceCatalogPage() {
       try {
         const response = await ofetch("/api/services", { ignoreResponseError: true })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to fetch services")
+          throw new Error(response?.message ?? "Không thể tải danh sách dịch vụ")
         }
         if (mounted) {
           const normalized = (response.data as Service[]).map((svc) => ({
@@ -110,7 +110,7 @@ export default function ServiceCatalogPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to load services")
+        toast.error("Tải danh sách dịch vụ thất bại")
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -133,7 +133,7 @@ export default function ServiceCatalogPage() {
           ignoreResponseError: true,
         })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to fetch recent activity")
+          throw new Error(response?.message ?? "Không thể tải hoạt động gần đây")
         }
         if (mounted) {
           setRecentBillings(response.data as BillingSummary[])
@@ -183,12 +183,12 @@ export default function ServiceCatalogPage() {
 
   const handleCheckout = async () => {
     if (!userId) {
-      toast.error("Please log in to complete checkout.")
+      toast.error("Vui lòng đăng nhập để hoàn tất thanh toán.")
       return
     }
     const serviceIds = cartEntries.flatMap((entry) => Array(entry.quantity).fill(entry.service.serviceId))
     if (!serviceIds.length) {
-      toast.error("Add a service to your cart first.")
+      toast.error("Vui lòng thêm dịch vụ vào giỏ hàng trước.")
       return
     }
 
@@ -204,10 +204,10 @@ export default function ServiceCatalogPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Failed to generate billing")
+        throw new Error(response?.message ?? "Tạo hóa đơn thất bại")
       }
 
-      toast.success("Checkout complete. Billing recorded.")
+      toast.success("Thanh toán hoàn tất. Hóa đơn đã được ghi nhận.")
       setCart({})
       setIsCartOpen(false)
       setRecentBillings((prev) => [
@@ -234,7 +234,7 @@ export default function ServiceCatalogPage() {
       ])
     } catch (error) {
       console.error(error)
-      toast.error("Unable to complete checkout")
+      toast.error("Không thể hoàn tất thanh toán")
     } finally {
       setIsCheckoutLoading(false)
     }
@@ -252,36 +252,36 @@ export default function ServiceCatalogPage() {
   return (
     <>
       <Head>
-        <title>Service catalog • Fee collection</title>
+        <title>Danh mục Dịch vụ • Thu phí</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Service catalog</BreadcrumbPage>
+              <BreadcrumbPage>Danh mục Dịch vụ</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Service marketplace</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Cửa hàng Dịch vụ</h1>
             <p className="text-muted-foreground text-sm">
-              Browse curated building services and bundle them into a single checkout.
+              Duyệt các dịch vụ tòa nhà được tuyển chọn và gộp chúng thành một giao dịch thanh toán duy nhất.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setIsCartOpen(true)} className="gap-2" disabled={!cartEntries.length}>
               <ShoppingCart className="size-4" />
-              View cart ({cartEntries.length})
+              Xem giỏ hàng ({cartEntries.length})
             </Button>
             <Button variant="ghost" onClick={() => window.location.reload()} className="gap-2">
               <RefreshCw className="size-4" />
-              Refresh
+              Làm mới
             </Button>
           </div>
         </div>
@@ -290,8 +290,8 @@ export default function ServiceCatalogPage() {
           <div className="flex flex-col gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Filters</CardTitle>
-                <CardDescription>Find the right service bundle with quick filters.</CardDescription>
+                <CardTitle>Bộ lọc</CardTitle>
+                <CardDescription>Tìm gói dịch vụ phù hợp với các bộ lọc nhanh.</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
                 <Tabs value={selectedCategory} onValueChange={(val) => setSelectedCategory(val as typeof selectedCategory)}>
@@ -308,14 +308,14 @@ export default function ServiceCatalogPage() {
                   <div className="relative">
                     <Search className="text-muted-foreground absolute left-3 top-3 size-4" />
                     <Input
-                      placeholder="Search service or description"
+                      placeholder="Tìm kiếm dịch vụ hoặc mô tả"
                       value={searchTerm}
                       onChange={(event) => setSearchTerm(event.target.value)}
                       className="pl-9"
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Price range</p>
+                    <p className="text-sm font-medium">Khoảng giá</p>
                     <Slider
                       value={priceRange}
                       onValueChange={(value) => setPriceRange([value[0], value[1]] as [number, number])}
@@ -352,7 +352,7 @@ export default function ServiceCatalogPage() {
                       <CardContent className="flex flex-col gap-3 text-sm">
                         <div className="flex items-center gap-2">
                           <BadgePercent className="text-muted-foreground size-4" />
-                          <span>{service.tax}% tax • ${service.price.toFixed(2)}</span>
+                          <span>{service.tax}% thuế • ${service.price.toFixed(2)}</span>
                         </div>
                       </CardContent>
                       <CardFooter className="flex items-center justify-between">
@@ -360,18 +360,18 @@ export default function ServiceCatalogPage() {
                           <p className="text-sm font-semibold">
                             ${(service.price + (service.price * service.tax) / 100).toFixed(2)}
                           </p>
-                          <p className="text-muted-foreground text-xs">Tax-inclusive</p>
+                          <p className="text-muted-foreground text-xs">Đã bao gồm thuế</p>
                         </div>
-                        <Button onClick={() => handleAddToCart(service.serviceId)}>Add to cart</Button>
+                        <Button onClick={() => handleAddToCart(service.serviceId)}>Thêm vào giỏ</Button>
                       </CardFooter>
                     </Card>
                   ))
                 ) : (
                   <div className="col-span-2 rounded-xl border border-dashed p-10 text-center">
                     <Sparkles className="text-muted-foreground mx-auto mb-3 size-5" />
-                    <p className="text-sm font-medium">No services match your filters.</p>
+                    <p className="text-sm font-medium">Không có dịch vụ nào phù hợp với bộ lọc của bạn.</p>
                     <p className="text-muted-foreground text-xs">
-                      Adjust your filters or contact administrators for custom offerings.
+                      Điều chỉnh bộ lọc của bạn hoặc liên hệ quản trị viên để có dịch vụ tùy chỉnh.
                     </p>
                   </div>
                 )}
@@ -379,8 +379,8 @@ export default function ServiceCatalogPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Recent bundles</CardTitle>
-                  <CardDescription>Rebook frequently used service packages.</CardDescription>
+                  <CardTitle>Gói dịch vụ gần đây</CardTitle>
+                  <CardDescription>Đặt lại các gói dịch vụ thường sử dụng.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
                   {recentBillings.length ? (
@@ -390,18 +390,18 @@ export default function ServiceCatalogPage() {
                           <div>
                             <p className="font-medium">{billing.billingId.slice(0, 8).toUpperCase()}</p>
                             <p className="text-muted-foreground text-xs">
-                              {billing.serviceCount} services • Due{" "}
+                              {billing.serviceCount} dịch vụ • Đến hạn{" "}
                               {new Date(billing.dueDate).toLocaleDateString()}
                             </p>
                           </div>
                           <Button size="sm" variant="outline" onClick={() => handleRebook(billing)}>
-                            Rebook
+                            Đặt lại
                           </Button>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-muted-foreground text-sm">No billing activity yet.</p>
+                    <p className="text-muted-foreground text-sm">Chưa có hoạt động thanh toán nào.</p>
                   )}
                 </CardContent>
               </Card>
@@ -413,8 +413,8 @@ export default function ServiceCatalogPage() {
       <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
         <SheetContent className="flex flex-col gap-4">
           <SheetHeader>
-            <SheetTitle>Cart overview</SheetTitle>
-            <SheetDescription>Review bundled services before generating a bill.</SheetDescription>
+            <SheetTitle>Tổng quan giỏ hàng</SheetTitle>
+            <SheetDescription>Xem lại các dịch vụ đã gộp trước khi tạo hóa đơn.</SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 space-y-4 overflow-y-auto mx-4">
@@ -425,14 +425,14 @@ export default function ServiceCatalogPage() {
                     <div>
                       <p className="font-semibold">{entry.service.serviceName}</p>
                       <p className="text-muted-foreground text-xs">
-                        ${(entry.service.price + (entry.service.price * entry.service.tax) / 100).toFixed(2)} per unit
+                        ${(entry.service.price + (entry.service.price * entry.service.tax) / 100).toFixed(2)} mỗi đơn vị
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
                         size="icon"
                         variant="outline"
-                        aria-label={`Decrease ${entry.service.serviceName} quantity`}
+                        aria-label={`Giảm số lượng ${entry.service.serviceName}`}
                         onClick={() => handleUpdateQuantity(entry.service.serviceId, entry.quantity - 1)}
                       >
                         -
@@ -441,7 +441,7 @@ export default function ServiceCatalogPage() {
                       <Button
                         size="icon"
                         variant="outline"
-                        aria-label={`Increase ${entry.service.serviceName} quantity`}
+                        aria-label={`Tăng số lượng ${entry.service.serviceName}`}
                         onClick={() => handleUpdateQuantity(entry.service.serviceId, entry.quantity + 1)}
                       >
                         +
@@ -452,7 +452,7 @@ export default function ServiceCatalogPage() {
               ))
             ) : (
               <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                Add services to your cart to create a bill.
+                Thêm dịch vụ vào giỏ hàng để tạo hóa đơn.
               </div>
             )}
           </div>
@@ -461,11 +461,11 @@ export default function ServiceCatalogPage() {
 
           <SheetFooter className="flex flex-col gap-2">
             <div className="flex items-center justify-between text-sm">
-              <p>Estimated total</p>
+              <p>Tổng ước tính</p>
               <p className="text-lg font-semibold">${cartTotal.toFixed(2)}</p>
             </div>
             <Button disabled={!cartEntries.length || isCheckoutLoading} onClick={handleCheckout}>
-              {isCheckoutLoading ? "Processing..." : "Generate billing"}
+              {isCheckoutLoading ? "Đang xử lý..." : "Tạo hóa đơn"}
             </Button>
           </SheetFooter>
         </SheetContent>

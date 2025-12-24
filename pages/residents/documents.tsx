@@ -38,7 +38,7 @@ export default function DocumentManagementPage() {
       try {
         const response = await ofetch("/api/users", { ignoreResponseError: true })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to fetch residents")
+          throw new Error(response?.message ?? "Không thể tải danh sách cư dân")
         }
         let userList = response.data as User[]
         // Tenants can only see their own documents
@@ -52,7 +52,7 @@ export default function DocumentManagementPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to load residents")
+        toast.error("Không thể tải danh sách cư dân")
       }
     }
     loadUsers()
@@ -71,7 +71,7 @@ export default function DocumentManagementPage() {
           ignoreResponseError: true,
         })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to fetch documents")
+          throw new Error(response?.message ?? "Không thể tải danh sách tài liệu")
         }
         const payload = (response.data as Document[]).map((doc, index) => ({
           ...doc,
@@ -84,7 +84,7 @@ export default function DocumentManagementPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to fetch documents")
+        toast.error("Không thể tải danh sách tài liệu")
         if (mounted) setDocuments([])
       } finally {
         if (mounted) setIsLoading(false)
@@ -104,36 +104,36 @@ export default function DocumentManagementPage() {
   return (
     <>
       <Head>
-        <title>Document Management • Resident Management</title>
+        <title>Quản lý tài liệu • Quản lý cư dân</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/residents/profiles">Resident Management</BreadcrumbLink>
+              <BreadcrumbLink href="/residents/profiles">Quản lý cư dân</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Document Management</BreadcrumbPage>
+              <BreadcrumbPage>Quản lý tài liệu</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Document management</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Quản lý tài liệu</h1>
             <p className="text-muted-foreground text-sm">
-              Centralize personal, apartment, and legal documents for residents.
+              Lưu trữ giấy tờ của cư dân để tra cứu khi cần.
             </p>
           </div>
           {hasAllowedRole && (
             <Select value={selectedUserId} onValueChange={setSelectedUserId} disabled={!users.length}>
               <SelectTrigger className="w-full sm:w-64">
-                <SelectValue placeholder="Select resident" />
+                <SelectValue placeholder="Chọn cư dân" />
               </SelectTrigger>
               <SelectContent>
                 {users.map((user) => (
@@ -166,7 +166,7 @@ export default function DocumentManagementPage() {
                 if (!file) return
 
                 if (!file.name.toLowerCase().endsWith(".pdf")) {
-                  toast.error("Only PDF files are allowed")
+                  toast.error("Chỉ chấp nhận file PDF")
                   return
                 }
 
@@ -181,14 +181,14 @@ export default function DocumentManagementPage() {
                   })
 
                   if (!response?.success) {
-                    throw new Error(response?.message ?? "Failed to upload document")
+                    throw new Error(response?.message ?? "Không thể tải tài liệu lên")
                   }
 
-                  toast.success("Document uploaded successfully")
+                  toast.success("Tải tài liệu lên thành công")
                   setRefreshKey((key) => key + 1)
                 } catch (error) {
                   console.error(error)
-                  toast.error("Failed to upload document")
+                  toast.error("Không thể tải tài liệu lên")
                 }
               }
               input.click()
@@ -198,7 +198,7 @@ export default function DocumentManagementPage() {
 
         {currentUser ? (
           <p className="text-muted-foreground text-xs">
-            Showing storage usage for <strong>{currentUser.fullName}</strong>. Switch residents to manage other folders.
+            Đang xem tài liệu của <strong>{currentUser.fullName}</strong>. Bạn có thể đổi cư dân để quản lý người khác.
           </p>
         ) : null}
       </div>

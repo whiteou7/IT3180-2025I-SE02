@@ -33,7 +33,7 @@ export default async function handler(
       if (!email || !password || !fullName) {
         return res.status(400).json({
           success: false,
-          message: "Full name, password, and email must be included.",
+          message: "Vui lòng nhập họ tên, email và mật khẩu.",
         })
       }
 
@@ -45,7 +45,7 @@ export default async function handler(
       if (existingUser) {
         return res.status(409).json({
           success: false,
-          message: "Email already registered.",
+          message: "Email này đã được đăng ký.",
         })
       }
 
@@ -61,7 +61,7 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Account created successfully.",
+        message: "Tạo tài khoản thành công.",
         data: { userId },
       })
     }
@@ -82,14 +82,14 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "User list fetched successfully.",
+        message: "Tải danh sách người dùng thành công.",
         data: users,
       })
     }
 
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} not allowed.`,
+      message: `Phương thức ${req.method} không được phép.`,
     })
   } catch (error) {
     console.error("Error in /api/users:", error)

@@ -78,12 +78,12 @@ export function LostPropertyFilters({ filters, onChange, isLoading }: LostProper
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-base">Filter reports</CardTitle>
-        <CardDescription>Review incident logs by status, approval, or timeline.</CardDescription>
+        <CardTitle className="text-base">Lọc báo cáo</CardTitle>
+        <CardDescription>Lọc theo trạng thái, phê duyệt hoặc khoảng thời gian.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <Input
-          placeholder="Search property or reporter..."
+          placeholder="Tìm theo tài sản hoặc người báo cáo..."
           value={filters.search}
           disabled={isLoading}
           onChange={(event) => update({ search: event.target.value })}
@@ -95,10 +95,10 @@ export function LostPropertyFilters({ filters, onChange, isLoading }: LostProper
             onValueChange={(value) => update({ status: value as LostPropertyFiltersState["status"] })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
               {propertyStatuses.map((status) => (
                 <SelectItem key={status} value={status}>
                   {formatStatusLabel(status)}
@@ -114,12 +114,12 @@ export function LostPropertyFilters({ filters, onChange, isLoading }: LostProper
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Approval" />
+              <SelectValue placeholder="Phê duyệt" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All approvals</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="approved">Đã duyệt</SelectItem>
+              <SelectItem value="pending">Chờ duyệt</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -150,7 +150,7 @@ export function LostPropertyFilters({ filters, onChange, isLoading }: LostProper
             })
           }
         >
-          Reset filters
+          Xóa bộ lọc
         </Button>
       </CardContent>
     </Card>
@@ -202,20 +202,20 @@ export function LostPropertyTable({
   return (
     <Card className="rounded-2xl">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Lost property registry</CardTitle>
-        <CardDescription>Real-time updates from residents and building security.</CardDescription>
+        <CardTitle className="text-lg">Danh sách tài sản thất lạc</CardTitle>
+        <CardDescription>Cập nhật từ cư dân và bộ phận an ninh.</CardDescription>
       </CardHeader>
       <CardContent>
         <ScrollArea className="max-h-[540px] pr-4">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Property</TableHead>
-                <TableHead>Reporter</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Approval</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>Tài sản</TableHead>
+                <TableHead>Người báo</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead>Phê duyệt</TableHead>
+                <TableHead>Thời gian</TableHead>
+                <TableHead>Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -239,7 +239,11 @@ export function LostPropertyTable({
                     </TableCell>
                     <TableCell>
                       <Badge variant={report.approved ? "secondary" : "outline"}>
-                        {report.status === "deleted" ? "Deleted" : report.approved ? "Approved" : "Pending"}
+                        {report.status === "deleted"
+                          ? "Đã xóa"
+                          : report.approved
+                            ? "Đã duyệt"
+                            : "Chờ duyệt"}
                       </Badge>
                     </TableCell>
                     <TableCell>{format(new Date(report.createdAt), "dd MMM yyyy")}</TableCell>
@@ -247,12 +251,12 @@ export function LostPropertyTable({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="outline" size="sm">
-                            Manage
+                            Quản lý
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onSelect={() => onView(report)}>
-                            View details
+                            Xem chi tiết
                           </DropdownMenuItem>
                           {allowStatusChanges &&
                             statusOptions.map((statusOption) => (
@@ -260,12 +264,12 @@ export function LostPropertyTable({
                                 key={`${report.propertyReportId}-${statusOption}`}
                                 onSelect={() => onStatusChange?.(report, statusOption)}
                               >
-                                Mark {formatStatusLabel(statusOption)}
+                                Chuyển sang: {formatStatusLabel(statusOption)}
                               </DropdownMenuItem>
                             ))}
                           {canToggleApproval && (
                             <DropdownMenuItem onSelect={() => onApprove?.(report, !report.approved)}>
-                              {report.approved ? "Revoke status" : "Approve status"}
+                              {report.approved ? "Bỏ duyệt" : "Duyệt"}
                             </DropdownMenuItem>
                           )}
                           {allowDelete && (
@@ -273,7 +277,7 @@ export function LostPropertyTable({
                               className="text-destructive"
                               onSelect={() => onDelete?.(report)}
                             >
-                              Delete report
+                              Xóa báo cáo
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -291,8 +295,8 @@ export function LostPropertyTable({
 }
 
 const reportFormSchema = z.object({
-  propertyId: z.string().min(1, "Select a property to report"),
-  description: z.string().min(10, "Please describe the incident (min 10 chars)"),
+  propertyId: z.string().min(1, "Vui lòng chọn tài sản cần báo cáo"),
+  description: z.string().min(10, "Vui lòng mô tả sự việc (ít nhất 10 ký tự)"),
 })
 
 export type ReportFormValues = z.infer<typeof reportFormSchema>
@@ -338,9 +342,9 @@ export function ReportLostPropertyDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Report lost property</DialogTitle>
+          <DialogTitle>Báo cáo tài sản thất lạc</DialogTitle>
           <DialogDescription>
-            Notify building security about a missing item so the team can start an investigation.
+            Gửi thông tin cho bộ phận an ninh để hỗ trợ tìm kiếm.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -350,11 +354,11 @@ export function ReportLostPropertyDialog({
               name="propertyId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Property</FormLabel>
+                  <FormLabel>Tài sản</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select property" />
+                        <SelectValue placeholder="Chọn tài sản" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -374,9 +378,13 @@ export function ReportLostPropertyDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Incident description</FormLabel>
+                  <FormLabel>Mô tả sự việc</FormLabel>
                   <FormControl>
-                    <Textarea rows={4} placeholder="Where was it last seen? Describe identifying marks." {...field} />
+                    <Textarea
+                      rows={4}
+                      placeholder="Bạn thấy lần cuối ở đâu? Có dấu hiệu nhận biết gì không?"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -384,7 +392,7 @@ export function ReportLostPropertyDialog({
             />
             <DialogFooter>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit report"}
+                {isSubmitting ? "Đang gửi..." : "Gửi báo cáo"}
               </Button>
             </DialogFooter>
           </form>
@@ -405,55 +413,59 @@ export function PropertyReportSheet({ report, open, onOpenChange }: PropertyRepo
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-full max-w-xl flex-col gap-6">
         <SheetHeader className="text-left">
-          <SheetTitle>{report?.propertyName ?? "Report details"}</SheetTitle>
-          <SheetDescription>Complete audit trail for the selected property.</SheetDescription>
+          <SheetTitle>{report?.propertyName ?? "Chi tiết báo cáo"}</SheetTitle>
+          <SheetDescription>Lịch sử xử lý của báo cáo đã chọn.</SheetDescription>
         </SheetHeader>
         {report ? (
           <div className="space-y-6 mx-4">
             <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
               <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                Status
+                Trạng thái
               </h4>
               <div className="grid gap-3 text-sm md:grid-cols-2">
-                <InfoLine label="Current status">
+                <InfoLine label="Trạng thái hiện tại">
                   <PropertyStatusBadge status={report.status} />
                 </InfoLine>
-                <InfoLine label="Approval">
+                <InfoLine label="Phê duyệt">
                   <Badge variant={report.approved ? "secondary" : "outline"}>
-                    {report.approved ? "Approved" : "Pending"}
+                    {report.approved ? "Đã duyệt" : "Chờ duyệt"}
                   </Badge>
                 </InfoLine>
-                <InfoLine label="Issued status">
-                  {report.issuedStatus ? formatStatusLabel(report.issuedStatus) : "Not issued"}
+                <InfoLine label="Trạng thái đã gán">
+                  {report.issuedStatus ? formatStatusLabel(report.issuedStatus) : "Chưa gán"}
                 </InfoLine>
-                <InfoLine label="Last updated">{format(new Date(report.updatedAt), "dd MMM yyyy")}</InfoLine>
+                <InfoLine label="Cập nhật lần cuối">
+                  {format(new Date(report.updatedAt), "dd MMM yyyy")}
+                </InfoLine>
               </div>
             </section>
             <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
               <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                Reporter
+                Người liên quan
               </h4>
               <div className="grid gap-3 text-sm md:grid-cols-2">
-                <InfoLine label="Resident">{report.ownerFullName}</InfoLine>
-                <InfoLine label="Issuer">{report.issuerFullName ?? "Not assigned"}</InfoLine>
-                <InfoLine label="Report ID">{report.propertyReportId.slice(0, 8)}</InfoLine>
-                <InfoLine label="Created">{format(new Date(report.createdAt), "dd MMM yyyy HH:mm")}</InfoLine>
+                <InfoLine label="Cư dân">{report.ownerFullName}</InfoLine>
+                <InfoLine label="Người xử lý">{report.issuerFullName ?? "Chưa có"}</InfoLine>
+                <InfoLine label="Mã báo cáo">{report.propertyReportId.slice(0, 8)}</InfoLine>
+                <InfoLine label="Thời gian tạo">
+                  {format(new Date(report.createdAt), "dd MMM yyyy HH:mm")}
+                </InfoLine>
               </div>
             </section>
             <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
               <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                Description
+                Mô tả
               </h4>
               <p className="flex items-start gap-2 text-sm">
                 <MessageSquare className="mt-0.5 size-4 text-muted-foreground" />
-                {report.content ?? "No description provided."}
+                {report.content ?? "Chưa có mô tả."}
               </p>
             </section>
           </div>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center text-muted-foreground">
             <ClipboardList className="mb-4 size-8" />
-            <p className="text-sm">Select a report to see its audit trail.</p>
+            <p className="text-sm">Chọn một báo cáo để xem chi tiết.</p>
           </div>
         )}
       </SheetContent>

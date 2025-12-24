@@ -67,14 +67,14 @@ export function ApartmentDirectoryFilters({
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-base">Filter apartments</CardTitle>
+        <CardTitle className="text-base">Lọc căn hộ</CardTitle>
         <CardDescription>
-          Quickly find an apartment by building, status, or number.
+          Tìm nhanh căn hộ theo tòa, trạng thái hoặc số căn.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <Input
-          placeholder="Search by apartment number..."
+          placeholder="Tìm theo số căn hộ..."
           value={filters.search}
           disabled={isLoading}
           onChange={(event) => setFilter({ search: event.target.value })}
@@ -88,13 +88,13 @@ export function ApartmentDirectoryFilters({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Building" />
+              <SelectValue placeholder="Tòa" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All buildings</SelectItem>
+              <SelectItem value="all">Tất cả tòa</SelectItem>
               {buildingOptions.map((option) => (
                 <SelectItem key={option} value={String(option)}>
-                  Building {option}
+                  Tòa {option}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -107,12 +107,12 @@ export function ApartmentDirectoryFilters({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Occupancy" />
+              <SelectValue placeholder="Tình trạng ở" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All units</SelectItem>
-              <SelectItem value="occupied">Occupied</SelectItem>
-              <SelectItem value="vacant">Vacant</SelectItem>
+              <SelectItem value="all">Tất cả căn</SelectItem>
+              <SelectItem value="occupied">Đang có người ở</SelectItem>
+              <SelectItem value="vacant">Đang trống</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -127,7 +127,7 @@ export function ApartmentDirectoryFilters({
             })
           }
         >
-          Reset filters
+          Xóa bộ lọc
         </Button>
       </CardContent>
     </Card>
@@ -161,7 +161,7 @@ export function ApartmentDirectoryGrid({
   if (!apartments.length) {
     return (
       <div className="rounded-xl border border-dashed bg-muted/20 p-10 text-center text-sm text-muted-foreground">
-        No apartments match the current filters.
+        Không có căn hộ nào phù hợp với bộ lọc hiện tại.
       </div>
     )
   }
@@ -182,11 +182,11 @@ export function ApartmentDirectoryGrid({
                   #{apartment.apartmentNumber}
                 </CardTitle>
                 <CardDescription>
-                  Building {apartment.buildingId} • {apartment.floor}F
+                  Tòa {apartment.buildingId} • {apartment.floor}F
                 </CardDescription>
               </div>
               <Badge variant={isOccupied ? "secondary" : "outline"}>
-                {isOccupied ? "Occupied" : "Vacant"}
+                {isOccupied ? "Đã Thuê" : "Trống"}
               </Badge>
             </CardHeader>
             <CardContent className="flex items-center justify-between text-sm">
@@ -228,16 +228,16 @@ export function ApartmentDetailsDialog({
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle>
-                Apartment #{apartment?.apartmentNumber ?? "—"}
+                Căn hộ #{apartment?.apartmentNumber ?? "—"}
               </DialogTitle>
               <DialogDescription>
-                Building {apartment?.buildingId} • Floor {apartment?.floor}
+                Tòa {apartment?.buildingId} • Tầng {apartment?.floor}
               </DialogDescription>
             </div>
             {isAdmin && apartment && onEdit && (
               <Button variant="outline" size="sm" onClick={() => onEdit(apartment)}>
                 <Pencil className="mr-2 size-4" />
-                Edit
+                Sửa
               </Button>
             )}
           </div>
@@ -247,14 +247,14 @@ export function ApartmentDetailsDialog({
             <div className="grid gap-4 rounded-xl border bg-muted/30 p-4 sm:grid-cols-2">
               <div className="flex items-center gap-2 text-sm">
                 <Building2 className="size-4 text-muted-foreground" />
-                Monthly fee:{" "}
+                Phí hàng tháng:{" "}
                 <span className="font-semibold">
                   {apartment.monthlyFee.toLocaleString()} $
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Users className="size-4 text-muted-foreground" />
-                Residents:{" "}
+                Số cư dân:{" "}
                 <span className="font-semibold">
                   {apartment.members?.length ?? 0}
                 </span>
@@ -296,20 +296,20 @@ export function ApartmentDetailsDialog({
                           </p>
                         </div>
                       </div>
-                      <Badge variant="secondary">Primary resident</Badge>
+                      <Badge variant="secondary">Cư dân đại diện</Badge>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="rounded-lg border border-dashed bg-muted/40 p-6 text-center text-sm text-muted-foreground">
-                  No residents assigned yet.
+                  Chưa có cư dân được gán.
                 </div>
               )}
             </div>
           </div>
         ) : (
           <div className="text-sm text-muted-foreground">
-            Select an apartment to see details.
+            Chọn một căn hộ để xem chi tiết.
           </div>
         )}
       </DialogContent>
@@ -318,10 +318,10 @@ export function ApartmentDetailsDialog({
 }
 
 const apartmentFormSchema = z.object({
-  buildingId: z.string().min(1, "Building ID is required"),
-  floor: z.string().min(1, "Floor is required"),
-  apartmentNumber: z.string().min(1, "Apartment number is required"),
-  monthlyFee: z.string().min(1, "Monthly fee is required"),
+  buildingId: z.string().min(1, "Vui lòng chọn tòa"),
+  floor: z.string().min(1, "Vui lòng nhập tầng"),
+  apartmentNumber: z.string().min(1, "Vui lòng nhập số căn hộ"),
+  monthlyFee: z.string().min(1, "Vui lòng nhập phí hàng tháng"),
 })
 
 export type ApartmentFormValues = z.infer<typeof apartmentFormSchema>
@@ -369,9 +369,9 @@ export function CreateApartmentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Create new apartment</DialogTitle>
+          <DialogTitle>Tạo căn hộ mới</DialogTitle>
           <DialogDescription>
-            Add a new apartment unit to the building directory.
+            Thêm căn hộ mới vào danh sách căn hộ.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -381,17 +381,17 @@ export function CreateApartmentDialog({
               name="buildingId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Building ID</FormLabel>
+                  <FormLabel>Tòa</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select building" />
+                        <SelectValue placeholder="Chọn tòa" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {buildingOptions.map((id) => (
                         <SelectItem key={id} value={String(id)}>
-                          Building {id}
+                          Tòa {id}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -406,7 +406,7 @@ export function CreateApartmentDialog({
                 name="floor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Floor</FormLabel>
+                    <FormLabel>Tầng</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -424,7 +424,7 @@ export function CreateApartmentDialog({
                 name="apartmentNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Apartment number</FormLabel>
+                    <FormLabel>Số căn hộ</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -443,7 +443,7 @@ export function CreateApartmentDialog({
               name="monthlyFee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Monthly fee ($)</FormLabel>
+                  <FormLabel>Phí hàng tháng</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -462,10 +462,10 @@ export function CreateApartmentDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isCreating}>
-                {isCreating ? "Creating..." : "Create apartment"}
+                {isCreating ? "Đang tạo..." : "Tạo căn hộ"}
               </Button>
             </DialogFooter>
           </form>
@@ -531,9 +531,9 @@ export function EditApartmentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Edit apartment #{apartment?.apartmentNumber ?? "—"}</DialogTitle>
+          <DialogTitle>Chỉnh sửa căn hộ #{apartment?.apartmentNumber ?? "—"}</DialogTitle>
           <DialogDescription>
-            Update apartment information and monthly fee.
+            Cập nhật thông tin căn hộ và phí hàng tháng.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -543,17 +543,17 @@ export function EditApartmentDialog({
               name="buildingId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Building ID</FormLabel>
+                  <FormLabel>Tòa</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select building" />
+                        <SelectValue placeholder="Chọn tòa" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {buildingOptions.map((id) => (
                         <SelectItem key={id} value={String(id)}>
-                          Building {id}
+                          Tòa {id}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -568,7 +568,7 @@ export function EditApartmentDialog({
                 name="floor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Floor</FormLabel>
+                    <FormLabel>Tầng</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -586,7 +586,7 @@ export function EditApartmentDialog({
                 name="apartmentNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Apartment number</FormLabel>
+                    <FormLabel>Số căn hộ</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -605,7 +605,7 @@ export function EditApartmentDialog({
               name="monthlyFee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Monthly fee ($)</FormLabel>
+                  <FormLabel>Phí hàng tháng</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -624,10 +624,10 @@ export function EditApartmentDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save changes"}
+                {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
               </Button>
             </DialogFooter>
           </form>

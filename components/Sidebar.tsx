@@ -57,61 +57,61 @@ type SidebarNavItem = {
 const data: { navMain: SidebarNavItem[] } = {
   navMain: [
     {
-      title: "Dashboard",
+      title: "Bảng điều khiển",
       url: "/dashboard",
       icon: LayoutDashboard,
     },
     {
-      title: "Resident Management",
+      title: "Quản lý Cư dân",
       url: "#",
       icon: Users,
       items: [
         {
-          title: "Resident Profiles",
+          title: "Hồ sơ Cư dân",
           url: "/residents/profiles",
           tenant: true,
           admin: true,
         },
         {
-          title: "Apartment Directory",
+          title: "Danh sách Căn hộ",
           url: "/residents/apartments",
           tenant: true,
           admin: true,
         },
         {
-          title: "Access Control",
+          title: "Kiểm soát Ra vào",
           url: "/residents/access-control",
           tenant: true,
           admin: true,
           police: true,
         },
         {
-          title: "Document Management",
+          title: "Quản lý Tài liệu",
           url: "/residents/documents",
           tenant: true,
           admin: true,
           police: true,
         },
         {
-          title: "Residence Status",
+          title: "Trạng thái Cư trú",
           url: "/residents/status",
           admin: true
         },
       ],
     },
     {
-      title: "Property Management",
+      title: "Quản lý Tài sản",
       url: "#",
       icon: Building2,
       items: [
         {
-          title: "Properties",
+          title: "Tài sản",
           url: "/property",
           tenant: true,
           admin: true,
         },
         {
-          title: "Lost Property",
+          title: "Tài sản Thất lạc",
           url: "/property/lost-property",
           tenant: true,
           admin: true,
@@ -120,12 +120,12 @@ const data: { navMain: SidebarNavItem[] } = {
       ],
     },
     {
-      title: "Fee Collection",
+      title: "Thu Phí",
       url: "#",
       icon: DollarSign,
       items: [
         {
-          title: "Billing Center",
+          title: "Trung tâm Thanh toán",
           url: "/billing",
           tenant: true,
           admin: true,
@@ -134,12 +134,12 @@ const data: { navMain: SidebarNavItem[] } = {
       ],
     },
     {
-      title: "Communication",
+      title: "Giao tiếp",
       url: "#",
       icon: Bell,
       items: [
         {
-          title: "Public Announcements",
+          title: "Thông báo Công khai",
           url: "/communication/announcements",
           tenant: true,
           admin: true,
@@ -147,7 +147,7 @@ const data: { navMain: SidebarNavItem[] } = {
           accountant: true,
         },
         {
-          title: "Private Chat",
+          title: "Tin nhắn Riêng",
           url: "/communication/chat",
           tenant: true,
           admin: true,
@@ -157,23 +157,23 @@ const data: { navMain: SidebarNavItem[] } = {
       ],
     },
     {
-      title: "Building Services",
+      title: "Dịch vụ Tòa nhà",
       url: "#",
       icon: Wrench,
       items: [
         {
-          title: "Service Catalog",
+          title: "Danh mục Dịch vụ",
           url: "/services/catalog",
           tenant: true,
           admin: true,
         },
         {
-          title: "Service Administration",
+          title: "Quản lý Dịch vụ",
           url: "/services/manage",
           admin: true,
         },
         {
-          title: "Feedback",
+          title: "Phản hồi",
           url: "/services/feedbacks",
           tenant: true,
           admin: true,
@@ -181,36 +181,36 @@ const data: { navMain: SidebarNavItem[] } = {
       ],
     },
     {
-      title: "System Operations",
+      title: "Vận hành Hệ thống",
       url: "#",
       icon: Settings,
       items: [
         {
-          title: "System Settings",
+          title: "Cài đặt Hệ thống",
           url: "/system/settings",
           admin: true,
         },
       ],
     },
     {
-      title: "Reports & Analytics",
+      title: "Báo cáo & Phân tích",
       url: "#",
       icon: BarChart3,
       items: [
         {
-          title: "Security Reports",
+          title: "Báo cáo An ninh",
           url: "/reports/security",
           admin: true,
           police: true,
         },
         {
-          title: "Financial Reports",
+          title: "Báo cáo Tài chính",
           url: "/reports/financial",
           admin: true,
           accountant: true,
         },
         {
-          title: "General Reports",
+          title: "Báo cáo Tổng hợp",
           url: "/reports/general",
           admin: true,
         },
@@ -223,7 +223,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
   const { userId, role, clearUser } = useUserStore()
   const isLoggedIn = Boolean(userId)
-  const authLabel = isLoggedIn ? "Logout" : "Login"
+  const authLabel = isLoggedIn ? "Đăng xuất" : "Đăng nhập"
   const AuthIcon = isLoggedIn ? LogOut : LogIn
   const isAdmin = role === "admin"
   const isPolice = role === "police"
@@ -267,8 +267,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Building2 className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium">Apartment Management</span>
-                  <span className="text-xs">System</span>
+                  <span className="font-medium">Quản lý Chung cư</span>
+                  <span className="text-xs">Hệ thống</span>
                 </div>
               </Link>
             </SidebarMenuButton>

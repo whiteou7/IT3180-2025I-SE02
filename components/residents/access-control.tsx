@@ -98,7 +98,7 @@ function AccessControlFilters({
   return (
     <div className="flex flex-col gap-3 rounded-xl border bg-card/40 p-4 lg:flex-row lg:items-center">
       <Input
-        placeholder="Search by resident, license plate..."
+        placeholder="Tìm theo cư dân, biển số xe..."
         value={filters.search}
         disabled={isLoading}
         onChange={(event) => onFiltersChange({ search: event.target.value })}
@@ -111,13 +111,13 @@ function AccessControlFilters({
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Timeframe" />
+          <SelectValue placeholder="Khoảng thời gian" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="week">Last 7 days</SelectItem>
-          <SelectItem value="month">Last 30 days</SelectItem>
-          <SelectItem value="year">Last 12 months</SelectItem>
-          <SelectItem value="all">All time</SelectItem>
+          <SelectItem value="week">7 ngày gần đây</SelectItem>
+          <SelectItem value="month">30 ngày gần đây</SelectItem>
+          <SelectItem value="year">12 tháng gần đây</SelectItem>
+          <SelectItem value="all">Tất cả thời gian</SelectItem>
         </SelectContent>
       </Select>
       <Select
@@ -128,16 +128,16 @@ function AccessControlFilters({
         }
       >
         <SelectTrigger>
-          <SelectValue placeholder="Status" />
+          <SelectValue placeholder="Trạng thái" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All events</SelectItem>
-          <SelectItem value="inside">Currently inside</SelectItem>
-          <SelectItem value="exited">Exited</SelectItem>
+          <SelectItem value="all">Tất cả</SelectItem>
+          <SelectItem value="inside">Đang ở trong</SelectItem>
+          <SelectItem value="exited">Đã ra</SelectItem>
         </SelectContent>
       </Select>
       <Button variant="outline" disabled={isLoading} onClick={onReset}>
-        Reset
+      Đặt lại
       </Button>
     </div>
   )
@@ -153,9 +153,9 @@ const statusBadgeVariant: Record<
 }
 
 const statusLabel: Record<AccessFiltersState["status"], string> = {
-  all: "All",
-  inside: "Inside",
-  exited: "Exited",
+  all: "Tất cả",
+  inside: "Đang ở trong",
+  exited: "Đã ra",
 }
 
 function MergedAccessLogTable({
@@ -191,13 +191,13 @@ function MergedAccessLogTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Resident</TableHead>
-            <TableHead>Apartment</TableHead>
-            <TableHead>License Plate</TableHead>
-            <TableHead>Entry</TableHead>
-            <TableHead>Exit</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Cư dân</TableHead>
+            <TableHead>Căn hộ</TableHead>
+            <TableHead>Biển số</TableHead>
+            <TableHead>Vào</TableHead>
+            <TableHead>Ra</TableHead>
+            <TableHead>Thời lượng</TableHead>
+            <TableHead>Trạng thái</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -214,19 +214,19 @@ function MergedAccessLogTable({
                 ? `B${log.buildingId} • #${log.apartmentNumber}`
                 : log.apartmentNumber
                   ? `#${log.apartmentNumber}`
-                  : "Unassigned"
+                  : "Chưa gán"
             const duration =
               entryDate && exitDate
                 ? `${Math.round(
                   (exitDate.getTime() - entryDate.getTime()) / (1000 * 60)
-                )} mins`
-                : "In-progress"
+                )} phút`
+                : "Đang diễn ra"
             return (
               <TableRow key={log.vehicleLogId}>
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="font-medium">
-                      {log.fullName ?? "Unknown resident"}
+                      {log.fullName ?? "Chưa rõ cư dân"}
                     </span>
                     {log.userId ? (
                       <span className="text-muted-foreground text-xs">
@@ -269,22 +269,22 @@ export function AccessSummaryCards({
 }: AccessSummaryCardsProps) {
   const cards = [
     {
-      title: "Gate events",
+      title: "Lượt ra/vào",
       value: totalEntries,
       icon: CalendarDays,
-      description: "Vehicle log entries in the selected range",
+      description: "Số lượt ra/vào trong khoảng thời gian đã chọn",
     },
     {
-      title: "Currently inside",
+      title: "Đang ở trong",
       value: insideCount,
       icon: Car,
-      description: "Vehicles with no exit timestamp",
+      description: "Xe chưa ghi nhận thời gian ra",
     },
     {
-      title: "Exited",
+      title: "Đã ra",
       value: exitedCount,
       icon: ShieldAlert,
-      description: "Vehicles recorded exiting the premises",
+      description: "Xe đã ghi nhận rời khỏi khu vực",
     },
   ]
 

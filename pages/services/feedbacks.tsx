@@ -51,18 +51,18 @@ import type { Feedback } from "@/types/feedbacks"
 import type { FeedbackStatus } from "@/types/enum"
 
 const statusOptions: { label: string; value: FeedbackStatus | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Open", value: "open" },
-  { label: "In Progress", value: "in_progress" },
-  { label: "Resolved", value: "resolved" },
-  { label: "Closed", value: "closed" },
+  { label: "Tất cả", value: "all" },
+  { label: "Mở", value: "open" },
+  { label: "Đang xử lý", value: "in_progress" },
+  { label: "Đã giải quyết", value: "resolved" },
+  { label: "Đã đóng", value: "closed" },
 ]
 
 const statusLabels: Record<FeedbackStatus, string> = {
-  open: "Open",
-  in_progress: "In Progress",
-  resolved: "Resolved",
-  closed: "Closed",
+  open: "Mở",
+  in_progress: "Đang xử lý",
+  resolved: "Đã giải quyết",
+  closed: "Đã đóng",
 }
 
 const statusColors: Record<FeedbackStatus, string> = {
@@ -111,13 +111,13 @@ export default function FeedbacksPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to load feedbacks")
+        throw new Error(response?.message ?? "Không thể tải phản hồi")
       }
 
       setFeedbacks(response.data)
     } catch (error) {
       console.error(error)
-      toast.error("Failed to load feedbacks")
+      toast.error("Không thể tải phản hồi")
     } finally {
       setIsLoading(false)
     }
@@ -130,7 +130,7 @@ export default function FeedbacksPage() {
   const handleCreateFeedback = async () => {
     if (!userId) return
     if (!formData.content.trim()) {
-      toast.error("Please fill in the feedback content")
+      toast.error("Vui lòng điền nội dung phản hồi")
       return
     }
 
@@ -152,16 +152,16 @@ export default function FeedbacksPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to create feedback")
+        throw new Error(response?.message ?? "Không thể tạo phản hồi")
       }
 
-      toast.success("Feedback submitted successfully")
+      toast.success("Gửi phản hồi thành công")
       setIsFormOpen(false)
       setFormData({ content: "", tags: "" })
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to submit feedback")
+      toast.error("Gửi phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }
@@ -203,16 +203,16 @@ export default function FeedbacksPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to update feedback")
+        throw new Error(response?.message ?? "Không thể cập nhật phản hồi")
       }
 
-      toast.success("Feedback updated successfully")
+      toast.success("Cập nhật phản hồi thành công")
       setIsEditModalOpen(false)
       setSelectedFeedback(null)
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to update feedback")
+      toast.error("Cập nhật phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }
@@ -235,16 +235,16 @@ export default function FeedbacksPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to update feedback")
+        throw new Error(response?.message ?? "Không thể cập nhật phản hồi")
       }
 
-      toast.success("Feedback status updated successfully")
+      toast.success("Cập nhật trạng thái phản hồi thành công")
       setIsUpdateDialogOpen(false)
       setSelectedFeedback(null)
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to update feedback status")
+      toast.error("Cập nhật trạng thái phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }
@@ -265,16 +265,16 @@ export default function FeedbacksPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to delete feedback")
+        throw new Error(response?.message ?? "Không thể xóa phản hồi")
       }
 
-      toast.success("Feedback deleted successfully")
+      toast.success("Xóa phản hồi thành công")
       setIsDeleteDialogOpen(false)
       setSelectedFeedback(null)
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to delete feedback")
+      toast.error("Xóa phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }
@@ -330,35 +330,35 @@ export default function FeedbacksPage() {
   return (
     <AuthGate isAuthenticated={!!userId}>
       <Head>
-        <title>Feedback - Apartment Management System</title>
+        <title>Phản hồi - Hệ thống Quản lý Chung cư</title>
       </Head>
       <div className="flex flex-col gap-6 p-6 pt-20">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/services/feedbacks">Services</BreadcrumbLink>
+              <BreadcrumbLink href="/services/feedbacks">Dịch vụ</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Feedback</BreadcrumbPage>
+              <BreadcrumbPage>Phản hồi</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Feedback</h1>
+            <h1 className="text-3xl font-bold">Phản hồi</h1>
             <p className="text-muted-foreground mt-1">
-              {isAdmin ? "Manage all feedbacks from residents" : "Submit and track your feedback"}
+              {isAdmin ? "Quản lý tất cả phản hồi từ cư dân" : "Gửi và theo dõi phản hồi của bạn"}
             </p>
           </div>
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Submit Feedback
+            Gửi phản hồi
           </Button>
         </div>
 
@@ -370,7 +370,7 @@ export default function FeedbacksPage() {
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search feedbacks..."
+                      placeholder="Tìm kiếm phản hồi..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9"
@@ -378,7 +378,7 @@ export default function FeedbacksPage() {
                   </div>
                   <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as FeedbackStatus | "all")}>
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter by status" />
+                      <SelectValue placeholder="Lọc theo trạng thái" />
                     </SelectTrigger>
                     <SelectContent>
                       {statusOptions.map((option) => (
@@ -391,7 +391,7 @@ export default function FeedbacksPage() {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-xs">From Date</Label>
+                    <Label className="text-xs">Từ ngày</Label>
                     <Input
                       type="date"
                       value={startDate}
@@ -399,7 +399,7 @@ export default function FeedbacksPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs">To Date</Label>
+                    <Label className="text-xs">Đến ngày</Label>
                     <Input
                       type="date"
                       value={endDate}
@@ -414,24 +414,24 @@ export default function FeedbacksPage() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Loading feedbacks...</p>
+            <p className="text-muted-foreground">Đang tải phản hồi...</p>
           </div>
         ) : filteredFeedbacks.length === 0 ? (
           <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">No feedbacks found</p>
+            <p className="text-muted-foreground">Không tìm thấy phản hồi</p>
           </div>
         ) : (
           <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Feedback ID</TableHead>
-                  <TableHead>Content</TableHead>
-                  {isAdmin && <TableHead>Author</TableHead>}
-                  <TableHead>Tags</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>Mã phản hồi</TableHead>
+                  <TableHead>Nội dung</TableHead>
+                  {isAdmin && <TableHead>Tác giả</TableHead>}
+                  <TableHead>Thẻ</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Ngày</TableHead>
+                  <TableHead>Hành động</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -496,7 +496,7 @@ export default function FeedbacksPage() {
                             size="sm"
                             onClick={() => handleOpenUpdateDialog(feedback)}
                           >
-                            Update Status
+                            Cập nhật trạng thái
                           </Button>
                         )}
                       </div>
@@ -518,27 +518,27 @@ export default function FeedbacksPage() {
         }}>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
-              <DialogTitle>{isEditModalOpen ? "Edit Feedback" : "Submit Feedback"}</DialogTitle>
+              <DialogTitle>{isEditModalOpen ? "Chỉnh sửa Phản hồi" : "Gửi Phản hồi"}</DialogTitle>
               <DialogDescription>
-                {isEditModalOpen ? "Update your feedback" : "Share your feedback with building management"}
+                {isEditModalOpen ? "Cập nhật phản hồi của bạn" : "Chia sẻ phản hồi của bạn với ban quản lý tòa nhà"}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="content">Feedback Content</Label>
+                <Label htmlFor="content">Nội dung Phản hồi</Label>
                 <Textarea
                   id="content"
-                  placeholder="Describe your feedback, suggestion, or concern..."
+                  placeholder="Mô tả phản hồi, đề xuất hoặc mối quan tâm của bạn..."
                   rows={8}
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="tags">Tags (comma-separated)</Label>
+                <Label htmlFor="tags">Thẻ (phân cách bằng dấu phẩy)</Label>
                 <Input
                   id="tags"
-                  placeholder="e.g., maintenance, billing, security"
+                  placeholder="ví dụ: bảo trì, thanh toán, an ninh"
                   value={formData.tags}
                   onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 />
@@ -553,10 +553,10 @@ export default function FeedbacksPage() {
                   setFormData({ content: "", tags: "" })
                 }}
               >
-                Cancel
+                Hủy
               </Button>
               <Button onClick={isEditModalOpen ? handleUpdateFeedback : handleCreateFeedback} disabled={isSubmitting}>
-                {isSubmitting ? (isEditModalOpen ? "Updating..." : "Submitting...") : (isEditModalOpen ? "Update" : "Submit")}
+                {isSubmitting ? (isEditModalOpen ? "Đang cập nhật..." : "Đang gửi...") : (isEditModalOpen ? "Cập nhật" : "Gửi")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -568,9 +568,9 @@ export default function FeedbacksPage() {
             <DialogHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <DialogTitle>Feedback Details</DialogTitle>
+                  <DialogTitle>Chi tiết Phản hồi</DialogTitle>
                   <DialogDescription className="mt-2">
-                    by {selectedFeedback?.fullName} • {selectedFeedback && new Date(selectedFeedback.createdAt).toLocaleString()}
+                    bởi {selectedFeedback?.fullName} • {selectedFeedback && new Date(selectedFeedback.createdAt).toLocaleString()}
                   </DialogDescription>
                 </div>
                 {selectedFeedback && (
@@ -585,16 +585,16 @@ export default function FeedbacksPage() {
             </DialogHeader>
             <div className="mt-4 space-y-4">
               <div>
-                <Label className="text-xs text-muted-foreground">Feedback ID</Label>
+                <Label className="text-xs text-muted-foreground">Mã phản hồi</Label>
                 <p className="font-mono text-sm">{selectedFeedback?.feedbackId}</p>
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Content</Label>
+                <Label className="text-xs text-muted-foreground">Nội dung</Label>
                 <p className="mt-1 whitespace-pre-wrap">{selectedFeedback?.content}</p>
               </div>
               {selectedFeedback?.tags && selectedFeedback.tags.length > 0 && (
                 <div>
-                  <Label className="text-xs text-muted-foreground">Tags</Label>
+                  <Label className="text-xs text-muted-foreground">Thẻ</Label>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {selectedFeedback.tags.map((tag, idx) => (
                       <Badge key={idx} variant="outline">
@@ -616,7 +616,7 @@ export default function FeedbacksPage() {
                     }}
                   >
                     <Edit className="mr-2 h-4 w-4" />
-                    Edit
+                    Chỉnh sửa
                   </Button>
                   <Button
                     variant="destructive"
@@ -626,12 +626,12 @@ export default function FeedbacksPage() {
                     }}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    Xóa
                   </Button>
                 </>
               )}
               <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
-                Close
+                Đóng
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -642,24 +642,24 @@ export default function FeedbacksPage() {
           <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Update Feedback Status</DialogTitle>
-                <DialogDescription>Change the status of this feedback</DialogDescription>
+                <DialogTitle>Cập nhật Trạng thái Phản hồi</DialogTitle>
+                <DialogDescription>Thay đổi trạng thái của phản hồi này</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 {selectedFeedback && (
                   <div className="rounded-md border p-4">
-                    <p className="text-sm text-muted-foreground mb-2">Feedback ID: {selectedFeedback.feedbackId}</p>
+                    <p className="text-sm text-muted-foreground mb-2">Mã phản hồi: {selectedFeedback.feedbackId}</p>
                     <p className="text-sm">{selectedFeedback.content}</p>
                   </div>
                 )}
                 <div className="grid gap-2">
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status">Trạng thái</Label>
                   <Select
                     value={updateStatus}
                     onValueChange={(value) => setUpdateStatus(value as FeedbackStatus)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder="Chọn trạng thái" />
                     </SelectTrigger>
                     <SelectContent>
                       {statusOptions.filter((opt) => opt.value !== "all").map((option) => (
@@ -673,10 +673,10 @@ export default function FeedbacksPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsUpdateDialogOpen(false)}>
-                  Cancel
+                  Hủy
                 </Button>
                 <Button onClick={handleUpdateStatus} disabled={isSubmitting}>
-                  {isSubmitting ? "Updating..." : "Update"}
+                  {isSubmitting ? "Đang cập nhật..." : "Cập nhật"}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -687,15 +687,15 @@ export default function FeedbacksPage() {
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the feedback.
+                Hành động này không thể hoàn tác. Điều này sẽ xóa vĩnh viễn phản hồi.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Hủy</AlertDialogCancel>
               <AlertDialogAction onClick={handleDeleteFeedback} disabled={isSubmitting}>
-                {isSubmitting ? "Deleting..." : "Delete"}
+                {isSubmitting ? "Đang xóa..." : "Xóa"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

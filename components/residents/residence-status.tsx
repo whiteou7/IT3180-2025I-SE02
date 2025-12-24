@@ -42,6 +42,25 @@ export type StatusRecord = Pick<User, "userId" | "fullName" | "role" | "apartmen
   buildingId?: number | null
 }
 
+function formatResidentStatus(status: ResidentStatus) {
+  return status === "assigned" ? "Đã gán" : "Chưa gán"
+}
+
+function formatRole(role: StatusRecord["role"]) {
+  switch (role) {
+    case "tenant":
+      return "Cư dân"
+    case "admin":
+      return "Quản trị"
+    case "police":
+      return "An ninh"
+    case "accountant":
+      return "Kế toán"
+    default:
+      return role
+  }
+}
+
 type StatusDashboardProps = {
   total: number
   assigned: number
@@ -55,16 +74,16 @@ export function ResidenceStatusCards({
 }: StatusDashboardProps) {
   const cards = [
     {
-      label: "Assigned residents",
+      label: "Cư dân đã gán",
       value: assigned,
       icon: UserCheck,
-      description: "Residents linked to an apartment record.",
+      description: "Cư dân đã được liên kết với căn hộ.",
     },
     {
-      label: "Unassigned residents",
+      label: "Cư dân chưa gán",
       value: unassigned,
       icon: UserMinus,
-      description: "Users without an apartment_id.",
+      description: "Cư dân chưa được liên kết với căn hộ.",
     },
   ]
 
@@ -72,11 +91,11 @@ export function ResidenceStatusCards({
     <div className="grid gap-4 md:grid-cols-2">
       <Card className="border border-border/60 bg-muted/20">
         <CardHeader className="pb-2">
-          <CardDescription>Total residents</CardDescription>
+          <CardDescription>Tổng số cư dân</CardDescription>
           <CardTitle className="text-4xl font-semibold">{total}</CardTitle>
         </CardHeader>
         <CardContent className="text-muted-foreground text-sm">
-          Fetched from `/api/users`.
+          Dữ liệu được lấy từ hệ thống.
         </CardContent>
       </Card>
       {cards.map((card) => (
@@ -123,11 +142,11 @@ export function ResidenceStatusTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Resident</TableHead>
-          <TableHead>Apartment</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead className="text-right">Action</TableHead>
+          <TableHead>Cư dân</TableHead>
+          <TableHead>Căn hộ</TableHead>
+          <TableHead>Trạng thái</TableHead>
+          <TableHead>Vai trò</TableHead>
+          <TableHead className="text-right">Thao tác</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -137,7 +156,7 @@ export function ResidenceStatusTable({
               ? `B${record.buildingId} • #${record.apartmentNumber}`
               : record.apartmentNumber
                 ? `#${record.apartmentNumber}`
-                : "Unassigned"
+                : "Chưa gán"
           return (
             <TableRow key={record.userId}>
               <TableCell>
@@ -151,13 +170,13 @@ export function ResidenceStatusTable({
               <TableCell>{apartmentLabel}</TableCell>
               <TableCell>
                 <Badge variant={record.status === "assigned" ? "default" : "outline"} className="capitalize">
-                  {record.status}
+                  {formatResidentStatus(record.status)}
                 </Badge>
               </TableCell>
-              <TableCell className="capitalize">{record.role}</TableCell>
+              <TableCell className="capitalize">{formatRole(record.role)}</TableCell>
               <TableCell className="text-right">
                 <Button size="sm" variant="outline" onClick={() => onSelect(record)}>
-                  Update assignment
+                  Cập nhật gán căn hộ
                 </Button>
               </TableCell>
             </TableRow>
@@ -231,15 +250,15 @@ export function StatusChangeDialog({
       ? `B${record.buildingId} • #${record.apartmentNumber}`
       : record?.apartmentNumber
         ? `#${record.apartmentNumber}`
-        : "Unassigned"
+        : "Chưa gán"
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Update assignment</DialogTitle>
+          <DialogTitle>Cập nhật gán căn hộ</DialogTitle>
           <DialogDescription>
-            Toggle whether the resident is linked to an apartment.
+            Chọn trạng thái và căn hộ để liên kết cho cư dân.
           </DialogDescription>
         </DialogHeader>
 
@@ -253,7 +272,7 @@ export function StatusChangeDialog({
 
             {/* status */}
             <div className="space-y-1">
-              <label className="text-sm font-medium">Status</label>
+              <label className="text-sm font-medium">Trạng thái</label>
               <Select
                 value={formState.status}
                 onValueChange={(value) =>
@@ -261,11 +280,11 @@ export function StatusChangeDialog({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="Chọn trạng thái" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="assigned">Assigned</SelectItem>
-                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  <SelectItem value="assigned">Đã gán</SelectItem>
+                  <SelectItem value="unassigned">Chưa gán</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -273,7 +292,7 @@ export function StatusChangeDialog({
             {/* apartment select */}
             {formState.status === "assigned" ? (
               <div className="space-y-1">
-                <label className="text-sm font-medium">Apartment</label>
+                <label className="text-sm font-medium">Căn hộ</label>
                 <Select
                   value={
                     formState.apartmentId
@@ -287,7 +306,7 @@ export function StatusChangeDialog({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select apartment" />
+                    <SelectValue placeholder="Chọn căn hộ" />
                   </SelectTrigger>
                   <SelectContent>
                     {apartments.map((apt) => (
@@ -309,16 +328,16 @@ export function StatusChangeDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                Hủy
               </Button>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Apply"}
+                {isSaving ? "Đang lưu..." : "Áp dụng"}
               </Button>
             </DialogFooter>
           </form>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Select a resident first to manage their assignment.
+            Vui lòng chọn một cư dân để cập nhật gán căn hộ.
           </p>
         )}
       </DialogContent>

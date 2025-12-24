@@ -15,7 +15,7 @@ export default async function handler(
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} not allowed.`,
+      message: `Phương thức ${req.method} không được phép.`,
     })
   }
 
@@ -29,7 +29,7 @@ export default async function handler(
     if (!email || !phoneNumber || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: "Email, phone number, and new password are required.",
+        message: "Email, số điện thoại và mật khẩu mới là bắt buộc.",
       })
     }
 
@@ -43,7 +43,7 @@ export default async function handler(
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "No account found with that email address.",
+        message: "Không tìm thấy tài khoản với địa chỉ email đó.",
       })
     }
 
@@ -51,7 +51,7 @@ export default async function handler(
     if (user.phoneNumber !== phoneNumber) {
       return res.status(401).json({
         success: false,
-        message: "Email and phone number do not match.",
+        message: "Email và số điện thoại không khớp.",
       })
     }
 
@@ -67,14 +67,14 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Password reset successfully.",
+      message: "Đặt lại mật khẩu thành công.",
       data: { success: true },
     })
   } catch (error) {
     console.error("Error in /api/auth/reset-password:", error)
     return res.status(500).json({
       success: false,
-      message: "Failed to reset password.",
+      message: "Đặt lại mật khẩu thất bại.",
     })
   }
 }

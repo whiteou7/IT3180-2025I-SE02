@@ -17,7 +17,7 @@ export default async function handler(
   if (!chatId || typeof chatId !== "string") {
     return res.status(400).json({
       success: false,
-      message: "Chat ID is required",
+      message: "Thiếu mã cuộc trò chuyện",
     })
   }
 
@@ -28,7 +28,7 @@ export default async function handler(
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({
           success: false,
-          message: "User ID is required",
+          message: "Thiếu mã người dùng",
         })
       }
 
@@ -43,14 +43,14 @@ export default async function handler(
       if (!chat) {
         return res.status(404).json({
           success: false,
-          message: "Chat not found",
+          message: "Không tìm thấy cuộc trò chuyện",
         })
       }
 
       if (chat.user1Id !== userId && chat.user2Id !== userId) {
         return res.status(403).json({
           success: false,
-          message: "You do not have access to this chat",
+          message: "Bạn không có quyền xem cuộc trò chuyện này",
         })
       }
 
@@ -111,7 +111,7 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Messages fetched successfully",
+        message: "Tải tin nhắn thành công",
         data: messagesWithSenders,
       })
     }
@@ -125,14 +125,14 @@ export default async function handler(
       if (!userId || !content) {
         return res.status(400).json({
           success: false,
-          message: "User ID and content are required",
+          message: "Thiếu thông tin người dùng hoặc nội dung tin nhắn",
         })
       }
 
       if (typeof content !== "string" || content.trim().length === 0) {
         return res.status(400).json({
           success: false,
-          message: "Message content cannot be empty",
+          message: "Nội dung tin nhắn không được để trống",
         })
       }
 
@@ -147,14 +147,14 @@ export default async function handler(
       if (!chat) {
         return res.status(404).json({
           success: false,
-          message: "Chat not found",
+          message: "Không tìm thấy cuộc trò chuyện",
         })
       }
 
       if (chat.user1Id !== userId && chat.user2Id !== userId) {
         return res.status(403).json({
           success: false,
-          message: "You do not have access to this chat",
+          message: "Bạn không có quyền xem cuộc trò chuyện này",
         })
       }
 
@@ -195,7 +195,7 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Message sent successfully",
+        message: "Gửi tin nhắn thành công",
         data: messageWithSender,
       })
     }
@@ -203,7 +203,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET", "POST"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
     console.error("Error in /api/chats/[chatId]/messages:", error)

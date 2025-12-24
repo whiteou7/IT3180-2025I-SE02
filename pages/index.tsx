@@ -19,33 +19,33 @@ export default function HomePage() {
   const features = [
     {
       icon: Users,
-      title: "Resident Management",
-      description: "Manage resident profiles, apartments, and access control",
+      title: "Quản lý Cư dân",
+      description: "Quản lý hồ sơ cư dân, căn hộ và kiểm soát ra vào",
     },
     {
       icon: Building2,
-      title: "Property Management",
-      description: "Track properties, lost items, and property reports",
+      title: "Quản lý Tài sản",
+      description: "Theo dõi tài sản, đồ thất lạc và báo cáo tài sản",
     },
     {
       icon: DollarSign,
-      title: "Fee Collection",
-      description: "Handle billing, invoices, and financial transactions",
+      title: "Thu Phí",
+      description: "Xử lý thanh toán, hóa đơn và giao dịch tài chính",
     },
     {
       icon: Shield,
-      title: "Security & Access",
-      description: "Monitor access control and security reports",
+      title: "An ninh & Ra vào",
+      description: "Giám sát kiểm soát ra vào và báo cáo an ninh",
     },
     {
       icon: Bell,
-      title: "Communications",
-      description: "Send announcements and manage communications",
+      title: "Giao tiếp",
+      description: "Gửi thông báo và quản lý giao tiếp",
     },
     {
       icon: Wrench,
-      title: "Building Services",
-      description: "Manage service catalog and handle service requests",
+      title: "Dịch vụ Tòa nhà",
+      description: "Quản lý danh mục dịch vụ và xử lý yêu cầu dịch vụ",
     },
   ]
 
@@ -61,16 +61,16 @@ export default function HomePage() {
                   <Building2 className="size-6" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold tracking-tight">Apartment Management System</h1>
+                  <h1 className="text-4xl font-bold tracking-tight">Hệ Thống Quản Lý Chung Cư</h1>
                   <p className="text-muted-foreground text-lg mt-1">
-                    Comprehensive solution for modern apartment complexes
+                    Giải pháp toàn diện cho các khu chung cư hiện đại
                   </p>
                 </div>
               </div>
               <p className="text-muted-foreground text-base leading-relaxed max-w-2xl">
-                Streamline your apartment complex operations with our integrated management platform.
-                From resident profiles to billing, property management to security - everything you need
-                in one place.
+                Tối ưu hóa hoạt động của khu chung cư với nền tảng quản lý tích hợp của chúng tôi.
+                Từ hồ sơ cư dân đến thanh toán, quản lý tài sản đến an ninh - tất cả những gì bạn cần
+                ở một nơi.
               </p>
             </div>
 
@@ -101,10 +101,10 @@ export default function HomePage() {
             {/* Additional Info */}
             <div className="flex flex-wrap gap-4 pt-4">
               <div className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">Role-based access:</span> Admin, Police, Accountant
+                <span className="font-semibold text-foreground">Truy cập theo vai trò:</span> Quản trị viên, An ninh, Kế toán
               </div>
               <div className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">Reports & Analytics:</span> Financial, Security, General
+                <span className="font-semibold text-foreground">Báo cáo & Phân tích:</span> Tài chính, An ninh, Tổng hợp
               </div>
             </div>
           </div>
@@ -114,9 +114,9 @@ export default function HomePage() {
             <div className="w-full max-w-md">
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Welcome Back</CardTitle>
+                  <CardTitle className="text-2xl">Chào mừng trở lại</CardTitle>
                   <CardDescription>
-                    Sign in to access your apartment management dashboard
+                    Đăng nhập để truy cập bảng điều khiển quản lý chung cư
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -127,7 +127,7 @@ export default function HomePage() {
               {/* Quick Links */}
               <div className="mt-6 text-center">
                 <p className="text-sm text-muted-foreground">
-                  Need help? Contact your system administrator
+                  Cần trợ giúp? Liên hệ quản trị viên hệ thống
                 </p>
               </div>
             </div>

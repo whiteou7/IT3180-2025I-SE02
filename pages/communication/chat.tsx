@@ -68,13 +68,13 @@ export default function ChatPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to load chats")
+        throw new Error(response?.message ?? "Không thể tải danh sách cuộc trò chuyện")
       }
 
       setChats(response.data)
     } catch (error) {
       console.error(error)
-      toast.error("Failed to load chats")
+      toast.error("Không thể tải cuộc trò chuyện")
     } finally {
       setIsLoadingChats(false)
     }
@@ -98,7 +98,7 @@ export default function ChatPage() {
         )
 
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to load messages")
+          throw new Error(response?.message ?? "Không thể tải tin nhắn")
         }
 
         setMessages(response.data)
@@ -106,7 +106,7 @@ export default function ChatPage() {
         console.error(error)
         // Only show error toast on initial load, not during background refreshes
         if (!isBackgroundRefresh) {
-          toast.error("Failed to load messages")
+          toast.error("Không thể tải tin nhắn")
         }
       } finally {
         if (!isBackgroundRefresh) {
@@ -160,7 +160,7 @@ export default function ChatPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to search users")
+        toast.error("Không thể tìm người dùng")
       } finally {
         setIsSearching(false)
       }
@@ -206,10 +206,10 @@ export default function ChatPage() {
         )
 
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to create chat")
+          throw new Error(response?.message ?? "Không thể tạo cuộc trò chuyện")
         }
 
-        toast.success("Chat created successfully")
+        toast.success("Đã tạo cuộc trò chuyện")
         setIsSearchOpen(false)
         setSearchQuery("")
         setSearchResults([])
@@ -217,7 +217,7 @@ export default function ChatPage() {
         setSelectedChat(response.data)
       } catch (error) {
         console.error(error)
-        toast.error((error as Error).message || "Failed to create chat")
+        toast.error((error as Error).message || "Không thể tạo cuộc trò chuyện")
       }
     },
     [userId, fetchChats]
@@ -241,7 +241,7 @@ export default function ChatPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to send message")
+        throw new Error(response?.message ?? "Không thể gửi tin nhắn")
       }
 
       setMessageContent("")
@@ -249,7 +249,7 @@ export default function ChatPage() {
       await fetchChats() // Refresh chat list to update last message
     } catch (error) {
       console.error(error)
-      toast.error("Failed to send message")
+      toast.error("Không thể gửi tin nhắn")
     } finally {
       setIsSendingMessage(false)
     }
@@ -274,21 +274,21 @@ export default function ChatPage() {
   return (
     <AuthGate isAuthenticated={!!userId}>
       <Head>
-        <title>Private Chat - Apartment Management System</title>
+        <title>Tin nhắn riêng • Quản lý chung cư</title>
       </Head>
       <div className="flex h-screen flex-col gap-4 p-4 pt-20">
         <Breadcrumb className="hidden md:flex">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/communication/chat">Communication</BreadcrumbLink>
+              <BreadcrumbLink href="/communication/chat">Giao tiếp</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Private Chat</BreadcrumbPage>
+              <BreadcrumbPage>Tin nhắn riêng</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -302,7 +302,7 @@ export default function ChatPage() {
             )}
           >
             <div className="flex items-center justify-between border-b p-3 md:p-4">
-              <h2 className="text-base font-semibold md:text-lg">Conversations</h2>
+              <h2 className="text-base font-semibold md:text-lg">Cuộc trò chuyện</h2>
               <Button
                 size="sm"
                 variant="outline"
@@ -315,12 +315,12 @@ export default function ChatPage() {
             <ScrollArea className="flex-1">
               {isLoadingChats ? (
                 <div className="flex items-center justify-center p-8">
-                  <p className="text-muted-foreground text-sm">Loading conversations...</p>
+                  <p className="text-muted-foreground text-sm">Đang tải cuộc trò chuyện...</p>
                 </div>
               ) : chats.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
                   <MessageCircle className="mb-2 h-8 w-8 text-muted-foreground" />
-                  <p className="text-muted-foreground text-sm">No conversations yet</p>
+                  <p className="text-muted-foreground text-sm">Chưa có cuộc trò chuyện</p>
                   <Button
                     size="sm"
                     variant="outline"
@@ -328,7 +328,7 @@ export default function ChatPage() {
                     onClick={() => setIsSearchOpen(true)}
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
-                    Start a chat
+                    Bắt đầu trò chuyện
                   </Button>
                 </div>
               ) : (
@@ -401,7 +401,7 @@ export default function ChatPage() {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="truncate font-medium text-sm md:text-base">
-                      {selectedChat.otherUser?.fullName || "Unknown User"}
+                      {selectedChat.otherUser?.fullName || "Chưa rõ người dùng"}
                     </p>
                     <p className="truncate text-muted-foreground text-xs md:text-sm">
                       {selectedChat.otherUser?.role || ""}
@@ -412,11 +412,11 @@ export default function ChatPage() {
                   <div className="flex flex-col gap-3 p-3 md:gap-4 md:p-4">
                     {isLoadingMessages ? (
                       <div className="flex items-center justify-center p-8">
-                        <p className="text-muted-foreground text-sm">Loading messages...</p>
+                        <p className="text-muted-foreground text-sm">Đang tải tin nhắn...</p>
                       </div>
                     ) : messages.length === 0 ? (
                       <div className="flex items-center justify-center p-8">
-                        <p className="text-muted-foreground text-sm">No messages yet</p>
+                        <p className="text-muted-foreground text-sm">Chưa có tin nhắn</p>
                       </div>
                     ) : (
                       messages.map((message) => {
@@ -439,7 +439,7 @@ export default function ChatPage() {
                             >
                               {!isOwnMessage && (
                                 <p className="mb-1 text-xs font-medium opacity-70">
-                                  {message.sender?.fullName || "Unknown"}
+                                  {message.sender?.fullName || "Chưa rõ"}
                                 </p>
                               )}
                               <p className="whitespace-pre-wrap break-words">{message.content}</p>
@@ -465,7 +465,7 @@ export default function ChatPage() {
                 <div className="border-t p-3 md:p-4">
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Type a message..."
+                      placeholder="Nhập tin nhắn..."
                       value={messageContent}
                       onChange={(e) => setMessageContent(e.target.value)}
                       onKeyDown={handleKeyPress}
@@ -487,14 +487,14 @@ export default function ChatPage() {
               <div className="flex flex-1 items-center justify-center">
                 <div className="text-center">
                   <MessageCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                  <p className="text-muted-foreground">Select a conversation to start chatting</p>
+                  <p className="text-muted-foreground">Chọn một cuộc trò chuyện để bắt đầu</p>
                   <Button
                     variant="outline"
                     className="mt-4"
                     onClick={() => setIsSearchOpen(true)}
                   >
                     <UserPlus className="mr-2 h-4 w-4" />
-                    Start a new chat
+                    Bắt đầu cuộc trò chuyện mới
                   </Button>
                 </div>
               </div>
@@ -506,13 +506,13 @@ export default function ChatPage() {
         <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>Search Users</DialogTitle>
-              <DialogDescription>Find a user to start a conversation with</DialogDescription>
+              <DialogTitle>Tìm người dùng</DialogTitle>
+              <DialogDescription>Tìm người để bắt đầu trò chuyện</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <Command shouldFilter={false}>
                 <CommandInput
-                  placeholder="Search by name..."
+                  placeholder="Tìm theo tên..."
                   value={searchQuery}
                   onValueChange={(value) => {
                     setSearchQuery(value)
@@ -521,10 +521,10 @@ export default function ChatPage() {
                 <CommandList>
                   {isSearching ? (
                     <div className="flex items-center justify-center p-8">
-                      <p className="text-muted-foreground text-sm">Searching...</p>
+                      <p className="text-muted-foreground text-sm">Đang tìm...</p>
                     </div>
                   ) : searchResults.length === 0 && searchQuery.trim() ? (
-                    <CommandEmpty>No users found</CommandEmpty>
+                    <CommandEmpty>Không tìm thấy người dùng</CommandEmpty>
                   ) : searchResults.length > 0 ? (
                     <CommandGroup>
                       {searchResults.map((user) => (

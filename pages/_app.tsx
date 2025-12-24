@@ -55,7 +55,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <div className="flex items-center gap-2 px-3">
               <SidebarTrigger />
               <ThemeToggle />
-              {fullName && <span className="text-sm">Welcome back, {fullName}</span>}
+              {fullName && <span className="text-sm">Chào mừng trở lại, {fullName}</span>}
             </div>
           </header>
           <main>

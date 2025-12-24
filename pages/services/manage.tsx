@@ -65,11 +65,11 @@ const defaultFormState: ServiceFormState = {
 }
 
 const categoryOptions: { label: string; value: ServiceCategory }[] = [
-  { label: "Cleaning", value: "cleaning" },
-  { label: "Maintenance", value: "maintenance" },
-  { label: "Utilities", value: "utilities" },
-  { label: "Amenities", value: "amenities" },
-  { label: "Other", value: "other" },
+  { label: "Dọn dẹp", value: "cleaning" },
+  { label: "Bảo trì", value: "maintenance" },
+  { label: "Tiện ích", value: "utilities" },
+  { label: "Tiện nghi", value: "amenities" },
+  { label: "Khác", value: "other" },
 ]
 
 export default function ServiceAdministrationPage() {
@@ -87,7 +87,7 @@ export default function ServiceAdministrationPage() {
     try {
       const response = await ofetch("/api/services", { ignoreResponseError: true })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to fetch services")
+        throw new Error(response?.message ?? "Không thể tải danh sách dịch vụ")
       }
       const payload = (response.data as Service[]).map((svc) => ({
         ...svc,
@@ -97,7 +97,7 @@ export default function ServiceAdministrationPage() {
       setServices(payload)
     } catch (error) {
       console.error(error)
-      toast.error("Failed to load services")
+      toast.error("Không thể tải danh sách dịch vụ")
     } finally {
       setIsLoading(false)
     }
@@ -142,20 +142,20 @@ export default function ServiceAdministrationPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to duplicate service")
+        throw new Error(response?.message ?? "Không thể nhân bản dịch vụ")
       }
-      toast.success("Service duplicated")
+      toast.success("Đã nhân bản dịch vụ")
       await loadServices()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to duplicate service")
+      toast.error("Không thể nhân bản dịch vụ")
     } finally {
       setIsSaving(false)
     }
   }
 
   const handleDelete = async (service: Service) => {
-    if (!window.confirm(`Delete ${service.serviceName}?`)) return
+    if (!window.confirm(`Xóa "${service.serviceName}"?`)) return
     try {
       setIsSaving(true)
       const response = await ofetch(`/api/services/${service.serviceId}`, {
@@ -164,13 +164,13 @@ export default function ServiceAdministrationPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to delete service")
+        throw new Error(response?.message ?? "Không thể xóa dịch vụ")
       }
-      toast.success("Service deleted")
+      toast.success("Đã xóa dịch vụ")
       await loadServices()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to delete service")
+      toast.error("Không thể xóa dịch vụ")
     } finally {
       setIsSaving(false)
     }
@@ -178,7 +178,7 @@ export default function ServiceAdministrationPage() {
 
   const handleSubmit = async () => {
     if (!formState.serviceName || Number(formState.price) <= 0) {
-      toast.error("Please provide a valid name and price.")
+      toast.error("Vui lòng nhập tên và giá hợp lệ.")
       return
     }
     try {
@@ -199,16 +199,16 @@ export default function ServiceAdministrationPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to save service")
+        throw new Error(response?.message ?? "Không thể lưu dịch vụ")
       }
-      toast.success(editingService ? "Service updated" : "Service created")
+      toast.success(editingService ? "Đã cập nhật dịch vụ" : "Đã tạo dịch vụ")
       setDialogOpen(false)
       setEditingService(null)
       setFormState(defaultFormState)
       await loadServices()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to save service")
+      toast.error("Không thể lưu dịch vụ")
     } finally {
       setIsSaving(false)
     }
@@ -219,32 +219,32 @@ export default function ServiceAdministrationPage() {
   return (
     <>
       <Head>
-        <title>Service administration • Fee collection</title>
+        <title>Quản lý dịch vụ • Thu phí</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Service administration</BreadcrumbPage>
+              <BreadcrumbPage>Quản lý dịch vụ</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Service lifecycle</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Vòng đời dịch vụ</h1>
             <p className="text-muted-foreground text-sm">
-              Publish, update, or retire services that appear in the resident catalog.
+              Tạo, cập nhật hoặc ẩn dịch vụ hiển thị cho cư dân.
             </p>
           </div>
           <div className="flex gap-2">
             <Button onClick={loadServices} variant="ghost" disabled={isLoading}>
               <RefreshCw className={`mr-2 size-4 ${isLoading ? "animate-spin" : ""}`} />
-              Refresh
+              Làm mới
             </Button>
             <Dialog
               open={dialogOpen}
@@ -258,15 +258,15 @@ export default function ServiceAdministrationPage() {
             >
               <Button disabled={!isAdmin} onClick={handleOpenCreate}>
                 <Plus className="mr-2 size-4" />
-                New service
+                Thêm dịch vụ
               </Button>
               <DialogContent className="max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{editingService ? "Edit service" : "Create service"}</DialogTitle>
+                  <DialogTitle>{editingService ? "Sửa dịch vụ" : "Tạo dịch vụ"}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="serviceName">Service name</Label>
+                    <Label htmlFor="serviceName">Tên dịch vụ</Label>
                     <Input
                       id="serviceName"
                       value={formState.serviceName}
@@ -274,7 +274,7 @@ export default function ServiceAdministrationPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">Mô tả</Label>
                     <Textarea
                       id="description"
                       rows={3}
@@ -284,7 +284,7 @@ export default function ServiceAdministrationPage() {
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="price">Price (USD)</Label>
+                      <Label htmlFor="price">Giá (USD)</Label>
                       <Input
                         id="price"
                         type="number"
@@ -294,7 +294,7 @@ export default function ServiceAdministrationPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="tax">Tax (%)</Label>
+                      <Label htmlFor="tax">Thuế (%)</Label>
                       <Input
                         id="tax"
                         type="number"
@@ -305,13 +305,13 @@ export default function ServiceAdministrationPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Category</Label>
+                    <Label>Nhóm</Label>
                     <Select
                       value={formState.category}
                       onValueChange={(value: ServiceCategory) => setFormState((prev) => ({ ...prev, category: value }))}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
+                        <SelectValue placeholder="Chọn nhóm" />
                       </SelectTrigger>
                       <SelectContent>
                         {categoryOptions.map((option) => (
@@ -324,8 +324,8 @@ export default function ServiceAdministrationPage() {
                   </div>
                   <div className="flex items-center justify-between rounded-md border p-3">
                     <div>
-                      <p className="text-sm font-medium">Available in catalog</p>
-                      <p className="text-muted-foreground text-xs">Toggle to draft or publish service.</p>
+                      <p className="text-sm font-medium">Hiển thị cho cư dân</p>
+                      <p className="text-muted-foreground text-xs">Bật để hiển thị, tắt để ẩn.</p>
                     </div>
                     <Switch
                       checked={formState.isAvailable}
@@ -335,10 +335,10 @@ export default function ServiceAdministrationPage() {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                    Cancel
+                    Hủy
                   </Button>
                   <Button onClick={handleSubmit} disabled={isSaving}>
-                    {isSaving ? "Saving..." : editingService ? "Save changes" : "Create service"}
+                    {isSaving ? "Đang lưu..." : editingService ? "Lưu thay đổi" : "Tạo dịch vụ"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -350,24 +350,24 @@ export default function ServiceAdministrationPage() {
           {isAdmin ? (
             <Card>
               <CardHeader>
-                <CardTitle>Service registry</CardTitle>
-                <CardDescription>Track availability, pricing, and lifecycle per service.</CardDescription>
+                <CardTitle>Danh sách dịch vụ</CardTitle>
+                <CardDescription>Theo dõi trạng thái hiển thị và giá dịch vụ.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3 text-sm">
-                  <Badge variant="outline">{services.length} total services</Badge>
-                  <Badge variant="default">{totalActive} active</Badge>
+                  <Badge variant="outline">{services.length} dịch vụ</Badge>
+                  <Badge variant="default">{totalActive} đang hiển thị</Badge>
                 </div>
                 <div className="rounded-xl border">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Tax</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>Tên</TableHead>
+                        <TableHead>Nhóm</TableHead>
+                        <TableHead>Giá</TableHead>
+                        <TableHead>Thuế</TableHead>
+                        <TableHead>Trạng thái</TableHead>
+                        <TableHead className="text-right">Thao tác</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -386,7 +386,7 @@ export default function ServiceAdministrationPage() {
                             <TableCell>{service.tax}%</TableCell>
                             <TableCell>
                               <Badge variant={service.isAvailable ? "default" : "secondary"}>
-                                {service.isAvailable ? "Published" : "Draft"}
+                                {service.isAvailable ? "Đang hiển thị" : "Đang ẩn"}
                               </Badge>
                             </TableCell>
                             <TableCell className="flex justify-end gap-2">
@@ -420,7 +420,7 @@ export default function ServiceAdministrationPage() {
                       ) : (
                         <TableRow>
                           <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
-                            No services configured yet.
+                            Chưa có dịch vụ nào.
                           </TableCell>
                         </TableRow>
                       )}
@@ -432,7 +432,7 @@ export default function ServiceAdministrationPage() {
           ) : (
             <Card>
               <CardContent className="py-10 text-center text-sm text-muted-foreground">
-                Administrator access is required to manage services.
+                Chỉ quản trị viên mới có thể quản lý dịch vụ.
               </CardContent>
             </Card>
           )}

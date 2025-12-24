@@ -15,7 +15,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -75,7 +75,7 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Fetched vehicle logs successfully.",
+      message: "Tải nhật ký ra vào thành công.",
       data: {
         logs,
       },
@@ -85,7 +85,7 @@ export default async function handler(
     console.error("Error fetching vehicle logs:", error)
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Có lỗi xảy ra. Vui lòng thử lại.",
     })
   }
 }

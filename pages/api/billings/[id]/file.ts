@@ -22,7 +22,7 @@ export default async function handler(
   if (!id || typeof id !== "string") {
     return res.status(400).json({
       success: false,
-      message: "Billing ID is required",
+      message: "Mã thanh toán là bắt buộc",
     })
   }
 
@@ -30,7 +30,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -73,7 +73,7 @@ export default async function handler(
     if (rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No billings found for this billing ID",
+        message: "Không tìm thấy thanh toán cho mã này",
       })
     }
 
@@ -169,14 +169,14 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Billing PDF generated",
+      message: "Tạo PDF thanh toán thành công",
       data: payload,
     })
   } catch (error) {
     console.error("Error generating billing PDF:", error)
     return res.status(500).json({
       success: false,
-      message: "Failed to generate billing PDF",
+      message: "Tạo PDF thanh toán thất bại",
     })
   }
 }

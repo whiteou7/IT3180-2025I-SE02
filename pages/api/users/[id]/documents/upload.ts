@@ -22,7 +22,7 @@ export default async function handler(
   if (!userId || typeof userId !== "string") {
     return res.status(400).json({
       success: false,
-      message: "User ID is required",
+      message: "Thiếu mã người dùng",
     })
   }
 
@@ -30,7 +30,7 @@ export default async function handler(
     res.setHeader("Allow", ["POST"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -46,7 +46,7 @@ export default async function handler(
     if (!file) {
       return res.status(400).json({
         success: false,
-        message: "No file uploaded",
+        message: "Vui lòng chọn tệp để tải lên",
       })
     }
 
@@ -54,7 +54,7 @@ export default async function handler(
     if (!file.originalFilename?.toLowerCase().endsWith(".pdf")) {
       return res.status(400).json({
         success: false,
-        message: "Only PDF files are allowed",
+        message: "Chỉ cho phép tệp PDF",
       })
     }
 
@@ -78,13 +78,13 @@ export default async function handler(
       console.error("Error uploading document:", uploadError)
       return res.status(500).json({
         success: false,
-        message: uploadError.message || "Failed to upload document",
+        message: uploadError.message || "Không thể tải lên tài liệu",
       })
     }
 
     return res.status(200).json({
       success: true,
-      message: "Document uploaded successfully",
+      message: "Tải lên tài liệu thành công",
       data: { path: filePath },
     })
   } catch (error) {

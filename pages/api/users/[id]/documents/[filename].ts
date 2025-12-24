@@ -13,14 +13,14 @@ export default async function handler(
   if (!userId || typeof userId !== "string") {
     return res.status(400).json({
       success: false,
-      message: "User ID is required",
+      message: "Thiếu mã người dùng",
     })
   }
 
   if (!filename || typeof filename !== "string") {
     return res.status(400).json({
       success: false,
-      message: "Filename is required",
+      message: "Thiếu tên tệp",
     })
   }
 
@@ -28,7 +28,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -44,7 +44,7 @@ export default async function handler(
       console.error("Error downloading document:", error)
       return res.status(404).json({
         success: false,
-        message: error.message || "Document not found",
+        message: error.message || "Không tìm thấy tài liệu",
       })
     }
 

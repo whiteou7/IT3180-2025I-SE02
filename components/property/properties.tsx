@@ -86,12 +86,12 @@ export function PropertyFilters({ filters, onChange, isLoading }: PropertyFilter
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-base">Filter properties</CardTitle>
-        <CardDescription>Search by name, status, or registration date.</CardDescription>
+        <CardTitle className="text-base">Lọc tài sản</CardTitle>
+        <CardDescription>Tìm theo tên, trạng thái hoặc ngày đăng ký.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <Input
-          placeholder="Search by property name..."
+          placeholder="Tìm theo tên tài sản..."
           value={filters.search}
           disabled={isLoading}
           onChange={(event) => update({ search: event.target.value })}
@@ -103,10 +103,10 @@ export function PropertyFilters({ filters, onChange, isLoading }: PropertyFilter
             onValueChange={(value) => update({ status: value as PropertyFiltersState["status"] })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
               {propertyStatuses.map((status) => (
                 <SelectItem key={status} value={status}>
                   {formatStatusLabel(status)}
@@ -122,10 +122,10 @@ export function PropertyFilters({ filters, onChange, isLoading }: PropertyFilter
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Property type" />
+              <SelectValue placeholder="Loại tài sản" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="all">Tất cả loại</SelectItem>
               {propertyTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {formatTypeLabel(type)}
@@ -136,7 +136,7 @@ export function PropertyFilters({ filters, onChange, isLoading }: PropertyFilter
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground">From</label>
+            <label className="text-xs font-medium text-muted-foreground">Từ</label>
             <Input
               type="date"
               value={filters.startDate ?? ""}
@@ -145,7 +145,7 @@ export function PropertyFilters({ filters, onChange, isLoading }: PropertyFilter
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground">To</label>
+            <label className="text-xs font-medium text-muted-foreground">Đến</label>
             <Input
               type="date"
               value={filters.endDate ?? ""}
@@ -167,7 +167,7 @@ export function PropertyFilters({ filters, onChange, isLoading }: PropertyFilter
             })
           }
         >
-          Reset filters
+          Xóa bộ lọc
         </Button>
       </CardContent>
     </Card>
@@ -232,7 +232,7 @@ export function PropertyGrid({
   if (!properties.length) {
     return (
       <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-        No properties match the current filters.
+        Không có tài sản nào phù hợp với bộ lọc hiện tại.
       </div>
     )
   }
@@ -253,7 +253,7 @@ export function PropertyGrid({
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <ShieldCheck className="size-4" />
-              <span>{property.isPublic ? "Public" : "Private"}</span>
+              <span>{property.isPublic ? "Công khai" : "Riêng tư"}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CalendarClock className="size-4" />
@@ -267,18 +267,18 @@ export function PropertyGrid({
             )}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CircleEllipsis className="size-4" />
-              <span>{property.totalReports ?? 0} reports logged</span>
+              <span>{property.totalReports ?? 0} báo cáo</span>
             </div>
             <Divider />
             <div className="flex items-center justify-between">
               <Button variant="ghost" size="sm" onClick={() => onSelect(property)}>
-                View details
+                Xem chi tiết
               </Button>
               {canManage && (onStatusChange || onEdit || onDelete) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
-                      Manage
+                      Quản lý
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
@@ -288,17 +288,17 @@ export function PropertyGrid({
                           key={statusOption}
                           onSelect={() => onStatusChange(property, statusOption)}
                         >
-                          Set {formatStatusLabel(statusOption)}
+                          Đặt {formatStatusLabel(statusOption)}
                         </DropdownMenuItem>
                       ))}
                     {onEdit && (
                       <DropdownMenuItem onSelect={() => onEdit(property)}>
-                        Edit details
+                        Sửa thông tin
                       </DropdownMenuItem>
                     )}
                     {onDelete && (
                       <DropdownMenuItem className="text-destructive" onSelect={() => onDelete(property)}>
-                        Delete property
+                        Xóa tài sản
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
@@ -323,9 +323,9 @@ export function PropertyDetailSheet({ property, open, onOpenChange }: PropertyDe
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-full max-w-xl flex-col gap-6">
         <SheetHeader className="text-left">
-          <SheetTitle>{property?.propertyName ?? "Property details"}</SheetTitle>
+          <SheetTitle>{property?.propertyName ?? "Chi tiết tài sản"}</SheetTitle>
           <SheetDescription>
-            Review registration data, visibility, and recent missing reports.
+            Xem thông tin đăng ký, mức chia sẻ và các báo cáo gần đây.
           </SheetDescription>
         </SheetHeader>
         {property ? (
@@ -333,41 +333,41 @@ export function PropertyDetailSheet({ property, open, onOpenChange }: PropertyDe
             <div className="space-y-6">
               <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
                 <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  Registration
+                  Đăng ký
                 </h4>
                 <div className="grid gap-4 text-sm md:grid-cols-2">
-                  <InfoRow label="Property ID" value={`#${property.propertyId}`} />
-                  <InfoRow label="Type" value={formatTypeLabel(property.propertyType)} />
-                  <InfoRow label="Visibility" value={property.isPublic ? "Public" : "Private"} />
-                  <InfoRow label="Created at" value={formatDate(property.createdAt)} />
+                  <InfoRow label="Mã tài sản" value={`#${property.propertyId}`} />
+                  <InfoRow label="Loại" value={formatTypeLabel(property.propertyType)} />
+                  <InfoRow label="Chia sẻ" value={property.isPublic ? "Công khai" : "Riêng tư"} />
+                  <InfoRow label="Ngày tạo" value={formatDate(property.createdAt)} />
                   {property.propertyType === "vehicle" && (
-                    <InfoRow label="License plate" value={property.licensePlate ?? "Not registered"} />
+                    <InfoRow label="Biển số xe" value={property.licensePlate ?? "Chưa đăng ký"} />
                   )}
                 </div>
               </section>
               {(property.ownerName || property.userId) && (
                 <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
                   <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Owner
+                    Chủ sở hữu
                   </h4>
                   <div className="grid gap-2 text-sm">
-                    <InfoRow label="Resident name" value={property.ownerName ?? "Unassigned"} />
-                    <InfoRow label="Resident ID" value={property.userId ?? "Not linked"} />
+                    <InfoRow label="Tên cư dân" value={property.ownerName ?? "Chưa gán"} />
+                    <InfoRow label="Mã cư dân" value={property.userId ?? "Chưa liên kết"} />
                   </div>
                 </section>
               )}
               <section className="space-y-3 rounded-2xl border bg-muted/30 p-4">
                 <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  Incident history
+                  Lịch sử báo cáo
                 </h4>
                 <div className="space-y-2 text-sm">
-                  <InfoRow label="Total reports" value={`${property.totalReports ?? 0}`} />
+                  <InfoRow label="Tổng số báo cáo" value={`${property.totalReports ?? 0}`} />
                   <InfoRow
-                    label="Last reported"
-                    value={property.lastReportedAt ? formatDate(property.lastReportedAt) : "No reports"}
+                    label="Báo cáo gần nhất"
+                    value={property.lastReportedAt ? formatDate(property.lastReportedAt) : "Chưa có báo cáo"}
                   />
                   <InfoRow
-                    label="Current status"
+                    label="Trạng thái hiện tại"
                     value={<PropertyStatusBadge status={property.status} />}
                   />
                 </div>
@@ -375,7 +375,7 @@ export function PropertyDetailSheet({ property, open, onOpenChange }: PropertyDe
             </div>
           </ScrollArea>
         ) : (
-          <p className="text-sm text-muted-foreground">Select a property to see details.</p>
+          <p className="text-sm text-muted-foreground">Chọn một tài sản để xem chi tiết.</p>
         )}
       </SheetContent>
     </Sheet>
@@ -384,8 +384,8 @@ export function PropertyDetailSheet({ property, open, onOpenChange }: PropertyDe
 
 const propertyFormSchema = z
   .object({
-    propertyName: z.string().min(2, "Property name is required"),
-    propertyType: z.string().min(1, "Property type is required"),
+    propertyName: z.string().min(2, "Vui lòng nhập tên tài sản"),
+    propertyType: z.string().min(1, "Vui lòng chọn loại tài sản"),
     isPublic: z.boolean(),
     status: z.enum(["found", "not found", "deleted"]).optional(),
     licensePlate: z.string().trim().optional(),
@@ -398,7 +398,7 @@ const propertyFormSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["licensePlate"],
-        message: "License plate is required for vehicle registrations",
+        message: "Vui lòng nhập biển số xe",
       })
       return
     }
@@ -407,7 +407,7 @@ const propertyFormSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["licensePlate"],
-        message: "License plate must be at least 4 characters",
+        message: "Biển số xe phải có ít nhất 4 ký tự",
       })
     }
   })
@@ -493,9 +493,9 @@ export function PropertyFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Register property" : "Edit property"}</DialogTitle>
+          <DialogTitle>{mode === "create" ? "Đăng ký tài sản" : "Chỉnh sửa tài sản"}</DialogTitle>
           <DialogDescription>
-            Manage items registered by residents for tracking and loss prevention.
+            Quản lý tài sản cư dân đã đăng ký để tiện theo dõi khi thất lạc.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -505,9 +505,9 @@ export function PropertyFormDialog({
               name="propertyName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Property name</FormLabel>
+                  <FormLabel>Tên tài sản</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Laptop, Motorcycle, Keycard" {...field} />
+                    <Input placeholder="VD: Laptop, xe máy, thẻ từ" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -519,11 +519,11 @@ export function PropertyFormDialog({
                 name="propertyType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel>Loại</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder="Chọn loại" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -544,11 +544,11 @@ export function PropertyFormDialog({
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Status</FormLabel>
+                      <FormLabel>Trạng thái</FormLabel>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
+                            <SelectValue placeholder="Chọn trạng thái" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -571,9 +571,9 @@ export function PropertyFormDialog({
                 name="licensePlate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>License plate</FormLabel>
+                    <FormLabel>Biển số xe</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: 51A-123.45" {...field} />
+                      <Input placeholder="VD: 51A-123.45" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -586,11 +586,11 @@ export function PropertyFormDialog({
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between rounded-xl border p-4">
                   <div className="space-y-1">
-                    <FormLabel>Share with building security</FormLabel>
+                    <FormLabel>Chia sẻ với bộ phận an ninh</FormLabel>
                     <p className="text-muted-foreground text-xs">
                       {canSetPublic
-                        ? "Allow staff to quickly identify this property during incidents."
-                        : "Only administrators can change this setting."}
+                        ? "Giúp nhân viên dễ nhận diện tài sản khi có sự cố."
+                        : "Chỉ quản trị viên mới có thể thay đổi mục này."}
                     </p>
                   </div>
                   <FormControl>
@@ -605,7 +605,7 @@ export function PropertyFormDialog({
             />
             <DialogFooter>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : mode === "create" ? "Create property" : "Save changes"}
+                {isSubmitting ? "Đang lưu..." : mode === "create" ? "Tạo tài sản" : "Lưu thay đổi"}
               </Button>
             </DialogFooter>
           </form>
@@ -643,11 +643,11 @@ function Divider() {
 export function formatStatusLabel(status: PropertyStatus) {
   switch (status) {
     case "found":
-      return "Found"
+      return "Đã tìm thấy"
     case "not found":
-      return "Not found"
+      return "Chưa tìm thấy"
     case "deleted":
-      return "Deleted"
+      return "Đã xóa"
     default:
       return status
   }
@@ -656,15 +656,15 @@ export function formatStatusLabel(status: PropertyStatus) {
 export function formatTypeLabel(type: PropertyType) {
   switch (type) {
     case "general":
-      return "General"
+      return "Chung"
     case "vehicle":
-      return "Vehicle"
+      return "Xe"
     case "document":
-      return "Document"
+      return "Giấy tờ"
     case "electronics":
-      return "Electronics"
+      return "Điện tử"
     case "other":
-      return "Other"
+      return "Khác"
     default:
       return type
   }

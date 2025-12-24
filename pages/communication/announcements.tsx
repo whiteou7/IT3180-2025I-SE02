@@ -53,18 +53,18 @@ import type { Post } from "@/types/posts"
 import type { PostCategory } from "@/types/enum"
 
 const categoryOptions: { label: string; value: PostCategory | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Fees & Billing", value: "fees_billing" },
-  { label: "Maintenance", value: "maintenance" },
-  { label: "Building Issues", value: "building_issues" },
-  { label: "General", value: "general" },
+  { label: "Tất cả", value: "all" },
+  { label: "Phí & hóa đơn", value: "fees_billing" },
+  { label: "Bảo trì", value: "maintenance" },
+  { label: "Sự cố tòa nhà", value: "building_issues" },
+  { label: "Chung", value: "general" },
 ]
 
 const categoryLabels: Record<PostCategory, string> = {
-  fees_billing: "Fees & Billing",
-  maintenance: "Maintenance",
-  building_issues: "Building Issues",
-  general: "General",
+  fees_billing: "Phí & hóa đơn",
+  maintenance: "Bảo trì",
+  building_issues: "Sự cố tòa nhà",
+  general: "Chung",
 }
 
 const categoryColors: Record<PostCategory, string> = {
@@ -104,13 +104,13 @@ export default function AnnouncementsPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to load announcements")
+        throw new Error(response?.message ?? "Không thể tải thông báo")
       }
 
       setPosts(response.data)
     } catch (error) {
       console.error(error)
-      toast.error("Failed to load announcements")
+      toast.error("Không thể tải thông báo")
     } finally {
       setIsLoading(false)
     }
@@ -123,7 +123,7 @@ export default function AnnouncementsPage() {
   const handleCreateAnnouncement = async () => {
     if (!userId) return
     if (!formData.title.trim() || !formData.content.trim()) {
-      toast.error("Please fill in all required fields")
+      toast.error("Vui lòng nhập đầy đủ thông tin")
       return
     }
 
@@ -141,16 +141,16 @@ export default function AnnouncementsPage() {
       })
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to create announcement")
+        throw new Error(response?.message ?? "Không thể tạo thông báo")
       }
 
-      toast.success("Announcement created successfully")
+      toast.success("Tạo thông báo thành công")
       setIsFormOpen(false)
       setFormData({ title: "", content: "", category: "general" })
       await fetchPosts()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to create announcement")
+      toast.error("Không thể tạo thông báo")
     } finally {
       setIsSubmitting(false)
     }
@@ -174,7 +174,7 @@ export default function AnnouncementsPage() {
   const handleUpdatePost = async () => {
     if (!userId || !selectedPost) return
     if (!formData.title.trim() || !formData.content.trim()) {
-      toast.error("Please fill in all required fields")
+      toast.error("Vui lòng nhập đầy đủ thông tin")
       return
     }
 
@@ -195,16 +195,16 @@ export default function AnnouncementsPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to update announcement")
+        throw new Error(response?.message ?? "Không thể cập nhật thông báo")
       }
 
-      toast.success("Announcement updated successfully")
+      toast.success("Cập nhật thông báo thành công")
       setIsEditModalOpen(false)
       setSelectedPost(null)
       await fetchPosts()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to update announcement")
+      toast.error("Không thể cập nhật thông báo")
     } finally {
       setIsSubmitting(false)
     }
@@ -225,16 +225,16 @@ export default function AnnouncementsPage() {
       )
 
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to delete announcement")
+        throw new Error(response?.message ?? "Không thể xóa thông báo")
       }
 
-      toast.success("Announcement deleted successfully")
+      toast.success("Xóa thông báo thành công")
       setIsDeleteDialogOpen(false)
       setSelectedPost(null)
       await fetchPosts()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to delete announcement")
+      toast.error("Không thể xóa thông báo")
     } finally {
       setIsSubmitting(false)
     }
@@ -284,33 +284,33 @@ export default function AnnouncementsPage() {
   return (
     <AuthGate isAuthenticated={!!userId}>
       <Head>
-        <title>Public Announcements - Apartment Management System</title>
+        <title>Thông báo công khai • Quản lý chung cư</title>
       </Head>
       <div className="flex flex-col gap-6 p-6 pt-20">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/communication/announcements">Communication</BreadcrumbLink>
+              <BreadcrumbLink href="/communication/announcements">Giao tiếp</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Public Announcements</BreadcrumbPage>
+              <BreadcrumbPage>Thông báo công khai</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Public Announcements</h1>
-            <p className="text-muted-foreground mt-1 text-sm sm:text-base">View and create building announcements</p>
+            <h1 className="text-2xl sm:text-3xl font-bold">Thông báo công khai</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">Xem và tạo thông báo cho cư dân</p>
           </div>
           <Button onClick={() => setIsFormOpen(true)} className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
-            Create Announcement
+            Tạo thông báo
           </Button>
         </div>
 
@@ -321,7 +321,7 @@ export default function AnnouncementsPage() {
                 <div className="mt-5 relative w-full md:w-1/2">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search announcements..."
+                    placeholder="Tìm thông báo..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
@@ -330,7 +330,7 @@ export default function AnnouncementsPage() {
 
                 <div className="flex gap-2 sm:gap-4 w-full md:w-auto">
                   <div className="flex flex-col space-y-1 flex-1 md:flex-initial">
-                    <Label className="text-xs">From Date</Label>
+                    <Label className="text-xs">Từ ngày</Label>
                     <Input
                       type="date"
                       value={startDate}
@@ -340,7 +340,7 @@ export default function AnnouncementsPage() {
                   </div>
 
                   <div className="flex flex-col space-y-1 flex-1 md:flex-initial">
-                    <Label className="text-xs">To Date</Label>
+                    <Label className="text-xs">Đến ngày</Label>
                     <Input
                       type="date"
                       value={endDate}
@@ -366,21 +366,21 @@ export default function AnnouncementsPage() {
           <TabsContent value={selectedCategory} className="mt-6">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <p className="text-muted-foreground">Loading announcements...</p>
+                <p className="text-muted-foreground">Đang tải thông báo...</p>
               </div>
             ) : filteredPosts.length === 0 ? (
               <div className="flex items-center justify-center py-12">
-                <p className="text-muted-foreground">No announcements found</p>
+                <p className="text-muted-foreground">Không có thông báo nào</p>
               </div>
             ) : (
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Title</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Author</TableHead>
-                      <TableHead>Date</TableHead>
+                      <TableHead>Tiêu đề</TableHead>
+                      <TableHead>Chủ đề</TableHead>
+                      <TableHead>Người đăng</TableHead>
+                      <TableHead>Ngày</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -390,7 +390,7 @@ export default function AnnouncementsPage() {
                         className="cursor-pointer"
                         onClick={() => handleViewPost(post)}
                       >
-                        <TableCell className="font-medium">{post.title || "Untitled"}</TableCell>
+                        <TableCell className="font-medium">{post.title || "Không có tiêu đề"}</TableCell>
                         <TableCell>
                           {post.category && (
                             <Badge
@@ -424,29 +424,29 @@ export default function AnnouncementsPage() {
         }}>
           <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{isEditModalOpen ? "Edit Announcement" : "Create Announcement"}</DialogTitle>
+              <DialogTitle>{isEditModalOpen ? "Sửa thông báo" : "Tạo thông báo"}</DialogTitle>
               <DialogDescription>
-                {isEditModalOpen ? "Update your announcement" : "Share an announcement with all residents"}
+                {isEditModalOpen ? "Cập nhật nội dung thông báo" : "Đăng thông báo cho cư dân"}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">Tiêu đề</Label>
                 <Input
                   id="title"
-                  placeholder="Enter announcement title"
+                  placeholder="Nhập tiêu đề thông báo"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">Chủ đề</Label>
                 <Select
                   value={formData.category}
                   onValueChange={(value) => setFormData({ ...formData, category: value as PostCategory })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="Chọn chủ đề" />
                   </SelectTrigger>
                   <SelectContent>
                     {categoryOptions.filter((opt) => opt.value !== "all").map((option) => (
@@ -458,10 +458,10 @@ export default function AnnouncementsPage() {
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="content">Content (Markdown supported)</Label>
+                <Label htmlFor="content">Nội dung</Label>
                 <Textarea
                   id="content"
-                  placeholder="Write your announcement content here (markdown supported)"
+                  placeholder="Nhập nội dung thông báo..."
                   rows={8}
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -478,14 +478,20 @@ export default function AnnouncementsPage() {
                 }}
                 className="w-full sm:w-auto"
               >
-                Cancel
+                Hủy
               </Button>
               <Button 
                 onClick={isEditModalOpen ? handleUpdatePost : handleCreateAnnouncement} 
                 disabled={isSubmitting}
                 className="w-full sm:w-auto"
               >
-                {isSubmitting ? (isEditModalOpen ? "Updating..." : "Publishing...") : (isEditModalOpen ? "Update" : "Publish")}
+                {isSubmitting
+                  ? isEditModalOpen
+                    ? "Đang cập nhật..."
+                    : "Đang đăng..."
+                  : isEditModalOpen
+                    ? "Cập nhật"
+                    : "Đăng"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -497,9 +503,9 @@ export default function AnnouncementsPage() {
             <DialogHeader>
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <DialogTitle className="text-xl sm:text-2xl break-words">{selectedPost?.title || "Untitled"}</DialogTitle>
+                  <DialogTitle className="text-xl sm:text-2xl break-words">{selectedPost?.title || "Không có tiêu đề"}</DialogTitle>
                   <DialogDescription className="mt-2 text-sm">
-                    by {selectedPost?.fullName} • {selectedPost && new Date(selectedPost.createdAt).toLocaleString()}
+                    bởi {selectedPost?.fullName} • {selectedPost && new Date(selectedPost.createdAt).toLocaleString()}
                   </DialogDescription>
                 </div>
                 {selectedPost?.category && (
@@ -527,7 +533,7 @@ export default function AnnouncementsPage() {
                     className="w-full sm:w-auto"
                   >
                     <Edit className="mr-2 h-4 w-4" />
-                    Edit
+                    Sửa
                   </Button>
                   <Button
                     variant="destructive"
@@ -538,7 +544,7 @@ export default function AnnouncementsPage() {
                     className="w-full sm:w-auto"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    Xóa
                   </Button>
                 </>
               )}
@@ -547,7 +553,7 @@ export default function AnnouncementsPage() {
                 onClick={() => setIsViewModalOpen(false)}
                 className="w-full sm:w-auto"
               >
-                Close
+                Đóng
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -557,19 +563,19 @@ export default function AnnouncementsPage() {
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the announcement.
+                Hành động này không thể hoàn tác. Thông báo sẽ bị xóa.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-              <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="w-full sm:w-auto">Hủy</AlertDialogCancel>
               <AlertDialogAction 
                 onClick={handleDeletePost} 
                 disabled={isSubmitting}
                 className="w-full sm:w-auto"
               >
-                {isSubmitting ? "Deleting..." : "Delete"}
+                {isSubmitting ? "Đang xóa..." : "Xóa"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

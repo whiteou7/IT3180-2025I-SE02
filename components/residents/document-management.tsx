@@ -101,15 +101,15 @@ export function DocumentDashboard({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Document repository</h2>
+          <h2 className="text-xl font-semibold">Kho tài liệu</h2>
           <p className="text-muted-foreground text-sm">
-            Secure storage for personal, apartment, and legal paperwork.
+            Lưu trữ giấy tờ cá nhân và giấy tờ căn hộ.
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" disabled={isLoading} onClick={onRefresh}>
             <RefreshCcw className="mr-2 size-4" />
-            Refresh
+            Làm mới
           </Button>
           <input
             ref={fileInputRef}
@@ -123,31 +123,31 @@ export function DocumentDashboard({
             onClick={handleUploadClick}
           >
             <Upload className="mr-2 size-4" />
-            {isUploading ? "Uploading..." : "Upload"}
+            {isUploading ? "Đang tải lên..." : "Tải lên"}
           </Button>
         </div>
       </div>
 
       <Card className="border border-border/70 bg-muted/20">
         <CardHeader className="pb-2">
-          <CardDescription>Total documents</CardDescription>
+          <CardDescription>Tổng số tài liệu</CardDescription>
           <CardTitle className="text-3xl">{totalDocuments}</CardTitle>
         </CardHeader>
         <CardContent className="text-muted-foreground text-xs">
-          Files synced from Supabase storage bucket.
+          Danh sách tài liệu đã được đồng bộ.
         </CardContent>
       </Card>
 
       <Card className="border border-border/70 shadow-sm">
         <CardHeader className="pb-4">
-          <CardTitle className="text-base">Document list</CardTitle>
+          <CardTitle className="text-base">Danh sách tài liệu</CardTitle>
           <CardDescription>
-            Browse, search, and download resident paperwork.
+            Xem, tìm kiếm và tải xuống giấy tờ của cư dân.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input
-            placeholder="Search by file name..."
+            placeholder="Tìm theo tên file..."
             value={search}
             disabled={isLoading}
             onChange={(event) => onSearchChange(event.target.value)}
@@ -170,7 +170,7 @@ export function DocumentDashboard({
               </div>
             ) : (
               <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-center text-sm text-muted-foreground">
-                No documents found.
+                Không tìm thấy tài liệu nào.
               </div>
             )}
           </ScrollArea>
@@ -219,11 +219,11 @@ function DocumentListItem({
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={handleView}>
           <Eye className="mr-2 size-4" />
-            View
+          Xem
         </Button>
         <Button size="sm" onClick={handleDownload}>
           <Download className="mr-2 size-4" />
-            Download
+          Tải xuống
         </Button>
       </div>
     </div>
@@ -240,17 +240,16 @@ export function DocumentEmptyState({ onUpload }: DocumentEmptyStateProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Folder className="size-5 text-primary" />
-          No documents yet
+          Chưa có tài liệu
         </CardTitle>
         <CardDescription>
-          Upload contracts, identification and apartment paperwork to keep
-          resident profiles synced across devices.
+          Tải lên hợp đồng, giấy tờ tùy thân và giấy tờ căn hộ để lưu trữ và tra cứu khi cần.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Button onClick={onUpload}>
           <Upload className="mr-2 size-4" />
-          Upload your first file
+          Tải lên file đầu tiên
         </Button>
       </CardContent>
     </Card>

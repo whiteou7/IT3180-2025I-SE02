@@ -20,7 +20,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -39,7 +39,7 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "System settings fetched successfully",
+      message: "Tải cài đặt hệ thống thành công",
       data: {
         previewMode,
         databaseUrl,

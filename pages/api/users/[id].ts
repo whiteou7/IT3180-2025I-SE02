@@ -17,7 +17,7 @@ export default async function handler(
   if (!userId) {
     return res.status(400).json({
       success: false, 
-      message: "User ID is required" 
+      message: "Thiếu mã người dùng" 
     })
   }
   try {
@@ -55,13 +55,13 @@ export default async function handler(
       if (updatedUser.length === 0) {
         return res.status(404).json({ 
           success: false,
-          message: "User not found" 
+          message: "Không tìm thấy người dùng" 
         })
       }
 
       res.status(200).json({
         success: true,
-        message: "Updated user info",
+        message: "Cập nhật thông tin người dùng thành công",
         data: updatedUser[0]
       })
     } else if (req.method == "GET") {
@@ -82,13 +82,13 @@ export default async function handler(
       if (user.length === 0) {
         return res.status(404).json({
           success: false,
-          message: "User not found",
+          message: "Không tìm thấy người dùng",
         })
       }
 
       return res.status(200).json({
         success: true,
-        message: "Fetched user info",
+        message: "Tải thông tin người dùng thành công",
         data: user[0],
       })
 
@@ -96,7 +96,7 @@ export default async function handler(
       res.setHeader("Allow", ["PUT"])
       return res.status(405).json({
         success: false,
-        message: `Method ${req.method} Not Allowed`,
+        message: `Phương thức ${req.method} không được phép`,
       })
     }
   } catch (error) {

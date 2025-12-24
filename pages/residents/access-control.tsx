@@ -92,7 +92,7 @@ export default function AccessControlPage() {
           query: Object.keys(queryParams).length > 0 ? queryParams : undefined,
         })
         if (!response?.success) {
-          throw new Error(response?.message ?? "Unable to load access logs")
+          throw new Error(response?.message ?? "Không thể tải nhật ký ra/vào")
         }
         const payload = (response.data as VehicleCheckinResponse).logs ?? []
         if (active) {
@@ -100,7 +100,7 @@ export default function AccessControlPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Failed to load gate events")
+        toast.error("Không thể tải dữ liệu ra/vào")
       } finally {
         if (active) {
           setIsLoading(false)
@@ -141,30 +141,30 @@ export default function AccessControlPage() {
   return (
     <>
       <Head>
-        <title>Access Control • Resident Management</title>
+        <title>Kiểm soát ra vào • Quản lý cư dân</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/residents/profiles">Resident Management</BreadcrumbLink>
+              <BreadcrumbLink href="/residents/profiles">Quản lý cư dân</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Access Control</BreadcrumbPage>
+              <BreadcrumbPage>Kiểm soát ra vào</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Access control</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Kiểm soát ra vào</h1>
             <p className="text-muted-foreground text-sm">
-              Monitor real-time gate activity using vehicle logs stored in the database schema.
+              Theo dõi hoạt động ra/vào theo thời gian thực.
             </p>
           </div>
           {hasVehicle && (
@@ -172,7 +172,7 @@ export default function AccessControlPage() {
               onClick={() => router.push("/vehicle-checkin-demo")}
               variant="default"
             >
-              Vehicle Check-In
+              Mô phỏng ra/vào xe
             </Button>
           )}
         </div>

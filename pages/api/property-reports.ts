@@ -45,7 +45,11 @@ export default async function handler(
 
       `
 
-      return res.status(200).json({ success: true, message: "Property reports fetched successfully", data: reports })
+      return res.status(200).json({
+        success: true,
+        message: "Tải danh sách báo cáo thành công",
+        data: reports,
+      })
     } else if (req.method === "POST") {
       const { userId, propertyId, content } = req.body as {
         userId: string
@@ -56,7 +60,7 @@ export default async function handler(
       if (!userId || !propertyId || !content) {
         return res.status(400).json({
           success: false,
-          message: "userId, propertyId, and content are required",
+          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
         })
       }
 
@@ -70,12 +74,15 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Property report created successfully",
+        message: "Gửi báo cáo thành công",
         data: newReport,
       })
     } else {
       res.setHeader("Allow", ["GET", "POST"])
-      return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` })
+      return res.status(405).json({
+        success: false,
+        message: `Phương thức ${req.method} không được phép`,
+      })
     }
   } catch (error) {
     console.error("Error in /api/property-reports:", error)

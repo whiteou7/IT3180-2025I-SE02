@@ -109,7 +109,7 @@ export default function SecurityReportsPage() {
 
   const generateReport = useCallback(async () => {
     if (!isAuthorized) {
-      toast.error("Unauthorized access")
+      toast.error("Bạn không có quyền truy cập")
       return
     }
 
@@ -142,7 +142,7 @@ export default function SecurityReportsPage() {
       ])
 
       if (!reportsResponse?.success) {
-        throw new Error(reportsResponse?.message ?? "Unable to load incidents")
+        throw new Error(reportsResponse?.message ?? "Không thể tải danh sách sự cố")
       }
 
       const incidents = reportsResponse.data || []
@@ -169,7 +169,7 @@ export default function SecurityReportsPage() {
       })
     } catch (error) {
       console.error(error)
-      toast.error("Failed to generate report")
+      toast.error("Không thể tạo báo cáo")
     } finally {
       setIsLoading(false)
     }
@@ -193,7 +193,7 @@ export default function SecurityReportsPage() {
 
   const handleExportCSV = async () => {
     if (!reportData) {
-      toast.error("Please generate a report first")
+      toast.error("Vui lòng tạo báo cáo trước")
       return
     }
     try {
@@ -202,33 +202,33 @@ export default function SecurityReportsPage() {
 
       if (reportType !== "access" && reportData.incidents.length > 0) {
         // Export incidents
-        const incidentHeaders = ["Property", "Owner", "Status", "Reported", "Content"]
+        const incidentHeaders = ["Tài sản", "Chủ sở hữu", "Trạng thái", "Thời gian báo", "Nội dung"]
         const incidentRows = reportData.incidents.map((incident) => ({
-          Property: incident.propertyName,
-          Owner: incident.ownerFullName,
-          Status: incident.status,
-          Reported: new Date(incident.createdAt).toLocaleString(),
-          Content: incident.content || "",
+          "Tài sản": incident.propertyName,
+          "Chủ sở hữu": incident.ownerFullName,
+          "Trạng thái": incident.status,
+          "Thời gian báo": new Date(incident.createdAt).toLocaleString(),
+          "Nội dung": incident.content || "",
         }))
-        csvContent += "Security Incidents Report\n"
-        csvContent += `Generated: ${new Date().toLocaleString()}\n\n`
+        csvContent += "Báo cáo sự cố an ninh\n"
+        csvContent += `Tạo lúc: ${new Date().toLocaleString()}\n\n`
         csvContent += convertToCSV(incidentRows, incidentHeaders)
       }
 
       if (reportType !== "incident" && reportData.accessLogs.length > 0) {
         if (csvContent) csvContent += "\n\n"
         // Export access logs
-        const accessHeaders = ["Resident", "Apartment", "License Plate", "Entry Time", "Exit Time", "Status"]
+        const accessHeaders = ["Cư dân", "Căn hộ", "Biển số", "Giờ vào", "Giờ ra", "Trạng thái"]
         const accessRows = reportData.accessLogs.map((log) => ({
-          Resident: log.fullName || "Unknown",
-          Apartment: log.apartmentNumber ? `#${log.apartmentNumber}` : "—",
-          "License Plate": log.licensePlate || "—",
-          "Entry Time": new Date(log.entranceTime).toLocaleString(),
-          "Exit Time": log.exitTime ? new Date(log.exitTime).toLocaleString() : "—",
-          Status: log.exitTime ? "Exited" : "Inside",
+          "Cư dân": log.fullName || "Chưa rõ",
+          "Căn hộ": log.apartmentNumber ? `#${log.apartmentNumber}` : "—",
+          "Biển số": log.licensePlate || "—",
+          "Giờ vào": new Date(log.entranceTime).toLocaleString(),
+          "Giờ ra": log.exitTime ? new Date(log.exitTime).toLocaleString() : "—",
+          "Trạng thái": log.exitTime ? "Đã ra" : "Đang ở trong",
         }))
-        csvContent += "Access Control Log\n"
-        csvContent += `Generated: ${new Date().toLocaleString()}\n\n`
+        csvContent += "Nhật ký ra/vào\n"
+        csvContent += `Tạo lúc: ${new Date().toLocaleString()}\n\n`
         csvContent += convertToCSV(accessRows, accessHeaders)
       }
 
@@ -237,15 +237,15 @@ export default function SecurityReportsPage() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `security-report-${timestamp}.csv`
+      a.download = `bao-cao-an-ninh-${timestamp}.csv`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      toast.success("CSV exported successfully")
+      toast.success("Xuất file CSV thành công")
     } catch (error) {
       console.error(error)
-      toast.error("Failed to export CSV")
+      toast.error("Không thể xuất file CSV")
     }
   }
 
@@ -259,13 +259,13 @@ export default function SecurityReportsPage() {
     return (
       <>
         <Head>
-          <title>Security Reports • Access Denied</title>
+          <title>Báo cáo an ninh • Không có quyền truy cập</title>
         </Head>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
           <AuthGate
             isAuthenticated={Boolean(userId)}
-            title="Access Denied"
-            description="Security reports are only accessible to administrators and law enforcement."
+            title="Không có quyền truy cập"
+            description="Báo cáo an ninh chỉ dành cho quản trị viên và bộ phận an ninh."
           >
             <div />
           </AuthGate>
@@ -277,26 +277,26 @@ export default function SecurityReportsPage() {
   return (
     <>
       <Head>
-        <title>Security Reports • Reports & Analytics</title>
+        <title>Báo cáo an ninh • Báo cáo & Phân tích</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Security Reports</BreadcrumbPage>
+              <BreadcrumbPage>Báo cáo an ninh</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Security Reports</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Báo cáo an ninh</h1>
             <p className="text-muted-foreground text-sm">
-              Generate security reports for incidents and access control.
+              Tạo báo cáo về sự cố và nhật ký ra/vào.
             </p>
           </div>
         </div>
@@ -305,30 +305,30 @@ export default function SecurityReportsPage() {
           {/* Report Configuration */}
           <Card>
             <CardHeader>
-              <CardTitle>Report Configuration</CardTitle>
+              <CardTitle>Cấu hình báo cáo</CardTitle>
               <CardDescription>
-                Select report type and date range
+                Chọn loại báo cáo và khoảng thời gian
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-2">
-                  <Label>Report Type</Label>
+                  <Label>Loại báo cáo</Label>
                   <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="daily">Daily Security Report</SelectItem>
-                      <SelectItem value="weekly">Weekly Security Report</SelectItem>
-                      <SelectItem value="monthly">Monthly Security Report</SelectItem>
-                      <SelectItem value="incident">Incident Summary</SelectItem>
-                      <SelectItem value="access">Access Control Report</SelectItem>
+                      <SelectItem value="daily">Báo cáo an ninh theo ngày</SelectItem>
+                      <SelectItem value="weekly">Báo cáo an ninh theo tuần</SelectItem>
+                      <SelectItem value="monthly">Báo cáo an ninh theo tháng</SelectItem>
+                      <SelectItem value="incident">Tổng hợp sự cố</SelectItem>
+                      <SelectItem value="access">Báo cáo ra/vào</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Start Date</Label>
+                  <Label>Từ ngày</Label>
                   <Input
                     type="date"
                     value={startDate}
@@ -336,7 +336,7 @@ export default function SecurityReportsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>End Date</Label>
+                  <Label>Đến ngày</Label>
                   <Input
                     type="date"
                     value={endDate}
@@ -344,7 +344,7 @@ export default function SecurityReportsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Incident Status</Label>
+                  <Label>Trạng thái sự cố</Label>
                   <Select
                     value={selectedStatus}
                     onValueChange={(value) => setSelectedStatus(value as PropertyStatus | "all")}
@@ -353,16 +353,16 @@ export default function SecurityReportsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="not found">Not Found</SelectItem>
-                      <SelectItem value="found">Found</SelectItem>
+                      <SelectItem value="all">Tất cả</SelectItem>
+                      <SelectItem value="not found">Chưa tìm thấy</SelectItem>
+                      <SelectItem value="found">Đã tìm thấy</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <Button onClick={generateReport} disabled={isLoading} className="w-full sm:w-auto">
                 <BarChart3 className="mr-2 size-4" />
-                {isLoading ? "Generating..." : "Generate Report"}
+                {isLoading ? "Đang tạo..." : "Tạo báo cáo"}
               </Button>
             </CardContent>
           </Card>
@@ -373,7 +373,7 @@ export default function SecurityReportsPage() {
               <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Incidents</CardTitle>
+                    <CardTitle className="text-sm font-medium">Tổng số sự cố</CardTitle>
                     <Shield className="size-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -382,7 +382,7 @@ export default function SecurityReportsPage() {
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Open Incidents</CardTitle>
+                    <CardTitle className="text-sm font-medium">Sự cố đang mở</CardTitle>
                     <FileText className="size-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -391,7 +391,7 @@ export default function SecurityReportsPage() {
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Resolved</CardTitle>
+                    <CardTitle className="text-sm font-medium">Đã xử lý</CardTitle>
                     <Shield className="size-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -400,7 +400,7 @@ export default function SecurityReportsPage() {
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Access Events</CardTitle>
+                    <CardTitle className="text-sm font-medium">Lượt ra/vào</CardTitle>
                     <Calendar className="size-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
@@ -412,15 +412,15 @@ export default function SecurityReportsPage() {
               {/* Export Options */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Export Options</CardTitle>
+                  <CardTitle>Xuất báo cáo</CardTitle>
                   <CardDescription>
-                    Download report as CSV
+                    Tải báo cáo dưới dạng CSV
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button variant="outline" onClick={handleExportCSV}>
                     <Download className="mr-2 size-4" />
-                    Export CSV
+                    Xuất CSV
                   </Button>
                 </CardContent>
               </Card>
@@ -429,9 +429,9 @@ export default function SecurityReportsPage() {
               {reportType !== "access" && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Incident Summary</CardTitle>
+                    <CardTitle>Tổng hợp sự cố</CardTitle>
                     <CardDescription>
-                      List of security incidents in the selected period
+                      Danh sách sự cố trong khoảng thời gian đã chọn
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -439,18 +439,18 @@ export default function SecurityReportsPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Property</TableHead>
-                            <TableHead>Owner</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Reported</TableHead>
-                            <TableHead>Content</TableHead>
+                            <TableHead>Tài sản</TableHead>
+                            <TableHead>Chủ sở hữu</TableHead>
+                            <TableHead>Trạng thái</TableHead>
+                            <TableHead>Thời gian báo</TableHead>
+                            <TableHead>Nội dung</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {reportData.incidents.length === 0 ? (
                             <TableRow>
                               <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                No incidents found
+                                Không có sự cố nào
                               </TableCell>
                             </TableRow>
                           ) : (
@@ -483,34 +483,34 @@ export default function SecurityReportsPage() {
               {reportType !== "incident" && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Access Control Log</CardTitle>
+                    <CardTitle>Nhật ký ra/vào</CardTitle>
                     <CardDescription>
-                      Vehicle and access events in the selected period
+                      Thông tin ra/vào trong khoảng thời gian đã chọn
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Resident</TableHead>
-                          <TableHead>Apartment</TableHead>
-                          <TableHead>License Plate</TableHead>
-                          <TableHead>Entry Time</TableHead>
-                          <TableHead>Exit Time</TableHead>
-                          <TableHead>Status</TableHead>
+                          <TableHead>Cư dân</TableHead>
+                          <TableHead>Căn hộ</TableHead>
+                          <TableHead>Biển số</TableHead>
+                          <TableHead>Giờ vào</TableHead>
+                          <TableHead>Giờ ra</TableHead>
+                          <TableHead>Trạng thái</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {reportData.accessLogs.length === 0 ? (
                           <TableRow>
                             <TableCell colSpan={6} className="text-center text-muted-foreground">
-                                No access events found
+                              Không có dữ liệu ra/vào
                             </TableCell>
                           </TableRow>
                         ) : (
                           reportData.accessLogs.map((log) => (
                             <TableRow key={log.vehicleLogId}>
-                              <TableCell>{log.fullName || "Unknown"}</TableCell>
+                              <TableCell>{log.fullName || "Chưa rõ"}</TableCell>
                               <TableCell>{log.apartmentNumber ? `#${log.apartmentNumber}` : "—"}</TableCell>
                               <TableCell className="font-mono text-xs">{log.licensePlate || "—"}</TableCell>
                               <TableCell>
@@ -521,7 +521,7 @@ export default function SecurityReportsPage() {
                               </TableCell>
                               <TableCell>
                                 <Badge variant={log.exitTime ? "secondary" : "default"}>
-                                  {log.exitTime ? "Exited" : "Inside"}
+                                  {log.exitTime ? "Đã ra" : "Đang ở trong"}
                                 </Badge>
                               </TableCell>
                             </TableRow>

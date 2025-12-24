@@ -21,9 +21,9 @@ type AuthGateProps = {
 
 export function AuthGate({
   isAuthenticated,
-  title = "Sign in required",
-  description = "Please log in to view this section of the console.",
-  actionLabel = "Go to login",
+  title = "Cần đăng nhập",
+  description = "Vui lòng đăng nhập để xem mục này.",
+  actionLabel = "Đi tới trang đăng nhập",
   children,
 }: AuthGateProps) {
   if (!isAuthenticated) {

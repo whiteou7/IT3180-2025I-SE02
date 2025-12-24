@@ -52,12 +52,12 @@ export default function LostPropertyPage() {
     try {
       const response = await ofetch("/api/property-reports", { ignoreResponseError: true })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to load reports")
+        throw new Error(response?.message ?? "Không thể tải danh sách báo cáo")
       }
       setReports(response.data as PropertyReport[])
     } catch (error) {
       console.error(error)
-      toast.error("Failed to fetch property reports")
+      toast.error("Không thể tải báo cáo")
     } finally {
       setIsLoading(false)
     }
@@ -139,14 +139,14 @@ export default function LostPropertyPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to submit report")
+        throw new Error(response?.message ?? "Không thể gửi báo cáo")
       }
-      toast.success("Report submitted for review")
+      toast.success("Đã gửi báo cáo để xem xét")
       setIsDialogOpen(false)
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to report property")
+      toast.error("Không thể gửi báo cáo")
     } finally {
       setIsSubmitting(false)
     }
@@ -155,11 +155,11 @@ export default function LostPropertyPage() {
   const handleStatusChange = async (report: PropertyReport, status: PropertyStatus) => {
     if (!userId) return
     if (report.issuerId) {
-      toast.error("Status can no longer be changed for this report.")
+      toast.error("Báo cáo này không thể đổi trạng thái nữa.")
       return
     }
     if (status === "deleted") {
-      toast.error("Use the delete action to remove reports.")
+      toast.error("Vui lòng dùng thao tác xóa để gỡ báo cáo.")
       return
     }
 
@@ -169,18 +169,18 @@ export default function LostPropertyPage() {
         body: { status, issuerId: userId },
         ignoreResponseError: true,
       })
-      toast.success("Report status updated")
+      toast.success("Đã cập nhật trạng thái báo cáo")
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to update report status")
+      toast.error("Không thể cập nhật trạng thái báo cáo")
     }
   }
 
   const handleApprove = async (report: PropertyReport, approved: boolean) => {
     if (!userId) return
     if (!report.issuerId) {
-      toast.error("Assign an issuer before updating approval.")
+      toast.error("Vui lòng phân công người xử lý trước khi duyệt.")
       return
     }
 
@@ -199,11 +199,11 @@ export default function LostPropertyPage() {
         })
       }
 
-      toast.success(approved ? "Report approved" : "Approval revoked")
+      toast.success(approved ? "Đã duyệt báo cáo" : "Đã bỏ duyệt")
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to update approval")
+      toast.error("Không thể cập nhật trạng thái duyệt")
     }
   }
 
@@ -214,11 +214,11 @@ export default function LostPropertyPage() {
         body: { status: "deleted", issuerId: null },
         ignoreResponseError: true,
       })
-      toast.success("Report marked as deleted")
+      toast.success("Đã đánh dấu báo cáo là đã xóa")
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to delete report")
+      toast.error("Không thể xóa báo cáo")
     }
   }
 
@@ -260,43 +260,43 @@ export default function LostPropertyPage() {
   return (
     <>
       <Head>
-        <title>Lost Property • Property Management</title>
+        <title>Tài sản thất lạc • Quản lý tài sản</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/property">Property Management</BreadcrumbLink>
+              <BreadcrumbLink href="/property">Quản lý tài sản</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Lost Property</BreadcrumbPage>
+              <BreadcrumbPage>Tài sản thất lạc</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Lost property reports</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Báo cáo tài sản thất lạc</h1>
             <p className="text-muted-foreground text-sm">
-              Centralized view of every missing item, approval status, and resolution.
+              Theo dõi tài sản thất lạc, tình trạng duyệt và xử lý.
             </p>
           </div>
           {canSubmitReport && (
             <Button onClick={() => setIsDialogOpen(true)}>
               <Plus className="mr-2 size-4" />
-              Report lost property
+              Báo cáo tài sản thất lạc
             </Button>
           )}
         </div>
 
         <AuthGate
           isAuthenticated={Boolean(userId)}
-          description="Sign in to view the lost property registry."
+          description="Vui lòng đăng nhập để xem danh sách tài sản thất lạc."
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {statusMetrics.map((metric) => (

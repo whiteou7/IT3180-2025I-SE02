@@ -58,14 +58,14 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Services fetched successfully.",
+        message: "Tải danh sách dịch vụ thành công.",
         data: filtered,
       })
     } catch (error) {
       console.error("Error fetching services:", error)
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: "Có lỗi xảy ra. Vui lòng thử lại.",
       })
     }
   }
@@ -88,7 +88,7 @@ export default async function handler(
       ) {
         return res.status(400).json({
           success: false,
-          message: "Missing required body keys",
+          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
         })
       }
 
@@ -98,14 +98,14 @@ export default async function handler(
       if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
         return res.status(400).json({
           success: false,
-          message: "Price must be a non-negative number",
+          message: "Giá phải là số không âm.",
         })
       }
 
       if (!Number.isFinite(parsedTax)) {
         return res.status(400).json({
           success: false,
-          message: "Tax must be a valid number",
+          message: "Thuế phải là số hợp lệ.",
         })
       }
 
@@ -129,14 +129,14 @@ export default async function handler(
 
       return res.status(201).json({
         success: true,
-        message: "Service created successfully.",
+        message: "Tạo dịch vụ thành công.",
         data: { serviceId: newService.serviceId },
       })
     } catch (error) {
       console.error("Error creating service:", error)
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error",
+        message: "Có lỗi xảy ra. Vui lòng thử lại.",
       })
     }
   }
@@ -144,6 +144,6 @@ export default async function handler(
   res.setHeader("Allow", ["GET", "POST"])
   return res.status(405).json({
     success: false,
-    message: `Method ${req.method} Not Allowed`,
+    message: `Phương thức ${req.method} không được phép`,
   })
 }

@@ -66,12 +66,12 @@ export default function FinancialReportsPage() {
         ignoreResponseError: true,
       })
       if (!response?.success) {
-        throw new Error(response?.message ?? "Unable to load reports data")
+        throw new Error(response?.message ?? "Không thể tải dữ liệu báo cáo")
       }
       setBillings(response.data as BillingSummary[])
     } catch (error) {
       console.error(error)
-      toast.error("Failed to load reports data")
+      toast.error("Không thể tải dữ liệu báo cáo")
     } finally {
       setIsLoading(false)
     }
@@ -148,40 +148,40 @@ export default function FinancialReportsPage() {
   const handleExportCSV = async () => {
     try {
       const timestamp = new Date().toISOString().split("T")[0]
-      const headers = ["Billing ID", "Service", "User", "Period Start", "Period End", "Amount", "Status", "Due Date", "Paid At"]
+      const headers = ["Mã hóa đơn", "Dịch vụ", "Cư dân", "Từ kỳ", "Đến kỳ", "Số tiền", "Trạng thái", "Hạn thanh toán", "Ngày đã thanh toán"]
         
       const rows = filteredBillings.map((billing) => ({
-        "Billing ID": billing.billingId,
-        Service: billing.services?.[0]?.serviceName || `Service (${billing.serviceCount})` || "N/A",
-        User: billing.fullName || "N/A",
-        "Period Start": new Date(billing.periodStart).toLocaleDateString(),
-        "Period End": new Date(billing.periodEnd).toLocaleDateString(),
-        Amount: billing.totalAmount.toFixed(2),
-        Status: billing.billingStatus,
-        "Due Date": new Date(billing.dueDate).toLocaleDateString(),
-        "Paid At": billing.paidAt ? new Date(billing.paidAt).toLocaleDateString() : "—",
+        "Mã hóa đơn": billing.billingId,
+        "Dịch vụ": billing.services?.[0]?.serviceName || `Dịch vụ (${billing.serviceCount})` || "Không có",
+        "Cư dân": billing.fullName || "Không có",
+        "Từ kỳ": new Date(billing.periodStart).toLocaleDateString(),
+        "Đến kỳ": new Date(billing.periodEnd).toLocaleDateString(),
+        "Số tiền": billing.totalAmount.toFixed(2),
+        "Trạng thái": billing.billingStatus,
+        "Hạn thanh toán": new Date(billing.dueDate).toLocaleDateString(),
+        "Ngày đã thanh toán": billing.paidAt ? new Date(billing.paidAt).toLocaleDateString() : "—",
       }))
 
-      let csvContent = "Financial Report\n"
-      csvContent += `Generated: ${new Date().toLocaleString()}\n`
-      csvContent += `Total Paid: $${totals.paid.toFixed(2)}\n`
-      csvContent += `Total Outstanding: $${totals.outstanding.toFixed(2)}\n`
-      csvContent += `Collection Rate: ${totals.rate}%\n\n`
+      let csvContent = "Báo cáo tài chính\n"
+      csvContent += `Tạo lúc: ${new Date().toLocaleString()}\n`
+      csvContent += `Đã thu: $${totals.paid.toFixed(2)}\n`
+      csvContent += `Còn phải thu: $${totals.outstanding.toFixed(2)}\n`
+      csvContent += `Tỷ lệ thu: ${totals.rate}%\n\n`
       csvContent += convertToCSV(rows, headers)
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `financial-report-${timestamp}.csv`
+      a.download = `bao-cao-tai-chinh-${timestamp}.csv`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      toast.success("CSV exported successfully")
+      toast.success("Xuất file CSV thành công")
     } catch (error) {
       console.error(error)
-      toast.error("Failed to export CSV")
+      toast.error("Không thể xuất file CSV")
     }
   }
 
@@ -189,13 +189,13 @@ export default function FinancialReportsPage() {
     return (
       <>
         <Head>
-          <title>Financial Reports • Access Denied</title>
+          <title>Báo cáo tài chính • Không có quyền truy cập</title>
         </Head>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
           <AuthGate
             isAuthenticated={Boolean(userId)}
-            title="Access Denied"
-            description="Financial reports are only accessible to administrators and accountants."
+            title="Không có quyền truy cập"
+            description="Báo cáo tài chính chỉ dành cho quản trị viên và kế toán."
           >
             <div />
           </AuthGate>
@@ -207,30 +207,30 @@ export default function FinancialReportsPage() {
   return (
     <>
       <Head>
-        <title>Financial Reports • Reports & Analytics</title>
+        <title>Báo cáo tài chính • Báo cáo & Phân tích</title>
       </Head>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12 pt-24">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/dashboard">Bảng điều khiển</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/reports">Reports</BreadcrumbLink>
+              <BreadcrumbLink href="/reports">Báo cáo</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Financial Reports</BreadcrumbPage>
+              <BreadcrumbPage>Báo cáo tài chính</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Financial Reports</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Báo cáo tài chính</h1>
             <p className="text-muted-foreground text-sm">
-              Generate comprehensive financial reports and analytics. Visualize fee collection performance across services and months.
+              Xem tổng quan thu/chi và tình hình thanh toán theo tháng.
             </p>
           </div>
         </div>
@@ -239,46 +239,46 @@ export default function FinancialReportsPage() {
           {/* Report Configuration */}
           <Card>
             <CardHeader>
-              <CardTitle>Report Configuration</CardTitle>
+              <CardTitle>Cấu hình báo cáo</CardTitle>
               <CardDescription>
-                Select report type and date range
+                Chọn loại báo cáo và khoảng thời gian
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-2">
-                  <Label>Report Type</Label>
+                  <Label>Loại báo cáo</Label>
                   <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="revenue">Revenue Report</SelectItem>
-                      <SelectItem value="collection">Collection Report</SelectItem>
-                      <SelectItem value="outstanding">Outstanding Report</SelectItem>
-                      <SelectItem value="tax">Tax Report</SelectItem>
-                      <SelectItem value="custom">Custom Report</SelectItem>
+                      <SelectItem value="revenue">Doanh thu</SelectItem>
+                      <SelectItem value="collection">Tình hình thu</SelectItem>
+                      <SelectItem value="outstanding">Công nợ</SelectItem>
+                      <SelectItem value="tax">Thuế</SelectItem>
+                      <SelectItem value="custom">Tùy chọn</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Time Range</Label>
+                  <Label>Khoảng thời gian</Label>
                   <Select value={monthsBack} onValueChange={setMonthsBack}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Range" />
+                      <SelectValue placeholder="Chọn khoảng" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="3">Last 3 months</SelectItem>
-                      <SelectItem value="6">Last 6 months</SelectItem>
-                      <SelectItem value="12">Last 12 months</SelectItem>
-                      <SelectItem value="0">Custom</SelectItem>
+                      <SelectItem value="3">3 tháng gần đây</SelectItem>
+                      <SelectItem value="6">6 tháng gần đây</SelectItem>
+                      <SelectItem value="12">12 tháng gần đây</SelectItem>
+                      <SelectItem value="0">Tùy chọn</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 {monthsBack === "0" && (
                   <>
                     <div className="space-y-2">
-                      <Label>Start Date</Label>
+                      <Label>Từ ngày</Label>
                       <Input
                         type="date"
                         value={startDate}
@@ -286,7 +286,7 @@ export default function FinancialReportsPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>End Date</Label>
+                      <Label>Đến ngày</Label>
                       <Input
                         type="date"
                         value={endDate}
@@ -299,7 +299,7 @@ export default function FinancialReportsPage() {
               <div className="flex gap-2">
                 <Button variant="outline" disabled={isLoading} onClick={loadBillings}>
                   <CalendarRange className="mr-2 size-4" />
-                  {isLoading ? "Loading..." : "Refresh"}
+                  {isLoading ? "Đang tải..." : "Làm mới"}
                 </Button>
               </div>
             </CardContent>
@@ -309,7 +309,7 @@ export default function FinancialReportsPage() {
           <div className="grid gap-4 md:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Paid revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">Doanh thu đã thu</CardTitle>
                 <TrendingUp className="text-muted-foreground size-4" />
               </CardHeader>
               <CardContent>
@@ -318,7 +318,7 @@ export default function FinancialReportsPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
+                <CardTitle className="text-sm font-medium">Còn phải thu</CardTitle>
                 <PieChart className="text-muted-foreground size-4" />
               </CardHeader>
               <CardContent>
@@ -327,7 +327,7 @@ export default function FinancialReportsPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm font-medium">Collection rate</CardTitle>
+                <CardTitle className="text-sm font-medium">Tỷ lệ thu</CardTitle>
                 <Badge className="w-fit">{totals.rate}%</Badge>
               </CardHeader>
               <CardContent>
@@ -345,15 +345,15 @@ export default function FinancialReportsPage() {
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Revenue trend</CardTitle>
-                <CardDescription>Paid revenue vs outstanding dues per month.</CardDescription>
+                <CardTitle>Xu hướng doanh thu</CardTitle>
+                <CardDescription>So sánh đã thu và còn phải thu theo tháng.</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer
                   id="revenue-trend"
                   config={{
-                    revenue: { label: "Paid revenue", color: "hsl(var(--primary))" },
-                    outstanding: { label: "Outstanding", color: "hsl(var(--destructive))" },
+                    revenue: { label: "Đã thu", color: "hsl(var(--primary))" },
+                    outstanding: { label: "Còn phải thu", color: "hsl(var(--destructive))" },
                   }}
                 >
                   <LineChart data={revenueData}>
@@ -375,14 +375,14 @@ export default function FinancialReportsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Outstanding by month</CardTitle>
-                <CardDescription>Focus collection efforts on the highest open balances.</CardDescription>
+                <CardTitle>Còn phải thu theo tháng</CardTitle>
+                <CardDescription>Theo dõi công nợ để nhắc thanh toán kịp thời.</CardDescription>
               </CardHeader>
               <CardContent>
                 <ChartContainer
                   id="outstanding-bar"
                   config={{
-                    outstanding: { label: "Outstanding", color: "hsl(var(--primary))" },
+                    outstanding: { label: "Còn phải thu", color: "hsl(var(--primary))" },
                   }}
                 >
                   <BarChart data={revenueData}>
@@ -400,15 +400,15 @@ export default function FinancialReportsPage() {
           {/* Export Options */}
           <Card>
             <CardHeader>
-              <CardTitle>Export Options</CardTitle>
+              <CardTitle>Xuất báo cáo</CardTitle>
               <CardDescription>
-                    Download report as CSV
+                Tải báo cáo dưới dạng CSV
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button variant="outline" onClick={handleExportCSV}>
                 <Download className="mr-2 size-4" />
-                    Export CSV
+                Xuất CSV
               </Button>
             </CardContent>
           </Card>

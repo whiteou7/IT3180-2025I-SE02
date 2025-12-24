@@ -12,7 +12,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -27,7 +27,7 @@ export default async function handler(
     if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12) {
       return res.status(400).json({
         success: false,
-        message: "Invalid month. Use 1-12 or 'current'.",
+        message: "Tháng không hợp lệ. Vui lòng chọn từ 1–12 hoặc 'current'.",
       })
     }
 
@@ -59,7 +59,7 @@ export default async function handler(
     if (rows.length === 0) {
       return res.status(200).json({
         success: true,
-        message: "No billings found for selected month",
+        message: "Không có khoản nào trong tháng đã chọn",
         data: {
           billingIds: [],
           totalIncome: 0,
@@ -82,14 +82,14 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Monthly tax report generated",
+      message: "Đã tạo báo cáo thuế theo tháng",
       data: report,
     })
   } catch (error) {
     console.error("Error generating tax report:", error)
     return res.status(500).json({
       success: false,
-      message: "Failed to generate monthly tax report",
+      message: "Không thể tạo báo cáo thuế theo tháng",
     })
   }
 }

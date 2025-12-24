@@ -15,7 +15,7 @@ export default async function handler(
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
-      message: `Method ${req.method} Not Allowed`,
+      message: `Phương thức ${req.method} không được phép`,
     })
   }
 
@@ -25,14 +25,14 @@ export default async function handler(
     if (!q || typeof q !== "string") {
       return res.status(400).json({
         success: false,
-        message: "Search query 'q' is required",
+        message: "Vui lòng nhập từ khóa tìm kiếm",
       })
     }
 
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({
         success: false,
-        message: "User ID is required",
+        message: "Thiếu mã người dùng",
       })
     }
 
@@ -56,7 +56,7 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: "Users found",
+      message: "Đã tìm thấy người dùng phù hợp",
       data: users,
     })
   } catch (error) {

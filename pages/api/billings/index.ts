@@ -78,21 +78,21 @@ export default async function handler(
 
       return res.status(200).json({
         success: true,
-        message: "Billings fetched successfully.",
+        message: "Tải danh sách thanh toán thành công.",
         data: payload,
       })
     } catch (error) {
       console.error("Error fetching billings:", error)
       return res.status(500).json({
         success: false,
-        message: (error as Error).message || "Internal Server Error",
+        message: (error as Error).message || "Lỗi máy chủ nội bộ",
       })
     }
   }
 
   if (req.method !== "POST") {
     res.setHeader("Allow", ["GET", "POST"])
-    return res.status(405).json({ success: false, message: "Method Not Allowed" })
+    return res.status(405).json({ success: false, message: "Phương thức không được phép" })
   }
 
   const { userId, serviceIds, dueDate, periodStart, periodEnd } = req.body as {
@@ -106,7 +106,7 @@ export default async function handler(
   if (!userId || !serviceIds || !Array.isArray(serviceIds) || serviceIds.length === 0) {
     return res.status(400).json({
       success: false,
-      message: "userId and serviceIds (non-empty array) are required",
+      message: "userId và serviceIds (mảng không rỗng) là bắt buộc",
     })
   }
 
@@ -119,7 +119,7 @@ export default async function handler(
       `
 
       if (services.length !== uniqueServiceIds.length) {
-        throw new Error("One or more services are invalid.")
+        throw new Error("Một hoặc nhiều dịch vụ không hợp lệ.")
       }
 
       const now = new Date()
@@ -149,14 +149,14 @@ export default async function handler(
 
     return res.status(201).json({
       success: true,
-      message: "Billing created successfully.",
+      message: "Tạo thanh toán thành công.",
       data: { billingId: newBillingId },
     })
   } catch (error) {
     console.error("Error creating billing:", error)
     return res.status(500).json({
       success: false,
-      message: (error as Error).message || "Internal Server Error",
+      message: (error as Error).message || "Có lỗi xảy ra. Vui lòng thử lại.",
     })
   }
 }
