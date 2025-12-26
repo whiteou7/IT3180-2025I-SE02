@@ -110,7 +110,7 @@ export default function ServiceCatalogPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Tải danh sách dịch vụ thất bại")
+        toast.error((error as Error).message || "Tải danh sách dịch vụ thất bại")
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -234,7 +234,7 @@ export default function ServiceCatalogPage() {
       ])
     } catch (error) {
       console.error(error)
-      toast.error("Không thể hoàn tất thanh toán")
+      toast.error((error as Error).message || "Không thể hoàn tất thanh toán")
     } finally {
       setIsCheckoutLoading(false)
     }

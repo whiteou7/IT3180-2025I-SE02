@@ -112,7 +112,7 @@ export default function BillingCenterPage() {
       setBillings(normalized)
     } catch (error) {
       console.error(error)
-      toast.error("Tải danh sách thanh toán thất bại")
+      toast.error((error as Error).message || "Tải danh sách thanh toán thất bại")
     } finally {
       setIsLoading(false)
     }
@@ -142,7 +142,7 @@ export default function BillingCenterPage() {
       })
       .catch((error) => {
         console.error(error)
-        toast.error("Tải chi tiết thanh toán thất bại")
+        toast.error((error as Error).message || "Tải chi tiết thanh toán thất bại")
       })
       .finally(() => {
         if (mounted) setIsDetailLoading(false)
@@ -232,7 +232,7 @@ export default function BillingCenterPage() {
       )
     } catch (error) {
       console.error(error)
-      toast.error("Đánh dấu thanh toán thất bại")
+      toast.error((error as Error).message || "Đánh dấu thanh toán thất bại")
     } finally {
       setIsPaying(false)
     }
@@ -253,7 +253,7 @@ export default function BillingCenterPage() {
       link.click()
     } catch (error) {
       console.error(error)
-      toast.error("Tải hóa đơn thất bại")
+      toast.error((error as Error).message || "Tải hóa đơn thất bại")
     }
   }
 

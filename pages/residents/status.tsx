@@ -80,7 +80,7 @@ export default function ResidenceStatusPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Không thể tải dữ liệu trạng thái cư trú")
+        toast.error((error as Error).message || "Không thể tải dữ liệu trạng thái cư trú")
       } finally {
         if (active) setIsLoading(false)
       }

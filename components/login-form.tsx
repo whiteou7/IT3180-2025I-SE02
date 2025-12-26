@@ -71,7 +71,7 @@ export function LoginForm({
       router.push("/dashboard")
     } catch (error) {
       console.error(error)
-      toast.error("Không thể đăng nhập. Vui lòng thử lại.")
+      toast.error((error as Error).message || "Không thể đăng nhập. Vui lòng thử lại.")
     } finally {
       setIsLoading(false)
     }
@@ -112,7 +112,7 @@ export function LoginForm({
       setNewPassword("")
     } catch (error) {
       console.error(error)
-      toast.error("Không thể đặt lại mật khẩu. Vui lòng thử lại.")
+      toast.error((error as Error).message || "Không thể đặt lại mật khẩu. Vui lòng thử lại.")
     } finally {
       setIsResetting(false)
     }
@@ -142,7 +142,7 @@ export function LoginForm({
       router.push("/dashboard")
     } catch (error) {
       console.error(error)
-      toast.error("Không thể đăng nhập. Vui lòng thử lại.")
+      toast.error((error as Error).message || "Không thể đăng nhập. Vui lòng thử lại.")
     } finally {
       setIsLoading(false)
     }

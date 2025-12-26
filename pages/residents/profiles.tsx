@@ -137,7 +137,7 @@ export default function ResidentProfilesPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Không thể tải dữ liệu. Vui lòng thử lại.")
+        toast.error((error as Error).message || "Không thể tải dữ liệu. Vui lòng thử lại.")
       } finally {
         if (active) {
           setIsLoading(false)
@@ -240,7 +240,7 @@ export default function ResidentProfilesPage() {
       setDrawerOpen(false)
     } catch (error) {
       console.error(error)
-      toast.error("Không thể lưu thông tin")
+      toast.error((error as Error).message || "Không thể lưu thông tin")
     } finally {
       setIsSaving(false)
     }
@@ -307,7 +307,7 @@ export default function ResidentProfilesPage() {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tạo người dùng")
+      toast.error((error as Error).message || "Không thể tạo người dùng")
     } finally {
       setIsCreating(false)
     }

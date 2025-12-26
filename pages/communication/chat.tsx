@@ -74,7 +74,7 @@ export default function ChatPage() {
       setChats(response.data)
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tải cuộc trò chuyện")
+      toast.error((error as Error).message || "Không thể tải cuộc trò chuyện")
     } finally {
       setIsLoadingChats(false)
     }
@@ -249,7 +249,7 @@ export default function ChatPage() {
       await fetchChats() // Refresh chat list to update last message
     } catch (error) {
       console.error(error)
-      toast.error("Không thể gửi tin nhắn")
+      toast.error((error as Error).message || "Không thể gửi tin nhắn")
     } finally {
       setIsSendingMessage(false)
     }

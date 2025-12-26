@@ -100,7 +100,7 @@ export default function AccessControlPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Không thể tải dữ liệu ra/vào")
+        toast.error((error as Error).message || "Không thể tải dữ liệu ra/vào")
       } finally {
         if (active) {
           setIsLoading(false)

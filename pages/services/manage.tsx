@@ -97,7 +97,7 @@ export default function ServiceAdministrationPage() {
       setServices(payload)
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tải danh sách dịch vụ")
+      toast.error((error as Error).message || "Không thể tải danh sách dịch vụ")
     } finally {
       setIsLoading(false)
     }
@@ -148,7 +148,7 @@ export default function ServiceAdministrationPage() {
       await loadServices()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể nhân bản dịch vụ")
+      toast.error((error as Error).message || "Không thể nhân bản dịch vụ")
     } finally {
       setIsSaving(false)
     }
@@ -170,7 +170,7 @@ export default function ServiceAdministrationPage() {
       await loadServices()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể xóa dịch vụ")
+      toast.error((error as Error).message || "Không thể xóa dịch vụ")
     } finally {
       setIsSaving(false)
     }
@@ -208,7 +208,7 @@ export default function ServiceAdministrationPage() {
       await loadServices()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể lưu dịch vụ")
+      toast.error((error as Error).message || "Không thể lưu dịch vụ")
     } finally {
       setIsSaving(false)
     }

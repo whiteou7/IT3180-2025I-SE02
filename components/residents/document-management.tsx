@@ -86,7 +86,7 @@ export function DocumentDashboard({
       onRefresh()
     } catch (error) {
       console.error(error)
-      toast.error("Failed to upload document")
+      toast.error((error as Error).message || "Failed to upload document")
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) {

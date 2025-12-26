@@ -107,7 +107,7 @@ export default function SystemSettingsPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Không thể tải cài đặt hệ thống")
+        toast.error((error as Error).message || "Không thể tải cài đặt hệ thống")
       } finally {
         setIsLoadingSettings(false)
       }
@@ -229,7 +229,7 @@ export default function SystemSettingsPage() {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tạo lệnh sao lưu")
+      toast.error((error as Error).message || "Không thể tạo lệnh sao lưu")
     } finally {
       setIsDumping(false)
     }

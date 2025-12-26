@@ -66,7 +66,7 @@ export default function PropertiesPage() {
       )
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tải danh sách tài sản")
+      toast.error((error as Error).message || "Không thể tải danh sách tài sản")
     } finally {
       setIsLoading(false)
     }
@@ -149,7 +149,7 @@ export default function PropertiesPage() {
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể đăng ký tài sản")
+      toast.error((error as Error).message || "Không thể đăng ký tài sản")
     } finally {
       setIsSubmitting(false)
     }
@@ -189,7 +189,7 @@ export default function PropertiesPage() {
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể cập nhật tài sản")
+      toast.error((error as Error).message || "Không thể cập nhật tài sản")
     } finally {
       setIsSubmitting(false)
     }
@@ -206,7 +206,7 @@ export default function PropertiesPage() {
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể xóa tài sản")
+      toast.error((error as Error).message || "Không thể xóa tài sản")
     }
   }
 
@@ -222,7 +222,7 @@ export default function PropertiesPage() {
       await fetchProperties()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể cập nhật trạng thái")
+      toast.error((error as Error).message || "Không thể cập nhật trạng thái")
     }
   }
 

@@ -110,7 +110,7 @@ export default function AnnouncementsPage() {
       setPosts(response.data)
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tải thông báo")
+      toast.error((error as Error).message || "Không thể tải thông báo")
     } finally {
       setIsLoading(false)
     }
@@ -150,7 +150,7 @@ export default function AnnouncementsPage() {
       await fetchPosts()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tạo thông báo")
+      toast.error((error as Error).message || "Không thể tạo thông báo")
     } finally {
       setIsSubmitting(false)
     }
@@ -204,7 +204,7 @@ export default function AnnouncementsPage() {
       await fetchPosts()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể cập nhật thông báo")
+      toast.error((error as Error).message || "Không thể cập nhật thông báo")
     } finally {
       setIsSubmitting(false)
     }
@@ -234,7 +234,7 @@ export default function AnnouncementsPage() {
       await fetchPosts()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể xóa thông báo")
+      toast.error((error as Error).message || "Không thể xóa thông báo")
     } finally {
       setIsSubmitting(false)
     }

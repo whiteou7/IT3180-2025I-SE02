@@ -52,7 +52,7 @@ export default function DocumentManagementPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Không thể tải danh sách cư dân")
+        toast.error((error as Error).message || "Không thể tải danh sách cư dân")
       }
     }
     loadUsers()
@@ -84,7 +84,7 @@ export default function DocumentManagementPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Không thể tải danh sách tài liệu")
+        toast.error((error as Error).message || "Không thể tải danh sách tài liệu")
         if (mounted) setDocuments([])
       } finally {
         if (mounted) setIsLoading(false)
@@ -188,7 +188,7 @@ export default function DocumentManagementPage() {
                   setRefreshKey((key) => key + 1)
                 } catch (error) {
                   console.error(error)
-                  toast.error("Không thể tải tài liệu lên")
+                  toast.error((error as Error).message || "Không thể tải tài liệu lên")
                 }
               }
               input.click()

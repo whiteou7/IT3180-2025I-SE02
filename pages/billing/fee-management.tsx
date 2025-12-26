@@ -73,7 +73,7 @@ export default function FeeManagementPage() {
       }
     } catch (error) {
       console.error("Error collecting rent:", error)
-      toast.error("Có lỗi xảy ra khi thu tiền nhà")
+      toast.error((error as Error).message || "Có lỗi xảy ra khi thu tiền nhà")
     } finally {
       setIsCollectingRent(false)
     }
@@ -115,7 +115,7 @@ export default function FeeManagementPage() {
       }
     } catch (error) {
       console.error("Error collecting other fee:", error)
-      toast.error("Có lỗi xảy ra khi thu khoản phí")
+      toast.error((error as Error).message || "Có lỗi xảy ra khi thu khoản phí")
     } finally {
       setIsCollectingOther(false)
     }
@@ -140,7 +140,7 @@ export default function FeeManagementPage() {
       }
     } catch (error) {
       console.error("Error rolling back:", error)
-      toast.error("Có lỗi xảy ra khi hoàn tác")
+      toast.error((error as Error).message || "Có lỗi xảy ra khi hoàn tác")
     } finally {
       setIsRollingBack(false)
     }

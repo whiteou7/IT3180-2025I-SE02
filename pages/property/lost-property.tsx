@@ -57,7 +57,7 @@ export default function LostPropertyPage() {
       setReports(response.data as PropertyReport[])
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tải báo cáo")
+      toast.error((error as Error).message || "Không thể tải báo cáo")
     } finally {
       setIsLoading(false)
     }
@@ -146,7 +146,7 @@ export default function LostPropertyPage() {
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể gửi báo cáo")
+      toast.error((error as Error).message || "Không thể gửi báo cáo")
     } finally {
       setIsSubmitting(false)
     }
@@ -173,7 +173,7 @@ export default function LostPropertyPage() {
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể cập nhật trạng thái báo cáo")
+      toast.error((error as Error).message || "Không thể cập nhật trạng thái báo cáo")
     }
   }
 
@@ -203,7 +203,7 @@ export default function LostPropertyPage() {
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể cập nhật trạng thái duyệt")
+      toast.error((error as Error).message || "Không thể cập nhật trạng thái duyệt")
     }
   }
 
@@ -218,7 +218,7 @@ export default function LostPropertyPage() {
       await loadReports()
     } catch (error) {
       console.error(error)
-      toast.error("Không thể xóa báo cáo")
+      toast.error((error as Error).message || "Không thể xóa báo cáo")
     }
   }
 

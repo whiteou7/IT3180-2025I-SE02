@@ -129,7 +129,7 @@ export default function GeneralReportsPage() {
       toast.success("Tạo báo cáo thành công")
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tạo báo cáo")
+      toast.error((error as Error).message || "Không thể tạo báo cáo")
     } finally {
       setIsLoading(false)
     }

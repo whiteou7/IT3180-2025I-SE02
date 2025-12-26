@@ -117,7 +117,7 @@ export default function FeedbacksPage() {
       setFeedbacks(response.data)
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tải phản hồi")
+      toast.error((error as Error).message || "Không thể tải phản hồi")
     } finally {
       setIsLoading(false)
     }
@@ -161,7 +161,7 @@ export default function FeedbacksPage() {
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Gửi phản hồi thất bại")
+      toast.error((error as Error).message || "Gửi phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }
@@ -212,7 +212,7 @@ export default function FeedbacksPage() {
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Cập nhật phản hồi thất bại")
+      toast.error((error as Error).message || "Cập nhật phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }
@@ -244,7 +244,7 @@ export default function FeedbacksPage() {
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Cập nhật trạng thái phản hồi thất bại")
+      toast.error((error as Error).message || "Cập nhật trạng thái phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }
@@ -274,7 +274,7 @@ export default function FeedbacksPage() {
       await fetchFeedbacks()
     } catch (error) {
       console.error(error)
-      toast.error("Xóa phản hồi thất bại")
+      toast.error((error as Error).message || "Xóa phản hồi thất bại")
     } finally {
       setIsSubmitting(false)
     }

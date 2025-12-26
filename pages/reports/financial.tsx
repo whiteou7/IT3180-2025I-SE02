@@ -71,7 +71,7 @@ export default function FinancialReportsPage() {
       setBillings(response.data as BillingSummary[])
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tải dữ liệu báo cáo")
+      toast.error((error as Error).message || "Không thể tải dữ liệu báo cáo")
     } finally {
       setIsLoading(false)
     }
@@ -181,7 +181,7 @@ export default function FinancialReportsPage() {
       toast.success("Xuất file CSV thành công")
     } catch (error) {
       console.error(error)
-      toast.error("Không thể xuất file CSV")
+      toast.error((error as Error).message || "Không thể xuất file CSV")
     }
   }
 

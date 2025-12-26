@@ -73,7 +73,7 @@ export default function ApartmentDirectoryPage() {
         }
       } catch (error) {
         console.error(error)
-        toast.error("Không thể tải danh sách căn hộ")
+        toast.error((error as Error).message || "Không thể tải danh sách căn hộ")
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -149,7 +149,7 @@ export default function ApartmentDirectoryPage() {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Không thể tạo căn hộ")
+      toast.error((error as Error).message || "Không thể tạo căn hộ")
     } finally {
       setIsCreating(false)
     }
@@ -183,7 +183,7 @@ export default function ApartmentDirectoryPage() {
       }
     } catch (error) {
       console.error(error)
-      toast.error("Không thể lưu căn hộ")
+      toast.error((error as Error).message || "Không thể lưu căn hộ")
     } finally {
       setIsSaving(false)
     }

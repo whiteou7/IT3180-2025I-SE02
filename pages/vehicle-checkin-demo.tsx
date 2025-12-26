@@ -106,7 +106,7 @@ export default function VehicleCheckInDemo() {
     } catch (err) {
       console.error(err)
       setCheckInStatus("error")
-      toast.error("Ghi nhận ra/vào thất bại")
+      toast.error((err as Error).message || "Ghi nhận ra/vào thất bại")
       
       setTimeout(() => {
         setCheckInStatus("idle")
