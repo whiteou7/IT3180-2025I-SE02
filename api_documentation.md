@@ -1106,6 +1106,9 @@ List services with optional filtering.
 - `200` - Success
 - `405` - Method not allowed
 
+**Notes:**
+- Only returns services with `service_id < 100`. Services created for bulk fee collection (rent with `service_id` equal to monthly fee, or other fees with `service_id` between 999000-999999) are excluded from this list.
+
 ---
 
 ### POST /api/services
@@ -1440,6 +1443,75 @@ Generate a PDF invoice for a billing.
 - `400` - Billing ID is required
 - `404` - Billing not found
 - `405` - Method not allowed
+
+---
+
+### POST /api/billings/bulk-collect
+
+Bulk collect fees (rent or other fees) from all users with apartments.
+
+**Request Body:**
+```json
+{
+  "type": "rent" | "other",
+  "name": "string (required if type is 'other')",
+  "price": "number (required if type is 'other', must be >= 0)"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "string",
+  "data": {
+    "billingCount": "number",
+    "serviceId": "number"
+  }
+}
+```
+
+**Status Codes:**
+- `200` - Success (no users with apartments found)
+- `201` - Created
+- `400` - Invalid type, missing required fields, or invalid price
+- `405` - Method not allowed
+- `500` - Internal server error
+
+**Notes:**
+- For `type: "rent"`: Creates billings for all users with apartments using their monthly fee. Services are created/reused with `service_id` equal to the monthly fee amount.
+- For `type: "other"`: Creates a new service with a random `service_id` between 999000-999999, then creates billings for all users with apartments.
+- All billings are created with:
+  - `billingStatus`: "unpaid"
+  - `dueDate`: 15 days from creation
+  - `periodStart`: Current date
+  - `periodEnd`: 30 days from period start
+
+---
+
+### POST /api/billings/rollback
+
+Delete the latest billing for each user (regardless of bill type).
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "string",
+  "data": {
+    "deletedCount": "number"
+  }
+}
+```
+
+**Status Codes:**
+- `200` - Success
+- `405` - Method not allowed
+- `500` - Internal server error
+
+**Notes:**
+- Deletes the most recent billing (by `used_at` timestamp) for each user.
+- If multiple billings share the same `billing_id`, all of them are deleted.
 
 ---
 
@@ -2301,5 +2373,4 @@ Generate monthly tax report.
 9. Non-admin users (tenant, police, accountant) can only chat with admin users
 10. Each user can only register one vehicle
 11. Document uploads are limited to PDF files with a maximum size of 10MB
-12. Tax calculation uses an 8% rate on the base income
 
