@@ -2,6 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Feedback } from "@/types/feedbacks"
+import {
+  validateString,
+  validateUUID,
+  validateStringArray,
+} from "@/lib/validation"
 
 /**
  * GET /api/feedbacks - Retrieve feedbacks (all for admin, own for residents)
@@ -98,18 +103,31 @@ export default async function handler(
         tags?: string[];
       }
 
-      if (!content || typeof content !== "string") {
+      const contentValidation = validateString(content, "Nội dung phản hồi")
+      if (!contentValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Vui lòng nhập nội dung phản hồi",
+          message: contentValidation.message,
         })
       }
 
-      if (!userId || typeof userId !== "string") {
+      const userIdValidation = validateUUID(userId, "Mã người dùng")
+      if (!userIdValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Thiếu mã người dùng",
+          message: userIdValidation.message,
         })
+      }
+
+      // Validate tags if provided
+      if (tags !== undefined && tags !== null) {
+        const tagsValidation = validateStringArray(tags, "Thẻ")
+        if (!tagsValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: tagsValidation.message,
+          })
+        }
       }
 
       // Insert feedback

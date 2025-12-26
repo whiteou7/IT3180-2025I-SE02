@@ -2,6 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import { PropertyReport } from "@/types/reports"
+import {
+  validateUUID,
+  validatePositiveInteger,
+  validateString,
+} from "@/lib/validation"
 
 /**
  * GET /api/property-reports - Retrieve all property reports with user and issuer information
@@ -57,10 +62,27 @@ export default async function handler(
         content: string
       }
 
-      if (!userId || !propertyId || !content) {
+      const userIdValidation = validateUUID(userId, "Mã người dùng")
+      if (!userIdValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
+          message: userIdValidation.message,
+        })
+      }
+
+      const propertyIdValidation = validatePositiveInteger(propertyId, "Mã tài sản")
+      if (!propertyIdValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: propertyIdValidation.message,
+        })
+      }
+
+      const contentValidation = validateString(content, "Nội dung báo cáo")
+      if (!contentValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: contentValidation.message,
         })
       }
 

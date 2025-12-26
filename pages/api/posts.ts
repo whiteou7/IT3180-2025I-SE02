@@ -3,6 +3,10 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Post } from "@/types/posts"
 import type { PostCategory } from "@/types/enum"
+import {
+  validateString,
+  validateUUID,
+} from "@/lib/validation"
 
 /**
  * GET /api/posts - Retrieve all posts with user information
@@ -56,18 +60,31 @@ export default async function handler(
         title?: string;
       }
 
-      if (!content || typeof content !== "string") {
+      const contentValidation = validateString(content, "Nội dung bài viết")
+      if (!contentValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Vui lòng nhập nội dung bài viết",
+          message: contentValidation.message,
         })
       }
 
-      if (!userId || typeof userId !== "string") {
+      const userIdValidation = validateUUID(userId, "Mã người dùng")
+      if (!userIdValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Thiếu mã người dùng",
+          message: userIdValidation.message,
         })
+      }
+
+      // Validate title if provided
+      if (title !== undefined && title !== null && title !== "") {
+        const titleValidation = validateString(title, "Tiêu đề")
+        if (!titleValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: titleValidation.message,
+          })
+        }
       }
 
       // Insert post

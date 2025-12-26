@@ -4,6 +4,11 @@ import type { APIBody } from "@/types/api"
 import type { BillingSummary } from "@/types/billings"
 import type { BillingStatus } from "@/types/enum"
 import { randomUUID } from "crypto"
+import {
+  validateUUID,
+  validateNumberArray,
+  validateDate,
+} from "@/lib/validation"
 
 export default async function handler(
   req: NextApiRequest,
@@ -103,11 +108,51 @@ export default async function handler(
     periodEnd?: string
   }
 
-  if (!userId || !serviceIds || !Array.isArray(serviceIds) || serviceIds.length === 0) {
+  const userIdValidation = validateUUID(userId, "Mã người dùng")
+  if (!userIdValidation.isValid) {
     return res.status(400).json({
       success: false,
-      message: "userId và serviceIds (mảng không rỗng) là bắt buộc",
+      message: userIdValidation.message,
     })
+  }
+
+  const serviceIdsValidation = validateNumberArray(serviceIds, "Danh sách dịch vụ")
+  if (!serviceIdsValidation.isValid) {
+    return res.status(400).json({
+      success: false,
+      message: serviceIdsValidation.message,
+    })
+  }
+
+  // Validate optional date fields
+  if (dueDate !== undefined && dueDate !== null && dueDate !== "") {
+    const dueDateValidation = validateDate(dueDate, "Ngày đến hạn")
+    if (!dueDateValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: dueDateValidation.message,
+      })
+    }
+  }
+
+  if (periodStart !== undefined && periodStart !== null && periodStart !== "") {
+    const periodStartValidation = validateDate(periodStart, "Ngày bắt đầu kỳ")
+    if (!periodStartValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: periodStartValidation.message,
+      })
+    }
+  }
+
+  if (periodEnd !== undefined && periodEnd !== null && periodEnd !== "") {
+    const periodEndValidation = validateDate(periodEnd, "Ngày kết thúc kỳ")
+    if (!periodEndValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: periodEndValidation.message,
+      })
+    }
   }
 
   try {

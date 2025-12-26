@@ -4,6 +4,13 @@ import { db } from "@/db"
 import { User } from "@/types/users"
 import { APIBody } from "@/types/api"
 import type { UserRole, Gender } from "@/types/enum"
+import {
+  validateString,
+  validateEmail,
+  validateYear,
+  validatePhoneNumber,
+  validateUUID,
+} from "@/lib/validation"
 
 /**
  * PUT /api/users/[id] - Update user information
@@ -14,12 +21,17 @@ export default async function handler(
   res: NextApiResponse<APIBody<User>>
 ) {
   const { id: userId } = req.query
-  if (!userId) {
+  const userIdParam = Array.isArray(userId) ? userId[0] : userId
+  const userIdValidation = validateUUID(userIdParam, "Mã người dùng")
+  if (!userIdValidation.isValid) {
     return res.status(400).json({
-      success: false, 
-      message: "Thiếu mã người dùng" 
+      success: false,
+      message: userIdValidation.message || "Mã người dùng không hợp lệ.",
     })
   }
+
+  const userIdString = userIdParam as string
+
   try {
     if (req.method === "PUT") {
       const { email, fullName, role, yearOfBirth, gender, phoneNumber } = req.body as {
@@ -31,6 +43,44 @@ export default async function handler(
         phoneNumber?: string | null;
       }
 
+      // Validate required fields
+      const emailValidation = validateEmail(email)
+      if (!emailValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: emailValidation.message || "Email không hợp lệ.",
+        })
+      }
+
+      const fullNameValidation = validateString(fullName, "Họ tên")
+      if (!fullNameValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: fullNameValidation.message || "Họ tên không hợp lệ.",
+        })
+      }
+
+      // Validate optional fields
+      if (yearOfBirth !== undefined && yearOfBirth !== null) {
+        const yearValidation = validateYear(yearOfBirth, "Năm sinh")
+        if (!yearValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: yearValidation.message || "Năm sinh không hợp lệ.",
+          })
+        }
+      }
+
+      if (phoneNumber !== undefined && phoneNumber !== null && phoneNumber !== "") {
+        const phoneValidation = validatePhoneNumber(phoneNumber)
+        if (!phoneValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: phoneValidation.message || "Số điện thoại không hợp lệ.",
+          })
+        }
+      }
+
       const updatedUser = await db<User[]>`
         UPDATE users
         SET
@@ -40,7 +90,7 @@ export default async function handler(
           year_of_birth = ${yearOfBirth ?? null},
           gender = ${gender ?? null},
           phone_number = ${phoneNumber ?? null}
-        WHERE user_id = ${userId}
+        WHERE user_id = ${userIdString}
         RETURNING 
           user_id,
           email,
@@ -76,7 +126,7 @@ export default async function handler(
           phone_number,
           apartment_id
         FROM users
-        WHERE user_id = ${userId};
+        WHERE user_id = ${userIdString};
       `
 
       if (user.length === 0) {

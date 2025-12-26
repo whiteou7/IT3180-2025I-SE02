@@ -3,6 +3,12 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Service } from "@/types/services"
 import type { ServiceCategory } from "@/types/enum"
+import {
+  validateString,
+  validateNonNegativeNumber,
+  validateTax,
+  validatePositiveInteger,
+} from "@/lib/validation"
 
 type UpsertBody = {
   serviceName: string
@@ -19,11 +25,14 @@ type DeleteBody = {
 
 function parseServiceId(idParam: string | string[] | undefined) {
   const rawId = Array.isArray(idParam) ? idParam[0] : idParam
-  const serviceId = Number(rawId)
-  if (!rawId || Number.isNaN(serviceId) || serviceId <= 0) {
+  if (!rawId) {
     return null
   }
-  return serviceId
+  const validation = validatePositiveInteger(rawId, "Mã dịch vụ")
+  if (!validation.isValid) {
+    return null
+  }
+  return Number(rawId)
 }
 
 export default async function handler(
@@ -79,33 +88,32 @@ export default async function handler(
         isAvailable = true,
       } = req.body as UpsertBody
 
-      if (
-        !serviceName ||
-        price === undefined ||
-        tax === undefined
-      ) {
+      const serviceNameValidation = validateString(serviceName, "Tên dịch vụ")
+      if (!serviceNameValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
+          message: serviceNameValidation.message,
+        })
+      }
+
+      const priceValidation = validateNonNegativeNumber(price, "Giá")
+      if (!priceValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: priceValidation.message,
+        })
+      }
+
+      const taxValidation = validateTax(tax)
+      if (!taxValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: taxValidation.message,
         })
       }
 
       const parsedPrice = Number(price)
       const parsedTax = Number(tax)
-
-      if (Number.isNaN(parsedPrice) || parsedPrice < 0) {
-        return res.status(400).json({
-          success: false,
-          message: "Giá phải là số không âm.",
-        })
-      }
-
-      if (!Number.isFinite(parsedTax)) {
-        return res.status(400).json({
-          success: false,
-          message: "Thuế phải là số hợp lệ.",
-        })
-      }
 
       const allowedCategories: ServiceCategory[] = ["cleaning", "maintenance", "utilities", "amenities", "other"]
       const normalizedCategory: ServiceCategory =

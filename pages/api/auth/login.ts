@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { UserRole } from "@/types/enum"
+import { validateEmail, validateString } from "@/lib/validation"
 
 type LoginSuccess = {
   userId: string
@@ -28,10 +29,19 @@ export default async function handler(
       password?: string
     }
 
-    if (!email || !password) {
+    const emailValidation = validateEmail(email)
+    if (!emailValidation.isValid) {
       return res.status(400).json({
         success: false,
-        message: "Email và mật khẩu là bắt buộc.",
+        message: emailValidation.message,
+      })
+    }
+
+    const passwordValidation = validateString(password, "Mật khẩu")
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message,
       })
     }
 

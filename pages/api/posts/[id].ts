@@ -3,6 +3,7 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Post } from "@/types/posts"
 import type { PostCategory } from "@/types/enum"
+import { validateUUID, validateString } from "@/lib/validation"
 
 function parsePostId(idParam: string | string[] | undefined): string | null {
   if (!idParam) return null
@@ -53,8 +54,33 @@ export default async function handler(
         category?: PostCategory;
       }
 
-      if (!userId) {
-        return res.status(400).json({ success: false, message: "Thiếu mã người dùng" })
+      const userIdValidation = validateUUID(userId, "Mã người dùng")
+      if (!userIdValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: userIdValidation.message || "Mã người dùng không hợp lệ.",
+        })
+      }
+
+      // Validate optional fields if provided
+      if (content !== undefined && content !== null && content !== "") {
+        const contentValidation = validateString(content, "Nội dung bài viết")
+        if (!contentValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: contentValidation.message || "Nội dung bài viết không hợp lệ.",
+          })
+        }
+      }
+
+      if (title !== undefined && title !== null && title !== "") {
+        const titleValidation = validateString(title, "Tiêu đề")
+        if (!titleValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: titleValidation.message || "Tiêu đề không hợp lệ.",
+          })
+        }
       }
 
       // Check if post exists and user owns it
@@ -100,8 +126,33 @@ export default async function handler(
         userId: string;
       }
 
-      if (!userId) {
-        return res.status(400).json({ success: false, message: "Thiếu mã người dùng" })
+      const userIdValidation = validateUUID(userId, "Mã người dùng")
+      if (!userIdValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: userIdValidation.message || "Mã người dùng không hợp lệ.",
+        })
+      }
+
+      // Validate optional fields if provided
+      if (content !== undefined && content !== null && content !== "") {
+        const contentValidation = validateString(content, "Nội dung bài viết")
+        if (!contentValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: contentValidation.message || "Nội dung bài viết không hợp lệ.",
+          })
+        }
+      }
+
+      if (title !== undefined && title !== null && title !== "") {
+        const titleValidation = validateString(title, "Tiêu đề")
+        if (!titleValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: titleValidation.message || "Tiêu đề không hợp lệ.",
+          })
+        }
       }
 
       // Check if post exists and user owns it

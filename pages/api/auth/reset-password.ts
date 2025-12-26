@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs"
 
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
+import { validateEmail, validatePhoneNumber, validateString } from "@/lib/validation"
 
 /**
  * POST /api/auth/reset-password - Reset user password
@@ -26,10 +27,27 @@ export default async function handler(
       newPassword?: string
     }
 
-    if (!email || !phoneNumber || !newPassword) {
+    const emailValidation = validateEmail(email)
+    if (!emailValidation.isValid) {
       return res.status(400).json({
         success: false,
-        message: "Email, số điện thoại và mật khẩu mới là bắt buộc.",
+        message: emailValidation.message,
+      })
+    }
+
+    const phoneValidation = validatePhoneNumber(phoneNumber)
+    if (!phoneValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: phoneValidation.message,
+      })
+    }
+
+    const passwordValidation = validateString(newPassword, "Mật khẩu mới")
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message,
       })
     }
 

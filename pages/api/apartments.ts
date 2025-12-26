@@ -2,6 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { Apartment } from "@/types/apartments"
+import {
+  validatePositiveInteger,
+  validateNonNegativeNumber,
+} from "@/lib/validation"
 
 /**
  * POST /api/apartments - Create a new apartment
@@ -23,14 +27,35 @@ export default async function handler(
         monthlyFee: number;
       }
 
-      if (buildingId == undefined 
-        || floor == undefined 
-        || apartmentNumber == undefined 
-        || monthlyFee == undefined 
-      ) {
+      const buildingIdValidation = validatePositiveInteger(buildingId, "Mã tòa nhà")
+      if (!buildingIdValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Vui lòng điền đầy đủ thông tin bắt buộc.",
+          message: buildingIdValidation.message,
+        })
+      }
+
+      const floorValidation = validatePositiveInteger(floor, "Tầng")
+      if (!floorValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: floorValidation.message,
+        })
+      }
+
+      const apartmentNumberValidation = validatePositiveInteger(apartmentNumber, "Số căn hộ")
+      if (!apartmentNumberValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: apartmentNumberValidation.message,
+        })
+      }
+
+      const monthlyFeeValidation = validateNonNegativeNumber(monthlyFee, "Phí hàng tháng")
+      if (!monthlyFeeValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: monthlyFeeValidation.message,
         })
       }
 

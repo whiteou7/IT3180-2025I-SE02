@@ -5,6 +5,13 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { User } from "@/types/users"
 import type { UserRole, Gender } from "@/types/enum"
+import {
+  validateString,
+  validateEmail,
+  validateYear,
+  validatePhoneNumber,
+  validateFields,
+} from "@/lib/validation"
 
 /**
  * POST /api/users - Create a new user account
@@ -30,11 +37,49 @@ export default async function handler(
       }
 
       // Validate required fields
-      if (!email || !password || !fullName) {
+      const emailValidation = validateEmail(email)
+      if (!emailValidation.isValid) {
         return res.status(400).json({
           success: false,
-          message: "Vui lòng nhập họ tên, email và mật khẩu.",
+          message: emailValidation.message,
         })
+      }
+
+      const fullNameValidation = validateString(fullName, "Họ tên")
+      if (!fullNameValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: fullNameValidation.message,
+        })
+      }
+
+      const passwordValidation = validateString(password, "Mật khẩu")
+      if (!passwordValidation.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: passwordValidation.message,
+        })
+      }
+
+      // Validate optional fields
+      if (yearOfBirth !== undefined && yearOfBirth !== null) {
+        const yearValidation = validateYear(yearOfBirth, "Năm sinh")
+        if (!yearValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: yearValidation.message,
+          })
+        }
+      }
+
+      if (phoneNumber !== undefined && phoneNumber !== null && phoneNumber !== "") {
+        const phoneValidation = validatePhoneNumber(phoneNumber)
+        if (!phoneValidation.isValid) {
+          return res.status(400).json({
+            success: false,
+            message: phoneValidation.message,
+          })
+        }
       }
 
       // Check for existing user
