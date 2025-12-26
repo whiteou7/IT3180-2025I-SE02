@@ -131,6 +131,12 @@ const data: { navMain: SidebarNavItem[] } = {
           admin: true,
           accountant: true,
         },
+        {
+          title: "Quản lý Thu phí",
+          url: "/billing/fee-management",
+          admin: true,
+          accountant: true,
+        },
       ],
     },
     {

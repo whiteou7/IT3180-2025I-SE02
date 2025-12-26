@@ -65,6 +65,7 @@ export default function BillingCenterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [statusFilter, setStatusFilter] = useState<BillingStatus | "all">("all")
   const [selectedUser, setSelectedUser] = useState<string>("all")
+  const [limit, setLimit] = useState<number>(25)
   const [users, setUsers] = useState<User[]>([])
   const [detailId, setDetailId] = useState<string | null>(null)
   const [detail, setDetail] = useState<BillingDetail | null>(null)
@@ -96,6 +97,7 @@ export default function BillingCenterPage() {
       if (statusFilter !== "all") {
         query.status = statusFilter
       }
+      query.limit = limit.toString()
       const response = await ofetch("/api/billings", {
         query,
         ignoreResponseError: true,
@@ -114,7 +116,7 @@ export default function BillingCenterPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [userId, hasAllowedRole, selectedUser, statusFilter])
+  }, [userId, hasAllowedRole, selectedUser, statusFilter, limit])
 
   useEffect(() => {
     fetchBillings()
@@ -356,6 +358,19 @@ export default function BillingCenterPage() {
                       </SelectContent>
                     </Select>
                   )}
+
+                  <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Giới hạn" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                      <SelectItem value="150">150</SelectItem>
+                      <SelectItem value="200">200</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button variant="ghost" size="sm" onClick={fetchBillings}>
                   Làm mới danh sách

@@ -39,6 +39,7 @@ export default async function handler(
           is_available,
           updated_at
         FROM services
+        WHERE service_id < 100
         ORDER BY service_id;
       `
 
