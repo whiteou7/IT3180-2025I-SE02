@@ -55,7 +55,7 @@ export default async function handler(
     const [user] = await db<{ userId: string; phoneNumber: string | null }[]>`
       SELECT user_id, phone_number
       FROM users
-      WHERE email = ${email};
+      WHERE email = ${email ?? ""};
     `
 
     if (!user) {
@@ -74,7 +74,7 @@ export default async function handler(
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    const hashedPassword = await bcrypt.hash(newPassword ?? "", 10)
 
     // Update password
     await db`

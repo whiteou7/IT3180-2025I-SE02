@@ -50,7 +50,7 @@ export default async function handler(
     >`
       SELECT user_id, role, password, full_name
       FROM users
-      WHERE email = ${email};
+      WHERE email = ${email ?? ""};
     `
 
     if (!user) {
@@ -60,7 +60,7 @@ export default async function handler(
       })
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.password)
+    const passwordMatches = await bcrypt.compare(password ?? "", user.password)
 
     if (!passwordMatches) {
       return res.status(401).json({

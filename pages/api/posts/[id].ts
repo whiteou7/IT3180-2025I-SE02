@@ -134,27 +134,6 @@ export default async function handler(
         })
       }
 
-      // Validate optional fields if provided
-      if (content !== undefined && content !== null && content !== "") {
-        const contentValidation = validateString(content, "Nội dung bài viết")
-        if (!contentValidation.isValid) {
-          return res.status(400).json({
-            success: false,
-            message: contentValidation.message || "Nội dung bài viết không hợp lệ.",
-          })
-        }
-      }
-
-      if (title !== undefined && title !== null && title !== "") {
-        const titleValidation = validateString(title, "Tiêu đề")
-        if (!titleValidation.isValid) {
-          return res.status(400).json({
-            success: false,
-            message: titleValidation.message || "Tiêu đề không hợp lệ.",
-          })
-        }
-      }
-
       // Check if post exists and user owns it
       const [existing] = await db<{ userId: string }[]>`
         SELECT user_id FROM posts WHERE post_id = ${postId} LIMIT 1;

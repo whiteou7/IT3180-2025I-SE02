@@ -4,6 +4,6 @@ export type APIBody<T> = {
   message?: string;
 } | {
   success: false;
-  message: string;
+  message?: string;
   error?: string;
 }
