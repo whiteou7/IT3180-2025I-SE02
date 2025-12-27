@@ -6,6 +6,7 @@ import os from "os"
 import { db } from "@/db"
 import type { BillingDetail, BillingService } from "@/types/billings"
 import type { APIBody } from "@/types/api"
+import PdfPrinter from "pdfmake"
 
 type BillingFileDetail = BillingDetail & {
   file: string
