@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { supabase } from "@/storage"
+import { supabase } from "@/lib/storage"
 import type { APIBody } from "@/types/api"
 
 export type Document = {

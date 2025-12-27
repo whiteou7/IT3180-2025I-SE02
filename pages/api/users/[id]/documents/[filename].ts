@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { supabase } from "@/storage"
+import { supabase } from "@/lib/storage"
 
 /**
  * GET /api/users/[id]/documents/[filename] - Download/view a document
