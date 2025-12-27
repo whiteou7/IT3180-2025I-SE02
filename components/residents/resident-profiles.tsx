@@ -238,7 +238,7 @@ export function ResidentProfilesTable({
                     : resident.role === "admin"
                       ? "Quản trị"
                       : resident.role === "police"
-                        ? "An ninh"
+                        ? "Công An"
                         : "Kế toán"}
                 </TableCell>
                 <TableCell>
@@ -387,7 +387,7 @@ export function ResidentProfileDrawer({
                     : resident.role === "admin"
                       ? "Quản trị"
                       : resident.role === "police"
-                        ? "An ninh"
+                        ? "Công An"
                         : "Kế toán"}
                 </span>
               </div>
@@ -504,7 +504,7 @@ export function ResidentProfileDrawer({
                           <SelectContent>
                             <SelectItem value="tenant">Cư dân</SelectItem>
                             <SelectItem value="admin">Quản trị</SelectItem>
-                            <SelectItem value="police">An ninh</SelectItem>
+                            <SelectItem value="police">Công An</SelectItem>
                             <SelectItem value="accountant">Kế toán</SelectItem>
                           </SelectContent>
                         </Select>
@@ -821,7 +821,7 @@ export function CreateUserDialog({
                       <SelectContent>
                         <SelectItem value="tenant">Cư dân</SelectItem>
                         <SelectItem value="admin">Quản trị</SelectItem>
-                        <SelectItem value="police">An ninh</SelectItem>
+                        <SelectItem value="police">Công An</SelectItem>
                         <SelectItem value="accountant">Kế toán</SelectItem>
                       </SelectContent>
                     </Select>

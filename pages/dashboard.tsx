@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Head from "next/head"
 import {
   Building2,
   Users,
@@ -141,53 +142,58 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 pt-24 pb-8 space-y-8">
-      {/* Welcome Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
+    <>
+      <Head>
+        <title>Bảng điều khiển • Quản lý chung cư</title>
+      </Head>
+      <div className="container mx-auto px-4 pt-24 pb-8 space-y-8">
+        {/* Welcome Header */}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">
           Chào mừng trở lại, {fullName || "Người dùng"}
-        </h1>
-        <p className="text-muted-foreground">
+          </h1>
+          <p className="text-muted-foreground">
           Đây là tổng quan về hệ thống quản lý chung cư của bạn
-        </p>
-        {role && (
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mt-2">
-            <Shield className="size-4" />
+          </p>
+          {role && (
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mt-2">
+              <Shield className="size-4" />
             Vai trò: {role === "admin" ? "Quản trị viên" : role === "tenant" ? "Cư dân" : role === "police" ? "An ninh" : "Kế toán"}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
 
-      {/* Quick Actions */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Hành động Nhanh</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((action, index) => {
-            const Icon = action.icon
-            return (
-              <Link key={index} href={action.href}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                  <CardHeader>
-                    <div className={`${action.bgColor} w-12 h-12 rounded-lg flex items-center justify-center mb-2`}>
-                      <Icon className={`${action.color} size-6`} />
-                    </div>
-                    <CardTitle className="text-base">{action.title}</CardTitle>
-                    <CardDescription className="text-sm">
-                      {action.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button variant="ghost" size="sm" className="w-full justify-between">
+        {/* Quick Actions */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Hành động Nhanh</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {quickActions.map((action, index) => {
+              const Icon = action.icon
+              return (
+                <Link key={index} href={action.href}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                    <CardHeader>
+                      <div className={`${action.bgColor} w-12 h-12 rounded-lg flex items-center justify-center mb-2`}>
+                        <Icon className={`${action.color} size-6`} />
+                      </div>
+                      <CardTitle className="text-base">{action.title}</CardTitle>
+                      <CardDescription className="text-sm">
+                        {action.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button variant="ghost" size="sm" className="w-full justify-between">
                       Đi đến trang
-                      <ArrowRight className="size-4" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Link>
-            )
-          })}
+                        <ArrowRight className="size-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }

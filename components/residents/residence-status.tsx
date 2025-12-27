@@ -53,7 +53,7 @@ function formatRole(role: StatusRecord["role"]) {
     case "admin":
       return "Quản trị"
     case "police":
-      return "An ninh"
+      return "Công An"
     case "accountant":
       return "Kế toán"
     default:

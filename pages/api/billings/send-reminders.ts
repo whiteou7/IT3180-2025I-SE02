@@ -13,6 +13,14 @@ type EligibleUser = {
   bills: BillingItem[]
 }
 
+/**
+ * GET /api/billings/send-reminders - Retrieve eligible users for billing reminders
+ *   Query params:
+ *     - reminderType: Type of reminder ('3days', '7days', or 'overdue')
+ * POST /api/billings/send-reminders - Send billing reminder emails to eligible users
+ *   Body:
+ *     - reminderType: Type of reminder ('3days', '7days', or 'overdue')
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<EligibleUser[] | { success: boolean }>>

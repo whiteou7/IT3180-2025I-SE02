@@ -4,6 +4,11 @@ import type { APIBody } from "@/types/api"
 import type { TaxReport } from "@/types/billings"
 type TaxReportResponse = APIBody<TaxReport>
 
+/**
+ * GET /api/taxes - Generate tax report for unpaid billings in a specific month
+ *   Query params:
+ *     - month: Month number (1-12) or 'current' for current month (optional, defaults to current month)
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TaxReportResponse>

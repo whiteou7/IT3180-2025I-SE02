@@ -11,6 +11,9 @@ type RawServiceFromDB = {
   description: string | null
 }
 
+/**
+ * GET /api/users/[id]/billings - Retrieve all billing records for a specific user
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<BillingDetail[]>>

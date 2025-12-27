@@ -4,6 +4,9 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { PropertySummary } from "@/types/properties"
 
+/**
+ * GET /api/properties - Retrieve all properties with owner information and report counts
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<PropertySummary[]>>

@@ -14,6 +14,9 @@ type BillingFileDetail = BillingDetail & {
 
 type BillingResponse = APIBody<BillingFileDetail>
 
+/**
+ * GET /api/billings/[id]/file - Generate and retrieve PDF invoice file for a billing
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<BillingResponse | Uint8Array>

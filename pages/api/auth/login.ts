@@ -12,6 +12,9 @@ type LoginSuccess = {
   fullName: string
 }
 
+/**
+ * POST /api/auth/login - Authenticate user with email and password
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<LoginSuccess>>

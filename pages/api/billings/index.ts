@@ -10,6 +10,35 @@ import {
   validateDate,
 } from "@/lib/validation"
 
+type RawBillingFromDB = {
+  billingId: string
+  userId: string
+  fullName: string
+  billingStatus: string
+  dueDate: string
+  periodStart: string
+  periodEnd: string
+  paidAt: string | null
+  serviceCount: number | string
+  totalAmount: number | string
+  services: Array<{
+    serviceId: number
+    serviceName: string
+    price: number | string
+    description: string | null
+    tax: number | string
+  }> | null
+  usedAt: string
+}
+
+/**
+ * GET /api/billings - Retrieve billing summaries with optional filtering
+ *   Query params:
+ *     - userId: Filter by user ID (optional)
+ *     - status: Filter by billing status (optional)
+ *     - limit: Limit number of results (default: 25, max: 200)
+ * POST /api/billings - Create a new billing record for a user with specified services
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ billingId: string } | BillingSummary[] | null>>
@@ -19,55 +48,142 @@ export default async function handler(
       const userIdParam = Array.isArray(req.query.userId) ? req.query.userId[0] : req.query.userId
       const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status
       const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit
-      const filters: string[] = []
-      const values: (string | number)[] = []
-
-      if (userIdParam) {
-        values.push(userIdParam)
-        filters.push(`b.user_id = $${values.length}`)
-      }
-
-      if (statusParam) {
-        values.push(statusParam)
-        filters.push(`b.billing_status = $${values.length}`)
-      }
 
       const limit = Math.min(Math.max(Number(limitParam) || 25, 1), 200)
-      values.push(limit)
-      const whereClause = filters.length ? `WHERE ${filters.join(" AND ")}` : ""
-      const query = `
-        SELECT 
-          b.billing_id AS "billingId",
-          b.user_id AS "userId",
-          u.full_name AS "fullName",
-          MAX(b.billing_status) AS "billingStatus",
-          MAX(b.due_date) AS "dueDate",
-          MIN(b.period_start) AS "periodStart",
-          MAX(b.period_end) AS "periodEnd",
-          MAX(b.paid_at) AS "paidAt",
-          COUNT(*) AS "serviceCount",
-          SUM(s.price + (s.price * s.tax / 100)) AS "totalAmount",
-          json_agg(
-            json_build_object(
-              'serviceId', s.service_id,
-              'serviceName', s.service_name,
-              'price', s.price,
-              'description', s.description,
-              'tax', s.tax
-            )
-            ORDER BY s.service_id
-          ) AS "services"
-        FROM billings b
-        JOIN users u ON u.user_id = b.user_id
-        JOIN services s ON s.service_id = b.service_id
-        ${whereClause}
-        GROUP BY b.billing_id, b.user_id, u.full_name
-        ORDER BY MAX(b.used_at) DESC
-        LIMIT $${values.length}
-      `
 
-      const rows = await db.unsafe(query, values)
-      const payload: BillingSummary[] = rows.map((row) => ({
+      // Build query with conditional WHERE clauses using template literals
+      let result: RawBillingFromDB[]
+
+      if (userIdParam && statusParam) {
+        // Both filters
+        result = await db<RawBillingFromDB[]>`
+          SELECT 
+            b.billing_id,
+            b.user_id,
+            u.full_name,
+            MAX(b.billing_status) as billing_status,
+            MAX(b.due_date) as due_date,
+            MIN(b.period_start) as period_start,
+            MAX(b.period_end) as period_end,
+            MAX(b.paid_at) as paid_at,
+            COUNT(*) as service_count,
+            SUM(s.price + (s.price * s.tax / 100)) as total_amount,
+            json_agg(
+              json_build_object(
+                'serviceId', s.service_id,
+                'serviceName', s.service_name,
+                'price', s.price,
+                'description', s.description,
+                'tax', s.tax
+              ) ORDER BY s.service_id
+            ) as services,
+            MAX(b.used_at) as used_at
+          FROM billings b
+          JOIN users u ON u.user_id = b.user_id
+          JOIN services s ON s.service_id = b.service_id
+          WHERE b.user_id = ${userIdParam} AND b.billing_status = ${statusParam}
+          GROUP BY b.billing_id, b.user_id, u.full_name
+          ORDER BY MAX(b.used_at) DESC
+          LIMIT ${limit}
+        `
+      } else if (userIdParam) {
+        // User filter only
+        result = await db<RawBillingFromDB[]>`
+          SELECT 
+            b.billing_id,
+            b.user_id,
+            u.full_name,
+            MAX(b.billing_status) as billing_status,
+            MAX(b.due_date) as due_date,
+            MIN(b.period_start) as period_start,
+            MAX(b.period_end) as period_end,
+            MAX(b.paid_at) as paid_at,
+            COUNT(*) as service_count,
+            SUM(s.price + (s.price * s.tax / 100)) as total_amount,
+            json_agg(
+              json_build_object(
+                'serviceId', s.service_id,
+                'serviceName', s.service_name,
+                'price', s.price,
+                'description', s.description,
+                'tax', s.tax
+              ) ORDER BY s.service_id
+            ) as services,
+            MAX(b.used_at) as used_at
+          FROM billings b
+          JOIN users u ON u.user_id = b.user_id
+          JOIN services s ON s.service_id = b.service_id
+          WHERE b.user_id = ${userIdParam}
+          GROUP BY b.billing_id, b.user_id, u.full_name
+          ORDER BY MAX(b.used_at) DESC
+          LIMIT ${limit}
+        `
+      } else if (statusParam) {
+        // Status filter only
+        result = await db<RawBillingFromDB[]>`
+          SELECT 
+            b.billing_id,
+            b.user_id,
+            u.full_name,
+            MAX(b.billing_status) as billing_status,
+            MAX(b.due_date) as due_date,
+            MIN(b.period_start) as period_start,
+            MAX(b.period_end) as period_end,
+            MAX(b.paid_at) as paid_at,
+            COUNT(*) as service_count,
+            SUM(s.price + (s.price * s.tax / 100)) as total_amount,
+            json_agg(
+              json_build_object(
+                'serviceId', s.service_id,
+                'serviceName', s.service_name,
+                'price', s.price,
+                'description', s.description,
+                'tax', s.tax
+              ) ORDER BY s.service_id
+            ) as services,
+            MAX(b.used_at) as used_at
+          FROM billings b
+          JOIN users u ON u.user_id = b.user_id
+          JOIN services s ON s.service_id = b.service_id
+          WHERE b.billing_status = ${statusParam}
+          GROUP BY b.billing_id, b.user_id, u.full_name
+          ORDER BY MAX(b.used_at) DESC
+          LIMIT ${limit}
+        `
+      } else {
+        // No filters
+        result = await db<RawBillingFromDB[]>`
+          SELECT 
+            b.billing_id,
+            b.user_id,
+            u.full_name,
+            MAX(b.billing_status) as billing_status,
+            MAX(b.due_date) as due_date,
+            MIN(b.period_start) as period_start,
+            MAX(b.period_end) as period_end,
+            MAX(b.paid_at) as paid_at,
+            COUNT(*) as service_count,
+            SUM(s.price + (s.price * s.tax / 100)) as total_amount,
+            json_agg(
+              json_build_object(
+                'serviceId', s.service_id,
+                'serviceName', s.service_name,
+                'price', s.price,
+                'description', s.description,
+                'tax', s.tax
+              ) ORDER BY s.service_id
+            ) as services,
+            MAX(b.used_at) as used_at
+          FROM billings b
+          JOIN users u ON u.user_id = b.user_id
+          JOIN services s ON s.service_id = b.service_id
+          GROUP BY b.billing_id, b.user_id, u.full_name
+          ORDER BY MAX(b.used_at) DESC
+          LIMIT ${limit}
+        `
+      }
+
+      const payload: BillingSummary[] = result.map((row) => ({
         billingId: row.billingId,
         userId: row.userId,
         fullName: row.fullName,

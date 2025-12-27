@@ -35,6 +35,11 @@ function parseServiceId(idParam: string | string[] | undefined) {
   return Number(rawId)
 }
 
+/**
+ * GET /api/services/[id] - Retrieve a specific service by ID
+ * PUT /api/services/[id] - Update an existing service
+ * DELETE /api/services/[id] - Delete a service by ID
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Service | null>>

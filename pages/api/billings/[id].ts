@@ -3,6 +3,10 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 import type { BillingDetail } from "@/types/billings"
 
+/**
+ * GET /api/billings/[id] - Retrieve detailed billing information by billing ID
+ * PUT /api/billings/[id] - Mark a billing as paid and update payment timestamp
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<BillingDetail | null>>

@@ -149,9 +149,9 @@ export function LoginForm({
   }
 
   const demoAccounts = [
-    { role: "Quản trị viên", email: "admin@gmail.com", password: "admin" },
+    { role: "Quản trị", email: "admin@gmail.com", password: "admin" },
     { role: "Cư dân", email: "tenant@gmail.com", password: "tenant" },
-    { role: "An ninh", email: "police@gmail.com", password: "police" },
+    { role: "Công An", email: "police@gmail.com", password: "police" },
     { role: "Kế toán", email: "accountant@gmail.com", password: "accountant" },
   ]
 
