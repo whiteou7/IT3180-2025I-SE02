@@ -500,6 +500,8 @@ export default function FeeManagementPage() {
               <DialogTitle>Gửi email nhắc nhở</DialogTitle>
               <DialogDescription>
                 Chọn loại nhắc nhở và người dùng để gửi email nhắc nhở thanh toán.
+                <br></br>
+                Lưu ý: Vì tài nguyên hệ thống có hạn, chỉ gửi email cho một người dùng tại một thời điểm.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">

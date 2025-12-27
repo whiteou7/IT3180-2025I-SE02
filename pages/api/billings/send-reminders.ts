@@ -80,7 +80,7 @@ export default async function handler(
             u.full_name,
             MAX(b.due_date)::text as due_date,
             SUM(s.price + (s.price * s.tax / 100)) as total_amount,
-            (CURRENT_DATE - MAX(b.due_date)::date)::integer as days_until_due
+            (MAX(b.due_date)::date - CURRENT_DATE)::integer as days_until_due
           FROM billings b
           JOIN users u ON u.user_id = b.user_id
           JOIN services s ON s.service_id = b.service_id
@@ -219,7 +219,7 @@ export default async function handler(
             b.billing_id,
             MAX(b.due_date)::text as due_date,
             SUM(s.price + (s.price * s.tax / 100)) as total_amount,
-            (CURRENT_DATE - MAX(b.due_date)::date)::integer as days_until_due
+            (MAX(b.due_date)::date - CURRENT_DATE)::integer as days_until_due
           FROM billings b
           JOIN services s ON s.service_id = b.service_id
           WHERE b.user_id = ${userId}
