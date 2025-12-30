@@ -408,7 +408,7 @@ export default function ChatPage() {
                     </p>
                   </div>
                 </div>
-                <ScrollArea className="flex-1">
+                <div className="flex-1 overflow-y-auto">
                   <div className="flex flex-col gap-3 p-3 md:gap-4 md:p-4">
                     {isLoadingMessages ? (
                       <div className="flex items-center justify-center p-8">
@@ -461,7 +461,7 @@ export default function ChatPage() {
                     )}
                     <div ref={messagesEndRef} />
                   </div>
-                </ScrollArea>
+                </div>
                 <div className="border-t p-3 md:p-4">
                   <div className="flex gap-2">
                     <Input
