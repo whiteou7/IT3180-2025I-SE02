@@ -18,7 +18,14 @@ export default async function handler(
 ) {
   try {
     if (req.method === "GET") {
-      const reports = await db<PropertyReport[]>`
+      const { startDate, endDate, filter, status } = req.query as {
+        startDate?: string
+        endDate?: string
+        filter?: "week" | "month" | "year" | "daily"
+        status?: string
+      }
+
+      let baseQuery = db<PropertyReport[]>`
         SELECT 
           pr.property_report_id, 
           pr.user_id AS owner_id, 
@@ -45,10 +52,44 @@ export default async function handler(
           properties p
         ON 
           p.property_id = pr.property_id
-        ORDER BY 
-          pr.created_at DESC;
-
       `
+
+      const whereClauses = []
+
+      // Date range filtering (takes precedence over filter)
+      if (startDate) {
+        whereClauses.push(db`pr.created_at >= ${startDate}::date`)
+      }
+      if (endDate) {
+        whereClauses.push(db`pr.created_at <= ${endDate}::date + '1 day'::interval`)
+      }
+
+      // Quick filter (only if no date range specified)
+      if (!startDate && !endDate && filter) {
+        if (filter === "daily") {
+          whereClauses.push(db`pr.created_at >= NOW() - '1 day'::interval`)
+        } else if (filter === "week") {
+          whereClauses.push(db`pr.created_at >= NOW() - '7 days'::interval`)
+        } else if (filter === "month") {
+          whereClauses.push(db`pr.created_at >= NOW() - '1 month'::interval`)
+        } else if (filter === "year") {
+          whereClauses.push(db`pr.created_at >= NOW() - '1 year'::interval`)
+        }
+      }
+
+      // Status filtering
+      if (status) {
+        whereClauses.push(db`pr.status = ${status}`)
+      }
+
+      if (whereClauses.length > 0) {
+        const combinedWhere = whereClauses.reduce(
+          (prev, curr) => db`${prev} AND ${curr}`
+        )
+        baseQuery = db<PropertyReport[]>`${baseQuery} WHERE ${combinedWhere}`
+      }
+
+      const reports = await db<PropertyReport[]>`${baseQuery} ORDER BY pr.created_at DESC`
 
       return res.status(200).json({
         success: true,

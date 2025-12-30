@@ -45,6 +45,8 @@ import { Badge } from "@/components/ui/badge"
 import { useUserStore } from "@/store/userStore"
 import type { Service } from "@/types/services"
 import type { ServiceCategory } from "@/types/enum"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 type ServiceFormState = {
   serviceName: string
@@ -215,6 +217,7 @@ export default function ServiceAdministrationPage() {
   }
 
   const totalActive = useMemo(() => services.filter((svc) => svc.isAvailable).length, [services])
+  const servicesPagination = usePagination(services, { itemsPerPage: 25 })
 
   return (
     <>
@@ -358,74 +361,89 @@ export default function ServiceAdministrationPage() {
                   <Badge variant="outline">{services.length} dịch vụ</Badge>
                   <Badge variant="default">{totalActive} đang hiển thị</Badge>
                 </div>
-                <div className="rounded-xl border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Tên</TableHead>
-                        <TableHead>Nhóm</TableHead>
-                        <TableHead>Giá</TableHead>
-                        <TableHead>Thuế</TableHead>
-                        <TableHead>Trạng thái</TableHead>
-                        <TableHead className="text-right">Thao tác</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {isLoading ? (
+                <div className="space-y-4">
+                  <div className="rounded-xl border">
+                    <Table>
+                      <TableHeader>
                         <TableRow>
-                          <TableCell colSpan={6} className="text-center">
-                            <Loader2 className="mx-auto size-4 animate-spin" />
-                          </TableCell>
+                          <TableHead>Tên</TableHead>
+                          <TableHead>Nhóm</TableHead>
+                          <TableHead>Giá</TableHead>
+                          <TableHead>Thuế</TableHead>
+                          <TableHead>Trạng thái</TableHead>
+                          <TableHead className="text-right">Thao tác</TableHead>
                         </TableRow>
-                      ) : services.length ? (
-                        services.map((service) => (
-                          <TableRow key={service.serviceId}>
-                            <TableCell className="font-medium">{service.serviceName}</TableCell>
-                            <TableCell className="capitalize">{service.category}</TableCell>
-                            <TableCell>${service.price.toFixed(2)}</TableCell>
-                            <TableCell>{service.tax}%</TableCell>
-                            <TableCell>
-                              <Badge variant={service.isAvailable ? "default" : "secondary"}>
-                                {service.isAvailable ? "Đang hiển thị" : "Đang ẩn"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="flex justify-end gap-2">
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleOpenEdit(service)}
-                                aria-label={`Edit ${service.serviceName}`}
-                              >
-                                <PencilLine className="size-4" />
-                              </Button>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleDuplicate(service)}
-                                aria-label={`Duplicate ${service.serviceName}`}
-                              >
-                                <Plus className="size-4" />
-                              </Button>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleDelete(service)}
-                                aria-label={`Delete ${service.serviceName}`}
-                              >
-                                <Trash2 className="text-destructive size-4" />
-                              </Button>
+                      </TableHeader>
+                      <TableBody>
+                        {isLoading ? (
+                          <TableRow>
+                            <TableCell colSpan={6} className="text-center">
+                              <Loader2 className="mx-auto size-4 animate-spin" />
                             </TableCell>
                           </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
-                            Chưa có dịch vụ nào.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                        ) : servicesPagination.paginatedItems.length ? (
+                          servicesPagination.paginatedItems.map((service) => (
+                            <TableRow key={service.serviceId}>
+                              <TableCell className="font-medium">{service.serviceName}</TableCell>
+                              <TableCell className="capitalize">{service.category}</TableCell>
+                              <TableCell>${service.price.toFixed(2)}</TableCell>
+                              <TableCell>{service.tax}%</TableCell>
+                              <TableCell>
+                                <Badge variant={service.isAvailable ? "default" : "secondary"}>
+                                  {service.isAvailable ? "Đang hiển thị" : "Đang ẩn"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="flex justify-end gap-2">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleOpenEdit(service)}
+                                  aria-label={`Edit ${service.serviceName}`}
+                                >
+                                  <PencilLine className="size-4" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleDuplicate(service)}
+                                  aria-label={`Duplicate ${service.serviceName}`}
+                                >
+                                  <Plus className="size-4" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleDelete(service)}
+                                  aria-label={`Delete ${service.serviceName}`}
+                                >
+                                  <Trash2 className="text-destructive size-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
+                              Chưa có dịch vụ nào.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  {services.length > 0 && (
+                    <PaginationWrapper
+                      currentPage={servicesPagination.currentPage}
+                      totalPages={servicesPagination.totalPages}
+                      itemsPerPage={servicesPagination.itemsPerPage}
+                      totalItems={servicesPagination.totalItems}
+                      startIndex={servicesPagination.startIndex}
+                      endIndex={servicesPagination.endIndex}
+                      onPageChange={servicesPagination.setCurrentPage}
+                      onItemsPerPageChange={servicesPagination.setItemsPerPage}
+                      itemsPerPageOptions={[25, 50, 100, 200]}
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>

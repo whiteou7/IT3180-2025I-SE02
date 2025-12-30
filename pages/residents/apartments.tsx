@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import { useUserStore } from "@/store/userStore"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 export default function ApartmentDirectoryPage() {
   const [apartments, setApartments] = useState<Apartment[]>([])
@@ -110,6 +112,8 @@ export default function ApartmentDirectoryPage() {
       return String(apartment.apartmentNumber).includes(query)
     })
   }, [apartments, filters])
+
+  const apartmentsPagination = usePagination(filteredApartments, { itemsPerPage: 12 })
 
   const handleSelectApartment = (apartment: Apartment) => {
     setSelectedApartment(apartment)
@@ -235,11 +239,26 @@ export default function ApartmentDirectoryPage() {
           />
         }
 
-        <ApartmentDirectoryGrid
-          apartments={filteredApartments}
-          onSelectApartment={handleSelectApartment}
-          isLoading={isLoading}
-        />
+        <div className="space-y-4">
+          <ApartmentDirectoryGrid
+            apartments={apartmentsPagination.paginatedItems}
+            onSelectApartment={handleSelectApartment}
+            isLoading={isLoading}
+          />
+          {filteredApartments.length > 0 && (
+            <PaginationWrapper
+              currentPage={apartmentsPagination.currentPage}
+              totalPages={apartmentsPagination.totalPages}
+              itemsPerPage={apartmentsPagination.itemsPerPage}
+              totalItems={apartmentsPagination.totalItems}
+              startIndex={apartmentsPagination.startIndex}
+              endIndex={apartmentsPagination.endIndex}
+              onPageChange={apartmentsPagination.setCurrentPage}
+              onItemsPerPageChange={apartmentsPagination.setItemsPerPage}
+              itemsPerPageOptions={[12, 24, 48, 96]}
+            />
+          )}
+        </div>
       </div>
       <ApartmentDetailsDialog
         apartment={selectedApartment}

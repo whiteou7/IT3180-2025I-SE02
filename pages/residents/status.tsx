@@ -20,6 +20,8 @@ import {
   StatusRecord,
   StatusChangePayload,
 } from "@/components/residents/residence-status"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 const buildStatusRecord = (
   user: User,
@@ -99,6 +101,8 @@ export default function ResidenceStatusPage() {
       unassigned: records.length - assigned,
     }
   }, [records])
+
+  const recordsPagination = usePagination(records, { itemsPerPage: 25 })
 
   const handleSelectRecord = (record: StatusRecord) => {
     setSelectedRecord(record)
@@ -225,20 +229,35 @@ export default function ResidenceStatusPage() {
           unassigned={stats.unassigned}
         />
 
-        <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Danh sách gán căn hộ</h2>
-              <p className="text-muted-foreground text-sm">
-                Mở khung chi tiết để gán hoặc gỡ căn hộ cho từng cư dân.
-              </p>
+        <div className="space-y-4">
+          <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Danh sách gán căn hộ</h2>
+                <p className="text-muted-foreground text-sm">
+                  Mở khung chi tiết để gán hoặc gỡ căn hộ cho từng cư dân.
+                </p>
+              </div>
             </div>
+            <ResidenceStatusTable
+              records={recordsPagination.paginatedItems}
+              onSelect={handleSelectRecord}
+              isLoading={isLoading}
+            />
           </div>
-          <ResidenceStatusTable
-            records={records}
-            onSelect={handleSelectRecord}
-            isLoading={isLoading}
-          />
+          {records.length > 0 && (
+            <PaginationWrapper
+              currentPage={recordsPagination.currentPage}
+              totalPages={recordsPagination.totalPages}
+              itemsPerPage={recordsPagination.itemsPerPage}
+              totalItems={recordsPagination.totalItems}
+              startIndex={recordsPagination.startIndex}
+              endIndex={recordsPagination.endIndex}
+              onPageChange={recordsPagination.setCurrentPage}
+              onItemsPerPageChange={recordsPagination.setItemsPerPage}
+              itemsPerPageOptions={[25, 50, 100, 200]}
+            />
+          )}
         </div>
       </div>
       <StatusChangeDialog

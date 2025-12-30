@@ -25,6 +25,8 @@ import {
 import type { PropertyFormValues } from "@/components/property/properties"
 import type { PropertyStatus, PropertySummary } from "@/types/properties"
 import { useUserStore } from "@/store/userStore"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 export default function PropertiesPage() {
   const { userId, role } = useUserStore()
@@ -114,6 +116,8 @@ export default function PropertiesPage() {
       return true
     })
   }, [properties, filters])
+
+  const propertiesPagination = usePagination(filteredProperties, { itemsPerPage: 12 })
 
   const handleSelectProperty = (property: PropertySummary) => {
     setSelectedProperty(property)
@@ -283,15 +287,30 @@ export default function PropertiesPage() {
         >
           <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
             <PropertyFilters filters={filters} onChange={setFilters} isLoading={isLoading} />
-            <PropertyGrid
-              properties={filteredProperties}
-              isLoading={isLoading}
-              onSelect={handleSelectProperty}
-              onEdit={isAdmin || tenantCanManage ? handleOpenEdit : undefined}
-              onDelete={isAdmin || tenantCanManage ? handleDeleteProperty : undefined}
-              onStatusChange={isAdmin ? handleStatusChange : undefined}
-              canManage={isAdmin || tenantCanManage}
-            />
+            <div className="space-y-4">
+              <PropertyGrid
+                properties={propertiesPagination.paginatedItems}
+                isLoading={isLoading}
+                onSelect={handleSelectProperty}
+                onEdit={isAdmin || tenantCanManage ? handleOpenEdit : undefined}
+                onDelete={isAdmin || tenantCanManage ? handleDeleteProperty : undefined}
+                onStatusChange={isAdmin ? handleStatusChange : undefined}
+                canManage={isAdmin || tenantCanManage}
+              />
+              {filteredProperties.length > 0 && (
+                <PaginationWrapper
+                  currentPage={propertiesPagination.currentPage}
+                  totalPages={propertiesPagination.totalPages}
+                  itemsPerPage={propertiesPagination.itemsPerPage}
+                  totalItems={propertiesPagination.totalItems}
+                  startIndex={propertiesPagination.startIndex}
+                  endIndex={propertiesPagination.endIndex}
+                  onPageChange={propertiesPagination.setCurrentPage}
+                  onItemsPerPageChange={propertiesPagination.setItemsPerPage}
+                  itemsPerPageOptions={[12, 24, 48, 96]}
+                />
+              )}
+            </div>
           </div>
         </AuthGate>
       </div>

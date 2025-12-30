@@ -51,6 +51,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useUserStore } from "@/store/userStore"
 import type { Post } from "@/types/posts"
 import type { PostCategory } from "@/types/enum"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 const categoryOptions: { label: string; value: PostCategory | "all" }[] = [
   { label: "Tất cả", value: "all" },
@@ -281,6 +283,8 @@ export default function AnnouncementsPage() {
     return filtered
   }, [posts, selectedCategory, searchQuery, startDate, endDate])
 
+  const announcementsPagination = usePagination(filteredPosts, { itemsPerPage: 25 })
+
   return (
     <AuthGate isAuthenticated={!!userId}>
       <Head>
@@ -373,42 +377,55 @@ export default function AnnouncementsPage() {
                 <p className="text-muted-foreground">Không có thông báo nào</p>
               </div>
             ) : (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Tiêu đề</TableHead>
-                      <TableHead>Chủ đề</TableHead>
-                      <TableHead>Người đăng</TableHead>
-                      <TableHead>Ngày</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredPosts.map((post) => (
-                      <TableRow
-                        key={post.postId}
-                        className="cursor-pointer"
-                        onClick={() => handleViewPost(post)}
-                      >
-                        <TableCell className="font-medium">{post.title || "Không có tiêu đề"}</TableCell>
-                        <TableCell>
-                          {post.category && (
-                            <Badge
-                              className={`${categoryColors[post.category]} text-white`}
-                              variant="secondary"
-                            >
-                              {categoryLabels[post.category]}
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>{post.fullName}</TableCell>
-                        <TableCell className="text-muted-foreground text-sm">
-                          {new Date(post.createdAt).toLocaleDateString()}
-                        </TableCell>
+              <div className="space-y-4">
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tiêu đề</TableHead>
+                        <TableHead>Chủ đề</TableHead>
+                        <TableHead>Người đăng</TableHead>
+                        <TableHead>Ngày</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {announcementsPagination.paginatedItems.map((post) => (
+                        <TableRow
+                          key={post.postId}
+                          className="cursor-pointer"
+                          onClick={() => handleViewPost(post)}
+                        >
+                          <TableCell className="font-medium">{post.title || "Không có tiêu đề"}</TableCell>
+                          <TableCell>
+                            {post.category && (
+                              <Badge
+                                className={`${categoryColors[post.category]} text-white`}
+                                variant="secondary"
+                              >
+                                {categoryLabels[post.category]}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>{post.fullName}</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">
+                            {new Date(post.createdAt).toLocaleDateString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <PaginationWrapper
+                  currentPage={announcementsPagination.currentPage}
+                  totalPages={announcementsPagination.totalPages}
+                  itemsPerPage={announcementsPagination.itemsPerPage}
+                  totalItems={announcementsPagination.totalItems}
+                  startIndex={announcementsPagination.startIndex}
+                  endIndex={announcementsPagination.endIndex}
+                  onPageChange={announcementsPagination.setCurrentPage}
+                  onItemsPerPageChange={announcementsPagination.setItemsPerPage}
+                  itemsPerPageOptions={[25, 50, 100, 200]}
+                />
               </div>
             )}
           </TabsContent>

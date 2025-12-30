@@ -26,6 +26,8 @@ import type { Property, PropertyStatus } from "@/types/properties"
 import type { PropertyReport } from "@/types/reports"
 import { useUserStore } from "@/store/userStore"
 import { propertyStatuses } from "@/components/property/properties"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 export default function LostPropertyPage() {
   const { userId, role } = useUserStore()
@@ -115,6 +117,8 @@ export default function LostPropertyPage() {
       return true
     })
   }, [visibleReports, filters])
+
+  const reportsPagination = usePagination(filteredReports, { itemsPerPage: 25 })
 
   const statusMetrics = useMemo(
     () =>
@@ -314,17 +318,32 @@ export default function LostPropertyPage() {
 
           <div className="grid gap-6 lg:grid-cols-[320px,1fr]">
             <LostPropertyFilters filters={filters} onChange={setFilters} isLoading={isLoading} />
-            <LostPropertyTable
-              reports={filteredReports}
-              isLoading={isLoading}
-              onView={handleViewReport}
-              canChangeStatus={canChangeStatus}
-              canApprove={canApproveReport}
-              canDelete={canDeleteReport}
-              onStatusChange={handleStatusChange}
-              onApprove={handleApprove}
-              onDelete={handleDelete}
-            />
+            <div className="space-y-4">
+              <LostPropertyTable
+                reports={reportsPagination.paginatedItems}
+                isLoading={isLoading}
+                onView={handleViewReport}
+                canChangeStatus={canChangeStatus}
+                canApprove={canApproveReport}
+                canDelete={canDeleteReport}
+                onStatusChange={handleStatusChange}
+                onApprove={handleApprove}
+                onDelete={handleDelete}
+              />
+              {filteredReports.length > 0 && (
+                <PaginationWrapper
+                  currentPage={reportsPagination.currentPage}
+                  totalPages={reportsPagination.totalPages}
+                  itemsPerPage={reportsPagination.itemsPerPage}
+                  totalItems={reportsPagination.totalItems}
+                  startIndex={reportsPagination.startIndex}
+                  endIndex={reportsPagination.endIndex}
+                  onPageChange={reportsPagination.setCurrentPage}
+                  onItemsPerPageChange={reportsPagination.setItemsPerPage}
+                  itemsPerPageOptions={[25, 50, 100, 200]}
+                />
+              )}
+            </div>
           </div>
         </AuthGate>
       </div>

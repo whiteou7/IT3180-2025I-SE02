@@ -36,7 +36,6 @@ type RawBillingFromDB = {
  *   Query params:
  *     - userId: Filter by user ID (optional)
  *     - status: Filter by billing status (optional)
- *     - limit: Limit number of results (default: 25, max: 200)
  * POST /api/billings - Create a new billing record for a user with specified services
  */
 export default async function handler(
@@ -47,9 +46,6 @@ export default async function handler(
     try {
       const userIdParam = Array.isArray(req.query.userId) ? req.query.userId[0] : req.query.userId
       const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status
-      const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit
-
-      const limit = Math.min(Math.max(Number(limitParam) || 25, 1), 200)
 
       // Build query with conditional WHERE clauses using template literals
       let result: RawBillingFromDB[]
@@ -84,7 +80,6 @@ export default async function handler(
           WHERE b.user_id = ${userIdParam} AND b.billing_status = ${statusParam}
           GROUP BY b.billing_id, b.user_id, u.full_name
           ORDER BY MAX(b.used_at) DESC
-          LIMIT ${limit}
         `
       } else if (userIdParam) {
         // User filter only
@@ -116,7 +111,6 @@ export default async function handler(
           WHERE b.user_id = ${userIdParam}
           GROUP BY b.billing_id, b.user_id, u.full_name
           ORDER BY MAX(b.used_at) DESC
-          LIMIT ${limit}
         `
       } else if (statusParam) {
         // Status filter only
@@ -148,7 +142,6 @@ export default async function handler(
           WHERE b.billing_status = ${statusParam}
           GROUP BY b.billing_id, b.user_id, u.full_name
           ORDER BY MAX(b.used_at) DESC
-          LIMIT ${limit}
         `
       } else {
         // No filters
@@ -179,7 +172,6 @@ export default async function handler(
           JOIN services s ON s.service_id = b.service_id
           GROUP BY b.billing_id, b.user_id, u.full_name
           ORDER BY MAX(b.used_at) DESC
-          LIMIT ${limit}
         `
       }
 

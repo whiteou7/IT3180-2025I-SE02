@@ -51,6 +51,8 @@ import { useUserStore } from "@/store/userStore"
 import type { BillingDetail, BillingSummary } from "@/types/billings"
 import type { BillingStatus } from "@/types/enum"
 import type { User } from "@/types/users"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 const statusBadges: Record<BillingStatus, { label: string; variant: "default" | "secondary" | "outline" }> = {
   unpaid: { label: "Chưa thanh toán", variant: "secondary" },
@@ -65,12 +67,14 @@ export default function BillingCenterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [statusFilter, setStatusFilter] = useState<BillingStatus | "all">("all")
   const [selectedUser, setSelectedUser] = useState<string>("all")
-  const [limit, setLimit] = useState<number>(25)
   const [users, setUsers] = useState<User[]>([])
   const [detailId, setDetailId] = useState<string | null>(null)
   const [detail, setDetail] = useState<BillingDetail | null>(null)
   const [isDetailLoading, setIsDetailLoading] = useState(false)
   const [isPaying, setIsPaying] = useState(false)
+
+  const billingsPagination = usePagination(billings, { itemsPerPage: 25 })
+  const { setCurrentPage } = billingsPagination
 
   useEffect(() => {
     if (hasAllowedRole) {
@@ -97,7 +101,7 @@ export default function BillingCenterPage() {
       if (statusFilter !== "all") {
         query.status = statusFilter
       }
-      query.limit = limit.toString()
+      // Remove limit - we'll paginate on client side
       const response = await ofetch("/api/billings", {
         query,
         ignoreResponseError: true,
@@ -110,13 +114,15 @@ export default function BillingCenterPage() {
         totalAmount: Number(billing.totalAmount),
       }))
       setBillings(normalized)
+      // Reset to page 1 when filters change
+      setCurrentPage(1)
     } catch (error) {
       console.error(error)
       toast.error((error as Error).message || "Tải danh sách thanh toán thất bại")
     } finally {
       setIsLoading(false)
     }
-  }, [userId, hasAllowedRole, selectedUser, statusFilter, limit])
+  }, [userId, hasAllowedRole, selectedUser, statusFilter, setCurrentPage])
 
   useEffect(() => {
     fetchBillings()
@@ -358,78 +364,80 @@ export default function BillingCenterPage() {
                       </SelectContent>
                     </Select>
                   )}
-
-                  <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Giới hạn" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="25">25</SelectItem>
-                      <SelectItem value="50">50</SelectItem>
-                      <SelectItem value="100">100</SelectItem>
-                      <SelectItem value="150">150</SelectItem>
-                      <SelectItem value="200">200</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
                 <Button variant="ghost" size="sm" onClick={fetchBillings}>
                   Làm mới danh sách
                 </Button>
               </div>
 
-              <div className="rounded-xl border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Thanh toán</TableHead>
-                      <TableHead>Cư dân</TableHead>
-                      <TableHead>Dịch vụ</TableHead>
-                      <TableHead>Số tiền</TableHead>
-                      <TableHead>Ngày đến hạn</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                      <TableHead className="text-right">Hành động</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {isLoading ? (
+              <div className="space-y-4">
+                <div className="rounded-xl border">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center">
-                          <Loader2 className="mx-auto size-4 animate-spin" />
-                        </TableCell>
+                        <TableHead>Thanh toán</TableHead>
+                        <TableHead>Cư dân</TableHead>
+                        <TableHead>Dịch vụ</TableHead>
+                        <TableHead>Số tiền</TableHead>
+                        <TableHead>Ngày đến hạn</TableHead>
+                        <TableHead>Trạng thái</TableHead>
+                        <TableHead className="text-right">Hành động</TableHead>
                       </TableRow>
-                    ) : billings.length ? (
-                      billings.map((billing) => (
-                        <TableRow key={billing.billingId}>
-                          <TableCell className="font-medium">{billing.billingId.slice(0, 8).toUpperCase()}</TableCell>
-                          <TableCell>{billing.fullName}</TableCell>
-                          <TableCell>{billing.serviceCount}</TableCell>
-                          <TableCell>${billing.totalAmount.toFixed(2)}</TableCell>
-                          <TableCell>{new Date(billing.dueDate).toLocaleDateString()}</TableCell>
-                          <TableCell>
-                            <Badge variant={statusBadges[billing.billingStatus].variant}>
-                              {statusBadges[billing.billingStatus].label}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setDetailId(billing.billingId)}
-                            >
-                              Xem
-                            </Button>
+                    </TableHeader>
+                    <TableBody>
+                      {isLoading ? (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center">
+                            <Loader2 className="mx-auto size-4 animate-spin" />
                           </TableCell>
                         </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
-                          Không tìm thấy hóa đơn.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                      ) : billingsPagination.paginatedItems.length ? (
+                        billingsPagination.paginatedItems.map((billing) => (
+                          <TableRow key={billing.billingId}>
+                            <TableCell className="font-medium">{billing.billingId.slice(0, 8).toUpperCase()}</TableCell>
+                            <TableCell>{billing.fullName}</TableCell>
+                            <TableCell>{billing.serviceCount}</TableCell>
+                            <TableCell>${billing.totalAmount.toFixed(2)}</TableCell>
+                            <TableCell>{new Date(billing.dueDate).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              <Badge variant={statusBadges[billing.billingStatus].variant}>
+                                {statusBadges[billing.billingStatus].label}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setDetailId(billing.billingId)}
+                              >
+                                Xem
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
+                            Không tìm thấy hóa đơn.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                {billings.length > 0 && (
+                  <PaginationWrapper
+                    currentPage={billingsPagination.currentPage}
+                    totalPages={billingsPagination.totalPages}
+                    itemsPerPage={billingsPagination.itemsPerPage}
+                    totalItems={billingsPagination.totalItems}
+                    startIndex={billingsPagination.startIndex}
+                    endIndex={billingsPagination.endIndex}
+                    onPageChange={billingsPagination.setCurrentPage}
+                    onItemsPerPageChange={billingsPagination.setItemsPerPage}
+                    itemsPerPageOptions={[25, 50, 100, 200]}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>

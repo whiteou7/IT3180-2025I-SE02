@@ -40,6 +40,8 @@ import { Plus } from "lucide-react"
 import { useUserStore } from "@/store/userStore"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
+import { usePagination } from "@/hooks/use-pagination"
+import { PaginationWrapper } from "@/components/ui/pagination-wrapper"
 
 const buildResidentProfile = (
   user: User,
@@ -153,6 +155,10 @@ export default function ResidentProfilesPage() {
 
   const filteredResidents = useResidentSearch(residents, filters)
   const filteredSpecialAccounts = useSpecialAccountSearch(specialAccounts, specialAccountSearch)
+  
+  const residentsPagination = usePagination(filteredResidents, { itemsPerPage: 10 })
+  const specialAccountsPagination = usePagination(filteredSpecialAccounts, { itemsPerPage: 10 })
+  
   const assignmentStats = useMemo(() => {
     const assigned = residents.filter((resident) => resident.status === "assigned").length
     return {
@@ -393,11 +399,24 @@ export default function ResidentProfilesPage() {
             )}
 
             {filteredResidents.length ? (
-              <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
-                <ResidentProfilesTable
-                  residents={filteredResidents}
-                  isLoading={isLoading}
-                  onSelectResident={handleRowClick}
+              <div className="space-y-4">
+                <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
+                  <ResidentProfilesTable
+                    residents={residentsPagination.paginatedItems}
+                    isLoading={isLoading}
+                    onSelectResident={handleRowClick}
+                  />
+                </div>
+                <PaginationWrapper
+                  currentPage={residentsPagination.currentPage}
+                  totalPages={residentsPagination.totalPages}
+                  itemsPerPage={residentsPagination.itemsPerPage}
+                  totalItems={residentsPagination.totalItems}
+                  startIndex={residentsPagination.startIndex}
+                  endIndex={residentsPagination.endIndex}
+                  onPageChange={residentsPagination.setCurrentPage}
+                  onItemsPerPageChange={residentsPagination.setItemsPerPage}
+                  itemsPerPageOptions={[10, 25, 50, 100]}
                 />
               </div>
             ) : isLoading ? null : (
@@ -436,11 +455,24 @@ export default function ResidentProfilesPage() {
             )}
 
             {filteredSpecialAccounts.length ? (
-              <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
-                <SpecialAccountsTable
-                  accounts={filteredSpecialAccounts}
-                  isLoading={isLoading}
-                  onSelectAccount={handleAccountClick}
+              <div className="space-y-4">
+                <div className="rounded-xl border bg-card/50 p-6 shadow-sm">
+                  <SpecialAccountsTable
+                    accounts={specialAccountsPagination.paginatedItems}
+                    isLoading={isLoading}
+                    onSelectAccount={handleAccountClick}
+                  />
+                </div>
+                <PaginationWrapper
+                  currentPage={specialAccountsPagination.currentPage}
+                  totalPages={specialAccountsPagination.totalPages}
+                  itemsPerPage={specialAccountsPagination.itemsPerPage}
+                  totalItems={specialAccountsPagination.totalItems}
+                  startIndex={specialAccountsPagination.startIndex}
+                  endIndex={specialAccountsPagination.endIndex}
+                  onPageChange={specialAccountsPagination.setCurrentPage}
+                  onItemsPerPageChange={specialAccountsPagination.setItemsPerPage}
+                  itemsPerPageOptions={[10, 25, 50, 100]}
                 />
               </div>
             ) : isLoading ? null : (
