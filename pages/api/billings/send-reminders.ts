@@ -14,21 +14,25 @@ type EligibleUser = {
 }
 
 /**
- * GET /api/billings/send-reminders - Retrieve eligible users for billing reminders
+ * API gửi nhắc nhở thanh toán
+ * GET /api/billings/send-reminders - Lấy danh sách người dùng đủ điều kiện nhận nhắc nhở thanh toán
  *   Query params:
- *     - reminderType: Type of reminder ('3days', '7days', or 'overdue')
- * POST /api/billings/send-reminders - Send billing reminder emails to eligible users
+ *     - reminderType: Loại nhắc nhở ('3days', '7days', hoặc 'overdue')
+ * POST /api/billings/send-reminders - Gửi email nhắc nhở thanh toán cho người dùng đủ điều kiện
  *   Body:
- *     - reminderType: Type of reminder ('3days', '7days', or 'overdue')
+ *     - userId: ID người dùng cần gửi nhắc nhở
+ *     - reminderType: Loại nhắc nhở ('3days', '7days', hoặc 'overdue')
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<EligibleUser[] | { success: boolean }>>
 ) {
+  // Xử lý yêu cầu lấy danh sách người dùng đủ điều kiện
   if (req.method === "GET") {
-    // Fetch eligible users with their bills
+    // Lấy loại nhắc nhở từ query parameters
     const { reminderType } = req.query as { reminderType?: ReminderType }
 
+    // Kiểm tra tính hợp lệ của loại nhắc nhở
     if (!reminderType || !["3days", "7days", "overdue"].includes(reminderType)) {
       return res.status(400).json({
         success: false,
@@ -37,29 +41,33 @@ export default async function handler(
     }
 
     try {
+      // Tính toán ngày đích dựa trên loại nhắc nhở
       const now = new Date()
       let targetDate: Date | null = null
 
-      // Calculate target date based on reminder type
+      // Tính toán ngày đích dựa trên loại nhắc nhở
       switch (reminderType) {
         case "3days": {
+          // Nhắc nhở 3 ngày trước ngày đến hạn
           targetDate = new Date(now)
           targetDate.setDate(now.getDate() + 3)
           break
         }
         case "7days": {
+          // Nhắc nhở 7 ngày trước ngày đến hạn
           targetDate = new Date(now)
           targetDate.setDate(now.getDate() + 7)
           break
         }
         case "overdue": {
-          targetDate = null // For overdue, we check if due_date < now
+          // Nhắc nhở cho hóa đơn quá hạn (due_date < now)
+          targetDate = null
           break
         }
       }
 
-      // Get all unpaid billings matching the criteria
-      // Group by billing_id to get unique billings with their totals
+      // Lấy tất cả các hóa đơn chưa thanh toán phù hợp với tiêu chí
+      // Nhóm theo billing_id để lấy các hóa đơn duy nhất với tổng tiền của chúng
       let billings: {
         billingId: string
         userId: string
@@ -70,7 +78,9 @@ export default async function handler(
         daysUntilDue: number
       }[]
 
+      // Xử lý trường hợp hóa đơn quá hạn
       if (reminderType === "overdue") {
+        // Lấy các hóa đơn chưa thanh toán có ngày đến hạn < ngày hiện tại
         billings = await db<{
           billingId: string
           userId: string
@@ -97,8 +107,11 @@ export default async function handler(
           GROUP BY b.billing_id, b.user_id, u.email, u.full_name
           ORDER BY MAX(b.due_date)
         `
-      } else if (targetDate) {
+      } 
+      // Xử lý trường hợp nhắc nhở trước ngày đến hạn (3 ngày hoặc 7 ngày)
+      else if (targetDate) {
         const targetDateStr = targetDate.toISOString().split("T")[0]
+        // Lấy các hóa đơn chưa thanh toán có ngày đến hạn = ngày đích
         billings = await db<{
           billingId: string
           userId: string
@@ -132,14 +145,16 @@ export default async function handler(
         })
       }
 
-      // Group billings by user
+      // Nhóm hóa đơn theo người dùng
+      // Mỗi người dùng có thể có nhiều hóa đơn
       const usersMap = new Map<string, EligibleUser>()
 
       for (const billing of billings) {
         const dueDate = new Date(billing.dueDate)
         const daysDiff = Number(billing.daysUntilDue)
-        const isOverdue = daysDiff < 0
+        const isOverdue = daysDiff < 0 // Hóa đơn quá hạn nếu số ngày < 0
 
+        // Tạo đối tượng BillingItem từ dữ liệu
         const billingItem: BillingItem = {
           billingId: billing.billingId,
           totalAmount: Number(billing.totalAmount),
@@ -148,6 +163,7 @@ export default async function handler(
           isOverdue,
         }
 
+        // Thêm người dùng vào map nếu chưa có
         if (!usersMap.has(billing.userId)) {
           usersMap.set(billing.userId, {
             userId: billing.userId,
@@ -157,6 +173,7 @@ export default async function handler(
           })
         }
 
+        // Thêm hóa đơn vào danh sách hóa đơn của người dùng
         usersMap.get(billing.userId)!.bills.push(billingItem)
       }
 
@@ -174,10 +191,13 @@ export default async function handler(
         message: (error as Error).message || "Lỗi máy chủ nội bộ khi tìm người dùng",
       })
     }
-  } else if (req.method === "POST") {
-    // Send email to a single selected user
+  } 
+  // Xử lý yêu cầu gửi email nhắc nhở cho một người dùng cụ thể
+  else if (req.method === "POST") {
+    // Lấy userId và reminderType từ request body
     const { userId, reminderType } = req.body as { userId: string; reminderType: ReminderType }
 
+    // Kiểm tra tính hợp lệ của userId và reminderType
     if (!userId || !reminderType || !["3days", "7days", "overdue"].includes(reminderType)) {
       return res.status(400).json({
         success: false,
@@ -186,28 +206,32 @@ export default async function handler(
     }
 
     try {
+      // Tính toán ngày đích dựa trên loại nhắc nhở
       const now = new Date()
       let targetDate: Date | null = null
 
-      // Calculate target date based on reminder type
+      // Tính toán ngày đích dựa trên loại nhắc nhở
       switch (reminderType) {
         case "3days": {
+          // Nhắc nhở 3 ngày trước ngày đến hạn
           targetDate = new Date(now)
           targetDate.setDate(now.getDate() + 3)
           break
         }
         case "7days": {
+          // Nhắc nhở 7 ngày trước ngày đến hạn
           targetDate = new Date(now)
           targetDate.setDate(now.getDate() + 7)
           break
         }
         case "overdue": {
+          // Nhắc nhở cho hóa đơn quá hạn
           targetDate = null
           break
         }
       }
 
-      // Get all unpaid billings for this user matching the criteria
+      // Lấy tất cả các hóa đơn chưa thanh toán của người dùng này phù hợp với tiêu chí
       let billings: {
         billingId: string
         dueDate: string
@@ -265,6 +289,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra xem có hóa đơn nào không
       if (billings.length === 0) {
         return res.status(404).json({
           success: false,
@@ -272,7 +297,7 @@ export default async function handler(
         })
       }
 
-      // Get user info
+      // Lấy thông tin người dùng (email và tên)
       const userInfo = await db<{ email: string; fullName: string }[]>`
         SELECT email, full_name
         FROM users
@@ -280,6 +305,7 @@ export default async function handler(
         LIMIT 1
       `
 
+      // Kiểm tra xem người dùng có tồn tại không
       if (userInfo.length === 0) {
         return res.status(404).json({
           success: false,
@@ -289,7 +315,7 @@ export default async function handler(
 
       const user = userInfo[0]
 
-      // Prepare billing items
+      // Chuẩn bị danh sách hóa đơn để gửi email
       const billingItems: BillingItem[] = billings.map((billing) => {
         const daysDiff = Number(billing.daysUntilDue)
         return {
@@ -297,11 +323,11 @@ export default async function handler(
           totalAmount: Number(billing.totalAmount),
           dueDate: billing.dueDate,
           daysUntilDue: daysDiff,
-          isOverdue: daysDiff < 0,
+          isOverdue: daysDiff < 0, // Hóa đơn quá hạn nếu số ngày < 0
         }
       })
 
-      // Send email
+      // Gửi email nhắc nhở thanh toán
       await sendBillingReminder(user.email, {
         fullName: user.fullName,
         bills: billingItems,
@@ -319,7 +345,9 @@ export default async function handler(
         message: (error as Error).message || "Lỗi máy chủ nội bộ khi gửi email nhắc nhở",
       })
     }
-  } else {
+  } 
+  // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
+  else {
     res.setHeader("Allow", ["GET", "POST"])
     return res.status(405).json({
       success: false,

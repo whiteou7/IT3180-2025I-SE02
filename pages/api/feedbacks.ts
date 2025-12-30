@@ -9,24 +9,30 @@ import {
 } from "@/lib/validation"
 
 /**
- * GET /api/feedbacks - Retrieve feedbacks (all for admin, own for residents)
- * POST /api/feedbacks - Create a new feedback
+ * API quản lý phản hồi
+ * GET /api/feedbacks - Lấy danh sách phản hồi (tất cả cho admin, chỉ của mình cho cư dân)
+ * POST /api/feedbacks - Tạo phản hồi mới
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Feedback[] | Feedback>>
 ) {
   try {
+    // Xử lý yêu cầu lấy danh sách phản hồi
     if (req.method === "GET") {
+      // Lấy các tham số từ query, xử lý trường hợp mảng
       const userId = Array.isArray(req.query.userId) ? req.query.userId[0] : req.query.userId
       const role = Array.isArray(req.query.role) ? req.query.role[0] : req.query.role
       const statusFilter = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status
 
       let feedbacks: Feedback[]
 
-      // Filter by user if not admin
+      // Lọc theo người dùng nếu không phải admin
+      // Người dùng thường chỉ có thể xem phản hồi của chính mình
       if (role !== "admin" && userId) {
+        // Nếu có bộ lọc trạng thái
         if (statusFilter && statusFilter !== "all") {
+          // Lấy phản hồi của người dùng với trạng thái cụ thể
           feedbacks = await db<Feedback[]>`
             SELECT 
               feedback_id,
@@ -43,6 +49,7 @@ export default async function handler(
             ORDER BY created_at DESC;
           `
         } else {
+          // Lấy tất cả phản hồi của người dùng
           feedbacks = await db<Feedback[]>`
             SELECT 
               feedback_id,
@@ -60,8 +67,9 @@ export default async function handler(
           `
         }
       } else {
-        // Admin can see all
+        // Admin có thể xem tất cả phản hồi
         if (statusFilter && statusFilter !== "all") {
+          // Lấy tất cả phản hồi với trạng thái cụ thể
           feedbacks = await db<Feedback[]>`
             SELECT 
               feedback_id,
@@ -78,6 +86,7 @@ export default async function handler(
             ORDER BY created_at DESC;
           `
         } else {
+          // Lấy tất cả phản hồi
           feedbacks = await db<Feedback[]>`
             SELECT 
               feedback_id,
@@ -96,13 +105,16 @@ export default async function handler(
       }
 
       return res.status(200).json({ success: true, message: "Tải danh sách phản hồi thành công", data: feedbacks })
+    // Xử lý yêu cầu tạo phản hồi mới
     } else if (req.method === "POST") {
+      // Lấy thông tin phản hồi từ request body
       const { content, userId, tags } = req.body as {
         content: string;
         userId: string;
         tags?: string[];
       }
 
+      // Kiểm tra tính hợp lệ của nội dung phản hồi (không được rỗng)
       const contentValidation = validateString(content, "Nội dung phản hồi")
       if (!contentValidation.isValid) {
         return res.status(400).json({
@@ -111,6 +123,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra tính hợp lệ của userId (phải là UUID)
       const userIdValidation = validateUUID(userId, "Mã người dùng")
       if (!userIdValidation.isValid) {
         return res.status(400).json({
@@ -119,7 +132,7 @@ export default async function handler(
         })
       }
 
-      // Validate tags if provided
+      // Kiểm tra tính hợp lệ của tags nếu có cung cấp
       if (tags !== undefined && tags !== null) {
         const tagsValidation = validateStringArray(tags, "Thẻ")
         if (!tagsValidation.isValid) {
@@ -130,14 +143,16 @@ export default async function handler(
         }
       }
 
-      // Insert feedback
+      // Thêm phản hồi mới vào database
+      // Sử dụng db.array() để chuyển mảng tags thành định dạng PostgreSQL array
       const [row] = await db<{ feedbackId: string }[]>`
         INSERT INTO feedbacks (user_id, content, tags)
         VALUES (${userId}, ${content}, ${tags ? db.array(tags) : db.array([])})
         RETURNING feedback_id
       `
 
-      // Fetch the created feedback joined with user to return full_name
+      // Lấy lại phản hồi vừa tạo kèm thông tin người dùng (full_name)
+      // Để trả về đầy đủ thông tin cho client
       const [created] = await db<Feedback[]>`
         SELECT 
           feedback_id,

@@ -12,20 +12,26 @@ type RawServiceFromDB = {
 }
 
 /**
- * GET /api/users/[id]/billings - Retrieve all billing records for a specific user
+ * API quản lý hóa đơn của người dùng
+ * GET /api/users/[id]/billings - Lấy tất cả bản ghi hóa đơn của một người dùng cụ thể
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<BillingDetail[]>>
 ) {
+  // Lấy userId từ query parameters
   const { id: userId } = req.query
 
+  // Chỉ chấp nhận phương thức GET
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({ success: false, message: "Phương thức không được phép" })
   }
 
   try {
+    // Lấy tất cả hóa đơn của người dùng
+    // Sử dụng GROUP BY để nhóm các dịch vụ cùng một billing_id
+    // Sử dụng json_agg để tổng hợp thông tin dịch vụ thành mảng JSON
     const result = await db`
       SELECT 
         b.billing_id,
@@ -54,9 +60,11 @@ export default async function handler(
       ORDER BY used_at DESC
     `
 
+    // Chuyển đổi dữ liệu từ database sang định dạng BillingDetail
     const billings: BillingDetail[] = result.map((row) => {
       const servicesList = (row.services || []) as RawServiceFromDB[]
 
+      // Tính tổng giá trị hóa đơn (bao gồm cả thuế)
       const totalPrice = servicesList.reduce((sum: number, s: RawServiceFromDB) => {
         const price = Number(s.price)
         const tax = Number(s.tax)
@@ -74,6 +82,7 @@ export default async function handler(
         periodEnd: row.periodEnd,
         paidAt: row.paidAt,
         
+        // Chuyển đổi danh sách dịch vụ từ định dạng database sang BillingService
         services: servicesList.map((s: RawServiceFromDB): BillingService => ({
           serviceId: s.serviceId,    
           serviceName: s.serviceName,
@@ -91,6 +100,7 @@ export default async function handler(
     })
 
   } catch (error: unknown) {
+    // Xử lý lỗi chung
     console.error("Error fetching user billings:", error)
     const errorMessage = error instanceof Error ? error.message : "Có lỗi xảy ra. Vui lòng thử lại."
     return res.status(500).json({ 

@@ -8,18 +8,22 @@ import {
 } from "@/lib/validation" 
 
 /**
- * GET /api/apartments/[id] - Get apartment information
- * PUT /api/apartments/[id] - Update apartment information
- * DELETE /api/apartments/[id] - Delete apartment
+ * API quản lý căn hộ theo ID
+ * GET /api/apartments/[id] - Lấy thông tin chi tiết của một căn hộ
+ * PUT /api/apartments/[id] - Cập nhật thông tin căn hộ
+ * DELETE /api/apartments/[id] - Xóa căn hộ
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Apartment | null>> 
 ) {
+  // Lấy ID căn hộ từ query parameters
   const { id } = req.query
 
   try {
+    // Xử lý yêu cầu cập nhật thông tin căn hộ
     if (req.method === "PUT") {
+      // Lấy thông tin cập nhật từ request body
       const { buildingId, floor, apartmentNumber, monthlyFee } = req.body as {
         buildingId: number;
         floor: number;
@@ -27,6 +31,7 @@ export default async function handler(
         monthlyFee: number;
       }
 
+      // Kiểm tra tính hợp lệ của mã tòa nhà
       const buildingIdValidation = validatePositiveInteger(buildingId, "Mã tòa nhà")
       if (!buildingIdValidation.isValid) {
         return res.status(400).json({
@@ -35,6 +40,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra tính hợp lệ của tầng
       const floorValidation = validatePositiveInteger(floor, "Tầng")
       if (!floorValidation.isValid) {
         return res.status(400).json({
@@ -43,6 +49,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra tính hợp lệ của số căn hộ
       const apartmentNumberValidation = validatePositiveInteger(apartmentNumber, "Số căn hộ")
       if (!apartmentNumberValidation.isValid) {
         return res.status(400).json({
@@ -51,6 +58,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra tính hợp lệ của phí hàng tháng
       const monthlyFeeValidation = validateNonNegativeNumber(monthlyFee, "Phí hàng tháng")
       if (!monthlyFeeValidation.isValid) {
         return res.status(400).json({
@@ -59,6 +67,7 @@ export default async function handler(
         })
       }
 
+      // Cập nhật thông tin căn hộ trong database
       const [updatedApartment] = await db<Apartment[]>`
         UPDATE apartments
         SET building_id = ${buildingId}, floor = ${floor}, apartment_number=${apartmentNumber}, monthly_fee=${monthlyFee}
@@ -66,6 +75,7 @@ export default async function handler(
         RETURNING *; 
       ` 
 
+      // Kiểm tra xem căn hộ có tồn tại không
       if (!updatedApartment) {
         return res.status(404).json({
           success: false,
@@ -80,7 +90,9 @@ export default async function handler(
       })
     }
 
+    // Xử lý yêu cầu lấy thông tin căn hộ
     else if (req.method === "GET") {
+      // Tìm căn hộ theo ID
       const [apartment] = await db<Apartment[]>`
         SELECT
           apartment_id,
@@ -92,6 +104,7 @@ export default async function handler(
         WHERE apartment_id = ${id as string}
       ` 
 
+      // Kiểm tra xem căn hộ có tồn tại không
       if (!apartment) {
         return res.status(404).json({
           success: false,
@@ -99,7 +112,7 @@ export default async function handler(
         })
       }
 
-      // Fetch apartment members
+      // Lấy danh sách thành viên của căn hộ
       const members = await db<{userId: string, fullName: string, email: string}[]>`
         SELECT 
           user_id,
@@ -109,6 +122,7 @@ export default async function handler(
         WHERE apartment_id = ${id as string}
       `
 
+      // Kết hợp thông tin căn hộ với danh sách thành viên
       const apartmentWithMembers = {
         ...apartment,
         members: members
@@ -121,13 +135,16 @@ export default async function handler(
       })
     }
 
+    // Xử lý yêu cầu xóa căn hộ
     else if (req.method === "DELETE") {
+      // Xóa căn hộ khỏi database
       const [deletedApartment] = await db<Apartment[]>`
         DELETE FROM apartments
         WHERE apartment_id = ${id as string}
         RETURNING apartment_id;
       ` 
 
+      // Kiểm tra xem căn hộ có tồn tại không
       if (!deletedApartment) {
         return res.status(404).json({
           success: false,
@@ -142,6 +159,7 @@ export default async function handler(
       })
     }
 
+    // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
     else {
       res.setHeader("Allow", ["PUT", "GET", "DELETE"])
       return res.status(405).json({
@@ -151,6 +169,7 @@ export default async function handler(
     }
 
   } catch (error) {
+    // Xử lý lỗi chung cho tất cả các phương thức
     console.error(`Error processing apartment ${id}:`, error)
     return res.status(500).json({
       success: false,

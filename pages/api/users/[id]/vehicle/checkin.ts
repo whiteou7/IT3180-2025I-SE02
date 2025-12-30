@@ -3,14 +3,17 @@ import { db } from "@/db"
 import type { APIBody } from "@/types/api"
 
 /**
- * POST /api/users/[id]/vehicle/checkin - Toggle vehicle entry/exit status
+ * API check-in/check-out phương tiện
+ * POST /api/users/[id]/vehicle/checkin - Chuyển đổi trạng thái vào/ra của phương tiện
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ time: string }>>
 ) {
+  // Lấy userId từ query parameters
   const { id: userId } = req.query
 
+  // Kiểm tra userId có tồn tại và là string không
   if (!userId || typeof userId !== "string") {
     return res.status(400).json({ 
       success: false, 
@@ -18,6 +21,7 @@ export default async function handler(
     })
   }
 
+  // Chỉ chấp nhận phương thức POST
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"])
     return res.status(405).json({ 
@@ -27,7 +31,7 @@ export default async function handler(
   }
 
   try {
-    // Check if user exists
+    // Kiểm tra người dùng có tồn tại không
     const [user] = await db`
       SELECT user_id FROM users WHERE user_id = ${userId};
     `
@@ -39,7 +43,8 @@ export default async function handler(
       })
     }
 
-    // Find the user's vehicle (1-to-1 mapping)
+    // Tìm phương tiện của người dùng (mối quan hệ 1-1)
+    // Kết hợp với bảng properties để tìm phương tiện thuộc về người dùng
     const [vehicle] = await db`
       SELECT 
         v.vehicle_id
@@ -60,7 +65,7 @@ export default async function handler(
       })
     }
 
-    // Get the latest log entry for this vehicle
+    // Lấy bản ghi nhật ký mới nhất của phương tiện này
     const [latestLog] = await db`
       SELECT 
         vehicle_log_id,
@@ -77,8 +82,9 @@ export default async function handler(
 
     const currentTime = new Date().toISOString()
 
+    // Kiểm tra trạng thái hiện tại của phương tiện
     if (!latestLog || latestLog.exitTime !== null) {
-      // No log exists or vehicle is currently outside - create new entry (entering)
+      // Không có nhật ký hoặc phương tiện đang ở bên ngoài - tạo bản ghi mới (vào)
       await db`
         INSERT INTO vehicle_logs (vehicle_id, entrance_time, exit_time)
         VALUES (${vehicle.vehicleId}, ${currentTime}, NULL);
@@ -90,7 +96,7 @@ export default async function handler(
         data: { time: currentTime }
       })
     } else {
-      // Vehicle is currently inside - update exit time (exiting)
+      // Phương tiện đang ở bên trong - cập nhật thời gian ra (ra)
       await db`
         UPDATE vehicle_logs 
         SET exit_time = ${currentTime}
@@ -105,6 +111,7 @@ export default async function handler(
     }
 
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/[id]/vehicle/checkin:", error)
     return res.status(500).json({ 
       success: false, 

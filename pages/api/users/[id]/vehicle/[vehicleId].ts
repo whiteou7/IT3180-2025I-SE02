@@ -9,14 +9,17 @@ type VehicleInfo = {
 }
 
 /**
- * PUT /api/users/[id]/vehicle/[vehicleId] - Update vehicle license plate
+ * API cập nhật phương tiện
+ * PUT /api/users/[id]/vehicle/[vehicleId] - Cập nhật biển số xe
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<VehicleInfo | null>>
 ) {
+  // Lấy userId và vehicleId từ query parameters
   const { id: userId, vehicleId } = req.query
 
+  // Kiểm tra userId và vehicleId có tồn tại không
   if (!userId || !vehicleId) {
     return res.status(400).json({
       success: false,
@@ -24,6 +27,7 @@ export default async function handler(
     })
   }
 
+  // Chỉ chấp nhận phương thức PUT
   if (req.method !== "PUT") {
     res.setHeader("Allow", ["PUT"])
     return res.status(405).json({
@@ -33,10 +37,12 @@ export default async function handler(
   }
 
   try {
+    // Lấy biển số xe từ request body
     const { licensePlate } = req.body as {
       licensePlate: string
     }
 
+    // Kiểm tra biển số xe có được cung cấp không
     if (!licensePlate) {
       return res.status(400).json({
         success: false,
@@ -44,7 +50,7 @@ export default async function handler(
       })
     }
 
-    // Update the vehicle's license plate
+    // Cập nhật biển số xe của phương tiện
     const [updatedVehicle] = await db<VehicleInfo[]>`
       UPDATE vehicles
       SET license_plate = ${licensePlate}
@@ -65,6 +71,7 @@ export default async function handler(
       data: updatedVehicle,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/[id]/vehicle/[vehicleId]:", error)
     return res.status(500).json({
       success: false,

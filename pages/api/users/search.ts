@@ -4,13 +4,15 @@ import type { APIBody } from "@/types/api"
 import type { User } from "@/types/users"
 
 /**
- * GET /api/users/search - Search users by name
- * Query params: q (search query)
+ * API tìm kiếm người dùng
+ * GET /api/users/search - Tìm kiếm người dùng theo tên
+ * Query params: q (từ khóa tìm kiếm), userId (mã người dùng hiện tại)
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<User[]>>
 ) {
+  // Chỉ chấp nhận phương thức GET
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
@@ -20,8 +22,10 @@ export default async function handler(
   }
 
   try {
+    // Lấy từ khóa tìm kiếm và userId từ query parameters
     const { q, userId } = req.query
 
+    // Kiểm tra từ khóa tìm kiếm có được cung cấp và là string không
     if (!q || typeof q !== "string") {
       return res.status(400).json({
         success: false,
@@ -29,6 +33,7 @@ export default async function handler(
       })
     }
 
+    // Kiểm tra userId có được cung cấp và là string không
     if (!userId || typeof userId !== "string") {
       return res.status(400).json({
         success: false,
@@ -36,7 +41,9 @@ export default async function handler(
       })
     }
 
-    // Search users by name (case-insensitive)
+    // Tìm kiếm người dùng theo tên (không phân biệt hoa thường)
+    // Loại trừ người dùng hiện tại khỏi kết quả
+    // Giới hạn 20 kết quả và sắp xếp theo tên
     const users = await db<User[]>`
       SELECT 
         user_id,
@@ -60,6 +67,7 @@ export default async function handler(
       data: users,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/search:", error)
     return res.status(500).json({
       success: false,

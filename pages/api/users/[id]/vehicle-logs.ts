@@ -9,14 +9,17 @@ type VehicleLogEntry = {
 }
 
 /**
- * GET /api/users/[id]/vehicle-logs - Get vehicle logs for a user's vehicle
+ * API quản lý nhật ký phương tiện của người dùng
+ * GET /api/users/[id]/vehicle-logs - Lấy nhật ký phương tiện của người dùng
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<VehicleLogEntry[]>>
 ) {
+  // Lấy userId từ query parameters
   const { id: userId } = req.query
 
+  // Kiểm tra userId có tồn tại không
   if (!userId) {
     return res.status(400).json({
       success: false,
@@ -24,6 +27,7 @@ export default async function handler(
     })
   }
 
+  // Chỉ chấp nhận phương thức GET
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
@@ -33,6 +37,8 @@ export default async function handler(
   }
 
   try {
+    // Lấy nhật ký ra vào của phương tiện thuộc về người dùng
+    // Kết hợp với bảng vehicles và properties để tìm phương tiện của người dùng
     const logs = await db<VehicleLogEntry[]>`
       SELECT 
         vl.vehicle_log_id,
@@ -60,6 +66,7 @@ export default async function handler(
       data: logs,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/[id]/vehicle-logs:", error)
     return res.status(500).json({
       success: false,

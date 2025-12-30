@@ -11,14 +11,17 @@ export const config = {
 }
 
 /**
- * POST /api/users/[id]/documents/upload - Upload a document for a user
+ * API tải lên tài liệu
+ * POST /api/users/[id]/documents/upload - Tải lên tài liệu cho người dùng
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ path: string }>>
 ) {
+  // Lấy userId từ query parameters
   const { id: userId } = req.query
 
+  // Kiểm tra userId có tồn tại và là string không
   if (!userId || typeof userId !== "string") {
     return res.status(400).json({
       success: false,
@@ -26,6 +29,7 @@ export default async function handler(
     })
   }
 
+  // Chỉ chấp nhận phương thức POST
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"])
     return res.status(405).json({
@@ -35,14 +39,18 @@ export default async function handler(
   }
 
   try {
+    // Cấu hình formidable để xử lý form data
+    // Giới hạn kích thước file tối đa 10MB
     const form = formidable({
       maxFileSize: 10 * 1024 * 1024, // 10MB
       keepExtensions: true,
     })
 
+    // Parse form data từ request
     const [, files] = await form.parse(req)
     const file = Array.isArray(files.file) ? files.file[0] : files.file
 
+    // Kiểm tra file có được cung cấp không
     if (!file) {
       return res.status(400).json({
         success: false,
@@ -50,7 +58,7 @@ export default async function handler(
       })
     }
 
-    // Validate file type (PDF only)
+    // Kiểm tra loại file (chỉ cho phép PDF)
     if (!file.originalFilename?.toLowerCase().endsWith(".pdf")) {
       return res.status(400).json({
         success: false,
@@ -58,20 +66,20 @@ export default async function handler(
       })
     }
 
-    // Read file buffer
+    // Đọc file buffer từ file tạm thời
     const fileBuffer = fs.readFileSync(file.filepath)
     const fileName = file.originalFilename || `document-${Date.now()}.pdf`
     const filePath = `${userId}/${fileName}`
 
-    // Upload to Supabase
+    // Tải lên file lên Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from("users")
       .upload(filePath, fileBuffer, {
         contentType: "application/pdf",
-        upsert: false,
+        upsert: false, // Không ghi đè file nếu đã tồn tại
       })
 
-    // Clean up temp file
+    // Xóa file tạm thời sau khi đã đọc
     fs.unlinkSync(file.filepath)
 
     if (uploadError) {
@@ -88,6 +96,7 @@ export default async function handler(
       data: { path: filePath },
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/[id]/documents/upload:", error)
     return res.status(500).json({
       success: false,

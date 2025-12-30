@@ -13,12 +13,14 @@ type LoginSuccess = {
 }
 
 /**
- * POST /api/auth/login - Authenticate user with email and password
+ * API xác thực người dùng
+ * POST /api/auth/login - Đăng nhập với email và mật khẩu
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<LoginSuccess>>
 ) {
+  // Chỉ chấp nhận phương thức POST
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -27,11 +29,13 @@ export default async function handler(
   }
 
   try {
+    // Lấy email và mật khẩu từ request body
     const { email, password } = req.body as {
       email?: string
       password?: string
     }
 
+    // Kiểm tra tính hợp lệ của email (định dạng email)
     const emailValidation = validateEmail(email)
     if (!emailValidation.isValid) {
       return res.status(400).json({
@@ -40,6 +44,7 @@ export default async function handler(
       })
     }
 
+    // Kiểm tra tính hợp lệ của mật khẩu (không được rỗng)
     const passwordValidation = validateString(password, "Mật khẩu")
     if (!passwordValidation.isValid) {
       return res.status(400).json({
@@ -48,6 +53,8 @@ export default async function handler(
       })
     }
 
+    // Tìm người dùng trong database theo email
+    // Lấy thông tin user_id, role, password (đã hash) và full_name
     const [user] = await db<
       { userId: string; role: UserRole; password: string, fullName: string }[]
     >`
@@ -56,6 +63,7 @@ export default async function handler(
       WHERE email = ${email ?? ""};
     `
 
+    // Kiểm tra xem người dùng có tồn tại không
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -63,8 +71,11 @@ export default async function handler(
       })
     }
 
+    // So sánh mật khẩu người dùng nhập với mật khẩu đã hash trong database
+    // Sử dụng bcrypt để so sánh an toàn
     const passwordMatches = await bcrypt.compare(password ?? "", user.password)
 
+    // Kiểm tra xem mật khẩu có khớp không
     if (!passwordMatches) {
       return res.status(401).json({
         success: false,
@@ -72,6 +83,7 @@ export default async function handler(
       })
     }
 
+    // Đăng nhập thành công, trả về thông tin người dùng (không bao gồm mật khẩu)
     return res.status(200).json({
       success: true,
       message: "Đăng nhập thành công.",
@@ -82,6 +94,7 @@ export default async function handler(
       },
     })
   } catch (error) {
+    // Xử lý lỗi khi đăng nhập
     console.error("Error in /api/auth/login:", error)
     return res.status(500).json({
       success: false,

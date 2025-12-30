@@ -5,16 +5,19 @@ import { Property } from "@/types/properties"
 import type { UserRole } from "@/types/enum"
 
 /**
- * GET /api/users/[id]/properties/[propertyId] - Get a property by ID
- * PUT /api/users/[id]/properties/[propertyId] - Update a property
- * DELETE /api/users/[id]/properties/[propertyId] - Delete a property
+ * API quản lý tài sản theo ID
+ * GET /api/users/[id]/properties/[propertyId] - Lấy thông tin tài sản theo ID
+ * PUT /api/users/[id]/properties/[propertyId] - Cập nhật tài sản
+ * DELETE /api/users/[id]/properties/[propertyId] - Xóa tài sản
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Property | null>>
 ) {
+  // Lấy userId và propertyId từ query parameters
   const { id: userId, propertyId } = req.query
 
+  // Kiểm tra userId và propertyId có tồn tại không
   if (!userId || !propertyId) {
     return res.status(400).json({
       success: false,
@@ -23,7 +26,9 @@ export default async function handler(
   }
 
   try {
+    // Xử lý yêu cầu lấy thông tin tài sản
     if (req.method === "GET") {
+      // Lấy thông tin tài sản kèm biển số xe (nếu là phương tiện)
       const [property] = await db<Property[]>`
         SELECT 
           p.property_id,
@@ -54,7 +59,9 @@ export default async function handler(
       })
     }
 
+    // Xử lý yêu cầu cập nhật tài sản
     if (req.method === "PUT") {
+      // Lấy thông tin cập nhật từ request body
       const { propertyName, propertyType, status, isPublic, licensePlate } = req.body as {
         propertyName?: string
         propertyType?: string
@@ -63,6 +70,7 @@ export default async function handler(
         licensePlate?: string
       }
 
+      // Kiểm tra ít nhất một trường phải được cung cấp để cập nhật
       if (
         propertyName === undefined &&
         propertyType === undefined &&
@@ -76,6 +84,7 @@ export default async function handler(
         })
       }
 
+      // Lấy thông tin tài sản hiện tại
       const [existingProperty] = await db<Property[]>`
         SELECT 
           p.property_id,
@@ -99,6 +108,7 @@ export default async function handler(
         })
       }
 
+      // Lấy role của chủ sở hữu
       const [ownerRecord] = await db<{ role: UserRole }[]>`
         SELECT role FROM users WHERE user_id = ${userId as string}
       `
@@ -110,6 +120,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra không cho phép thay đổi loại tài sản
       if (
         propertyType !== undefined &&
         propertyType !== existingProperty.propertyType
@@ -120,6 +131,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra quyền: chỉ admin mới có thể đặt tài sản là công khai
       if (
         isPublic === true &&
         ownerRecord.role !== "admin" &&
@@ -131,10 +143,13 @@ export default async function handler(
         })
       }
 
+      // Xử lý các giá trị null/undefined
       const safePropertyName = propertyName ?? null
       const safeStatus = status ?? null
       const safeIsPublic = isPublic ?? null
 
+      // Cập nhật thông tin tài sản
+      // Sử dụng COALESCE để chỉ cập nhật các trường được cung cấp
       const [updatedProperty] = await db<Property[]>`
         UPDATE properties
         SET 
@@ -159,6 +174,7 @@ export default async function handler(
         })
       }
 
+      // Xử lý cập nhật biển số xe nếu tài sản là phương tiện
       let nextLicensePlate: string | null | undefined = existingProperty.licensePlate ?? null
 
       if (updatedProperty.propertyType === "vehicle" && licensePlate?.trim()) {
@@ -182,7 +198,9 @@ export default async function handler(
       })
     }
 
+    // Xử lý yêu cầu xóa tài sản
     if (req.method === "DELETE") {
+      // Xóa tài sản khỏi database
       const [deletedProperty] = await db<Property[]>`
         DELETE FROM properties
         WHERE property_id = ${propertyId as string}
@@ -204,12 +222,14 @@ export default async function handler(
       })
     }
 
+    // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
     res.setHeader("Allow", ["GET", "PUT", "DELETE"])
     return res.status(405).json({
       success: false,
       message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/[id]/properties/[propertyId]:", error)
     return res.status(500).json({
       success: false,

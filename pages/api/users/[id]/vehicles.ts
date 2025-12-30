@@ -4,14 +4,17 @@ import type { APIBody } from "@/types/api"
 import { Vehicle } from "@/types/properties"
 
 /**
- * GET /api/users/[id]/vehicles - Get vehicle info and logs for a user
+ * API quản lý phương tiện của người dùng
+ * GET /api/users/[id]/vehicles - Lấy thông tin phương tiện và nhật ký của người dùng
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Vehicle | null>>
 ) {
+  // Lấy userId từ query parameters
   const { id: userId } = req.query
 
+  // Kiểm tra userId có tồn tại không
   if (!userId) {
     return res.status(400).json({
       success: false,
@@ -19,6 +22,7 @@ export default async function handler(
     })
   }
 
+  // Chỉ chấp nhận phương thức GET
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
@@ -28,6 +32,8 @@ export default async function handler(
   }
 
   try {
+    // Tìm phương tiện của người dùng
+    // Kết hợp với bảng properties để lấy thông tin tài sản
     const [vehicle] = await db<Vehicle[]>`
       SELECT 
         v.vehicle_id,
@@ -43,6 +49,7 @@ export default async function handler(
         p.user_id = ${userId as string};
     `
 
+    // Kiểm tra xem phương tiện có tồn tại không
     if (!vehicle) {
       return res.status(404).json({
         success: false,
@@ -56,6 +63,7 @@ export default async function handler(
       data: vehicle,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/[id]/vehicles:", error)
     return res.status(500).json({
       success: false,

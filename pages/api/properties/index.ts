@@ -5,14 +5,21 @@ import type { APIBody } from "@/types/api"
 import type { PropertySummary } from "@/types/properties"
 
 /**
- * GET /api/properties - Retrieve all properties with owner information and report counts
+ * API quản lý tài sản
+ * GET /api/properties - Lấy danh sách tất cả tài sản kèm thông tin chủ sở hữu và số lượng báo cáo
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<PropertySummary[]>>
 ) {
   try {
+    // Xử lý yêu cầu lấy danh sách tài sản
     if (req.method === "GET") {
+      // Lấy danh sách tài sản với thông tin chi tiết
+      // Kết hợp với bảng users để lấy tên chủ sở hữu
+      // Kết hợp với bảng vehicles để lấy biển số xe (nếu có)
+      // Kết hợp với bảng property_reports để đếm số lượng báo cáo
+      // Sử dụng LEFT JOIN để bao gồm cả tài sản không có chủ sở hữu, xe, hoặc báo cáo
       const properties = await db<PropertySummary[]>`
         SELECT
           p.property_id,
@@ -41,12 +48,14 @@ export default async function handler(
       })
     }
 
+    // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
       message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/properties:", error)
     return res.status(500).json({
       success: false,

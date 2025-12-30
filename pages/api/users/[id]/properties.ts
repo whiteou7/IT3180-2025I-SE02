@@ -5,15 +5,18 @@ import { Property } from "@/types/properties"
 import type { UserRole } from "@/types/enum"
 
 /**
- * GET /api/users/[id]/properties - Get all properties for a user
- * POST /api/users/[id]/properties - Create a new property for a user
+ * API quản lý tài sản của người dùng
+ * GET /api/users/[id]/properties - Lấy tất cả tài sản của một người dùng
+ * POST /api/users/[id]/properties - Tạo tài sản mới cho người dùng
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Property | Property[] | { propertyId: number }>>
 ) {
+  // Lấy userId từ query parameters
   const { id: userId } = req.query
 
+  // Kiểm tra userId có tồn tại không
   if (!userId) {
     return res.status(400).json({
       success: false,
@@ -22,7 +25,10 @@ export default async function handler(
   }
 
   try {
+    // Xử lý yêu cầu lấy danh sách tài sản
     if (req.method === "GET") {
+      // Lấy tất cả tài sản của người dùng
+      // Kết hợp với bảng vehicles để lấy biển số xe (nếu có)
       const properties = await db<Property[]>`
         SELECT 
           p.property_id,
@@ -46,7 +52,9 @@ export default async function handler(
       })
     }
 
+    // Xử lý yêu cầu tạo tài sản mới
     if (req.method === "POST") {
+      // Lấy thông tin tài sản từ request body
       const { propertyName, propertyType, isPublic, licensePlate } = req.body as {
         propertyName: string
         propertyType?: string
@@ -54,6 +62,7 @@ export default async function handler(
         licensePlate?: string
       }
 
+      // Kiểm tra tên tài sản có được cung cấp không
       if (!propertyName) {
         return res.status(400).json({
           success: false,
@@ -61,6 +70,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra người dùng có tồn tại và lấy role của họ
       const [userRecord] = await db<{ role: UserRole }[]>`
         SELECT role FROM users WHERE user_id = ${userId as string}
       `
@@ -72,9 +82,11 @@ export default async function handler(
         })
       }
 
+      // Xử lý loại tài sản và trạng thái công khai
       const requestedType = propertyType ?? "general"
       const requestedPublic = Boolean(isPublic)
 
+      // Kiểm tra quyền: chỉ admin mới có thể đăng ký tài sản công khai
       if (requestedPublic && userRecord.role !== "admin") {
         return res.status(403).json({
           success: false,
@@ -82,7 +94,9 @@ export default async function handler(
         })
       }
 
+      // Xử lý đặc biệt cho loại tài sản là phương tiện (vehicle)
       if (requestedType === "vehicle") {
+        // Kiểm tra biển số xe có được cung cấp không
         if (!licensePlate?.trim()) {
           return res.status(400).json({
             success: false,
@@ -90,6 +104,8 @@ export default async function handler(
           })
         }
 
+        // Kiểm tra xem người dùng đã có phương tiện chưa
+        // Mỗi người chỉ được đăng ký 1 phương tiện
         const [existingVehicle] = await db<{ propertyId: number }[]>`
           SELECT property_id
           FROM properties
@@ -105,7 +121,10 @@ export default async function handler(
           })
         }
 
+        // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
+        // Tạo property và vehicle trong cùng một transaction
         const result = await db.begin(async (sql) => {
+          // Tạo property mới
           const [newProperty] = await sql<{ propertyId: number }[]>`
             INSERT INTO properties (property_name, user_id, is_public, property_type)
             VALUES (
@@ -117,6 +136,7 @@ export default async function handler(
             RETURNING property_id;
           `
 
+          // Tạo vehicle với biển số xe
           await sql`
             INSERT INTO vehicles (property_id, license_plate)
             VALUES (${newProperty.propertyId}, ${licensePlate})
@@ -132,6 +152,7 @@ export default async function handler(
         })
       }
 
+      // Tạo tài sản thông thường (không phải phương tiện)
       const [newProperty] = await db<{ propertyId: number }[]>`
         INSERT INTO properties (property_name, user_id, is_public, property_type)
         VALUES (
@@ -150,12 +171,14 @@ export default async function handler(
       })
     }
 
+    // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
     res.setHeader("Allow", ["GET", "POST"])
     return res.status(405).json({
       success: false,
       message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/users/[id]/properties:", error)
     return res.status(500).json({
       success: false,

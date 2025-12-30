@@ -6,17 +6,21 @@ import type { User } from "@/types/users"
 import type { UserRole } from "@/types/enum"
 
 /**
- * GET /api/chats - Get all chats for the current user
- * POST /api/chats - Create a new chat conversation
+ * API quản lý cuộc trò chuyện
+ * GET /api/chats - Lấy tất cả cuộc trò chuyện của người dùng hiện tại
+ * POST /api/chats - Tạo cuộc trò chuyện mới
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Chat[] | Chat>>
 ) {
   try {
+    // Xử lý yêu cầu lấy danh sách cuộc trò chuyện
     if (req.method === "GET") {
+      // Lấy userId từ query parameters
       const { userId } = req.query
 
+      // Kiểm tra userId có tồn tại và là string không
       if (!userId || typeof userId !== "string") {
         return res.status(400).json({
           success: false,
@@ -24,7 +28,8 @@ export default async function handler(
         })
       }
 
-      // Get all chats where user is either user1 or user2
+      // Lấy tất cả cuộc trò chuyện mà người dùng là user1 hoặc user2
+      // Sắp xếp theo thời gian cập nhật mới nhất
       const chats = await db<Chat[]>`
         SELECT 
           c.chat_id,
@@ -37,12 +42,14 @@ export default async function handler(
         ORDER BY c.updated_at DESC
       `
 
-      // For each chat, get the other user and last message
+      // Với mỗi cuộc trò chuyện, lấy thông tin người dùng còn lại và tin nhắn cuối cùng
+      // Sử dụng Promise.all để thực hiện song song các truy vấn
       const chatsWithDetails = await Promise.all(
         chats.map(async (chat) => {
+          // Xác định ID của người dùng còn lại trong cuộc trò chuyện
           const otherUserId = chat.user1Id === userId ? chat.user2Id : chat.user1Id
 
-          // Get other user details
+          // Lấy thông tin chi tiết của người dùng còn lại
           const [otherUser] = await db<User[]>`
             SELECT 
               user_id,
@@ -58,7 +65,7 @@ export default async function handler(
             LIMIT 1
           `
 
-          // Get last message
+          // Lấy tin nhắn cuối cùng trong cuộc trò chuyện
           const [lastMessage] = await db<{
             messageId: string
             chatId: string
@@ -74,7 +81,7 @@ export default async function handler(
             LIMIT 1
           `
 
-          // Get unread count
+          // Đếm số tin nhắn chưa đọc (của người dùng khác gửi cho mình)
           const [unreadResult] = await db<{ count: number }[]>`
             SELECT COUNT(*) as count
             FROM messages
@@ -108,12 +115,15 @@ export default async function handler(
       })
     }
 
+    // Xử lý yêu cầu tạo cuộc trò chuyện mới
     if (req.method === "POST") {
+      // Lấy thông tin từ request body
       const { userId, otherUserId } = req.body as {
         userId: string
         otherUserId: string
       }
 
+      // Kiểm tra cả hai userId đều có giá trị
       if (!userId || !otherUserId) {
         return res.status(400).json({
           success: false,
@@ -121,6 +131,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra không được tự tạo cuộc trò chuyện với chính mình
       if (userId === otherUserId) {
         return res.status(400).json({
           success: false,
@@ -128,7 +139,7 @@ export default async function handler(
         })
       }
 
-      // Check if users exist
+      // Kiểm tra xem cả hai người dùng có tồn tại không
       const [user1] = await db<{ userId: string; role: UserRole }[]>`
         SELECT user_id, role FROM users WHERE user_id = ${userId} LIMIT 1
       `
@@ -143,8 +154,8 @@ export default async function handler(
         })
       }
 
-      // Check permissions: tenant, police, accountant can only chat with admin
-      // Admin can chat with anyone
+      // Kiểm tra quyền: tenant, police, accountant chỉ có thể trò chuyện với admin
+      // Admin có thể trò chuyện với bất kỳ ai
       if (user1.role !== "admin") {
         if (user2.role !== "admin") {
           return res.status(403).json({
@@ -154,7 +165,7 @@ export default async function handler(
         }
       }
 
-      // Check if chat already exists (order doesn't matter)
+      // Kiểm tra xem cuộc trò chuyện đã tồn tại chưa (thứ tự user1_id và user2_id không quan trọng)
       const [existingChat] = await db<Chat[]>`
         SELECT chat_id, user1_id, user2_id, created_at, updated_at
         FROM chats
@@ -163,6 +174,7 @@ export default async function handler(
         LIMIT 1
       `
 
+      // Nếu cuộc trò chuyện đã tồn tại, trả về thông tin cuộc trò chuyện đó
       if (existingChat) {
         return res.status(200).json({
           success: true,
@@ -171,7 +183,8 @@ export default async function handler(
         })
       }
 
-      // Create new chat (always put smaller user_id first for consistency)
+      // Tạo cuộc trò chuyện mới
+      // Luôn đặt user_id nhỏ hơn làm user1_id để đảm bảo tính nhất quán
       const [user1Id, user2Id] = userId < otherUserId ? [userId, otherUserId] : [otherUserId, userId]
 
       const [newChat] = await db<Chat[]>`
@@ -180,7 +193,7 @@ export default async function handler(
         RETURNING chat_id, user1_id, user2_id, created_at, updated_at
       `
 
-      // Get other user details
+      // Lấy thông tin chi tiết của người dùng còn lại để trả về
       const otherUserIdForResponse = newChat.user1Id === userId ? newChat.user2Id : newChat.user1Id
       const [otherUser] = await db<User[]>`
         SELECT 

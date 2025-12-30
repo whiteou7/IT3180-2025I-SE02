@@ -13,15 +13,19 @@ import {
 } from "@/lib/validation"
 
 /**
- * PUT /api/users/[id] - Update user information
- * GET /api/users/[id] - Get user info 
+ * API quản lý người dùng theo ID
+ * PUT /api/users/[id] - Cập nhật thông tin người dùng
+ * GET /api/users/[id] - Lấy thông tin người dùng
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<User>>
 ) {
+  // Lấy userId từ query parameters, xử lý trường hợp mảng
   const { id: userId } = req.query
   const userIdParam = Array.isArray(userId) ? userId[0] : userId
+  
+  // Kiểm tra tính hợp lệ của userId (phải là UUID)
   const userIdValidation = validateUUID(userIdParam, "Mã người dùng")
   if (!userIdValidation.isValid) {
     return res.status(400).json({
@@ -33,7 +37,9 @@ export default async function handler(
   const userIdString = userIdParam as string
 
   try {
+    // Xử lý yêu cầu cập nhật thông tin người dùng
     if (req.method === "PUT") {
+      // Lấy thông tin cập nhật từ request body
       const { email, fullName, role, yearOfBirth, gender, phoneNumber } = req.body as {
         email: string;
         fullName: string;
@@ -43,7 +49,8 @@ export default async function handler(
         phoneNumber?: string | null;
       }
 
-      // Validate required fields
+      // Kiểm tra tính hợp lệ của các trường bắt buộc
+      // Kiểm tra email (phải đúng định dạng)
       const emailValidation = validateEmail(email)
       if (!emailValidation.isValid) {
         return res.status(400).json({
@@ -52,6 +59,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra họ tên (không được rỗng)
       const fullNameValidation = validateString(fullName, "Họ tên")
       if (!fullNameValidation.isValid) {
         return res.status(400).json({
@@ -60,7 +68,8 @@ export default async function handler(
         })
       }
 
-      // Validate optional fields
+      // Kiểm tra tính hợp lệ của các trường tùy chọn
+      // Kiểm tra năm sinh nếu có cung cấp
       if (yearOfBirth !== undefined && yearOfBirth !== null) {
         const yearValidation = validateYear(yearOfBirth, "Năm sinh")
         if (!yearValidation.isValid) {
@@ -71,6 +80,7 @@ export default async function handler(
         }
       }
 
+      // Kiểm tra số điện thoại nếu có cung cấp
       if (phoneNumber !== undefined && phoneNumber !== null && phoneNumber !== "") {
         const phoneValidation = validatePhoneNumber(phoneNumber)
         if (!phoneValidation.isValid) {
@@ -81,6 +91,7 @@ export default async function handler(
         }
       }
 
+      // Cập nhật thông tin người dùng trong database
       const updatedUser = await db<User[]>`
         UPDATE users
         SET
@@ -102,6 +113,7 @@ export default async function handler(
           apartment_id;
       `
 
+      // Kiểm tra xem người dùng có tồn tại không
       if (updatedUser.length === 0) {
         return res.status(404).json({ 
           success: false,
@@ -114,7 +126,10 @@ export default async function handler(
         message: "Cập nhật thông tin người dùng thành công",
         data: updatedUser[0]
       })
-    } else if (req.method == "GET") {
+    } 
+    // Xử lý yêu cầu lấy thông tin người dùng
+    else if (req.method == "GET") {
+      // Tìm người dùng theo ID
       const user = await db<User[]>`
         SELECT 
           user_id,
@@ -129,6 +144,7 @@ export default async function handler(
         WHERE user_id = ${userIdString};
       `
 
+      // Kiểm tra xem người dùng có tồn tại không
       if (user.length === 0) {
         return res.status(404).json({
           success: false,
@@ -142,7 +158,9 @@ export default async function handler(
         data: user[0],
       })
 
-    } else {
+    } 
+    // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
+    else {
       res.setHeader("Allow", ["PUT"])
       return res.status(405).json({
         success: false,

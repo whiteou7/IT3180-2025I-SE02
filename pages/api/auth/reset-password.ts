@@ -6,13 +6,15 @@ import type { APIBody } from "@/types/api"
 import { validateEmail, validatePhoneNumber, validateString } from "@/lib/validation"
 
 /**
- * POST /api/auth/reset-password - Reset user password
- * Requires matching email and phone number
+ * API đặt lại mật khẩu
+ * POST /api/auth/reset-password - Đặt lại mật khẩu người dùng
+ * Yêu cầu email và số điện thoại phải khớp với tài khoản
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ success: boolean }>>
 ) {
+  // Chỉ chấp nhận phương thức POST
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -21,12 +23,14 @@ export default async function handler(
   }
 
   try {
+    // Lấy thông tin từ request body
     const { email, phoneNumber, newPassword } = req.body as {
       email?: string
       phoneNumber?: string
       newPassword?: string
     }
 
+    // Kiểm tra tính hợp lệ của email (phải đúng định dạng)
     const emailValidation = validateEmail(email)
     if (!emailValidation.isValid) {
       return res.status(400).json({
@@ -35,6 +39,7 @@ export default async function handler(
       })
     }
 
+    // Kiểm tra tính hợp lệ của số điện thoại
     const phoneValidation = validatePhoneNumber(phoneNumber)
     if (!phoneValidation.isValid) {
       return res.status(400).json({
@@ -43,6 +48,7 @@ export default async function handler(
       })
     }
 
+    // Kiểm tra tính hợp lệ của mật khẩu mới (không được rỗng)
     const passwordValidation = validateString(newPassword, "Mật khẩu mới")
     if (!passwordValidation.isValid) {
       return res.status(400).json({
@@ -51,13 +57,15 @@ export default async function handler(
       })
     }
 
-    // Find user with matching email and phone number
+    // Tìm người dùng với email khớp
+    // Lấy user_id và phone_number để xác thực
     const [user] = await db<{ userId: string; phoneNumber: string | null }[]>`
       SELECT user_id, phone_number
       FROM users
       WHERE email = ${email ?? ""};
     `
 
+    // Kiểm tra xem người dùng có tồn tại không
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -65,7 +73,8 @@ export default async function handler(
       })
     }
 
-    // Verify phone number matches
+    // Xác thực số điện thoại có khớp với tài khoản không
+    // Đây là bước bảo mật để đảm bảo chỉ chủ tài khoản mới có thể đặt lại mật khẩu
     if (user.phoneNumber !== phoneNumber) {
       return res.status(401).json({
         success: false,
@@ -73,10 +82,11 @@ export default async function handler(
       })
     }
 
-    // Hash new password
+    // Hash mật khẩu mới
+    // Sử dụng bcrypt với salt rounds = 10 để hash mật khẩu
     const hashedPassword = await bcrypt.hash(newPassword ?? "", 10)
 
-    // Update password
+    // Cập nhật mật khẩu trong database
     await db`
       UPDATE users
       SET password = ${hashedPassword}

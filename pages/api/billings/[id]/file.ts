@@ -15,14 +15,17 @@ type BillingFileDetail = BillingDetail & {
 type BillingResponse = APIBody<BillingFileDetail>
 
 /**
- * GET /api/billings/[id]/file - Generate and retrieve PDF invoice file for a billing
+ * API tạo và lấy file PDF hóa đơn
+ * GET /api/billings/[id]/file - Tạo và lấy file PDF hóa đơn cho một thanh toán
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<BillingResponse | Uint8Array>
 ) {
+  // Lấy billing ID từ query parameters
   const { id } = req.query
 
+  // Kiểm tra billing ID có tồn tại và là string không
   if (!id || typeof id !== "string") {
     return res.status(400).json({
       success: false,
@@ -30,6 +33,7 @@ export default async function handler(
     })
   }
 
+  // Chỉ chấp nhận phương thức GET
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
@@ -39,6 +43,8 @@ export default async function handler(
   }
 
   try {
+    // Lấy thông tin thanh toán kèm thông tin người dùng và các dịch vụ
+    // Một billing có thể có nhiều dịch vụ, nên kết quả trả về có thể có nhiều dòng
     const rows = await db<{
       billingId: string
       userId: string
@@ -74,6 +80,7 @@ export default async function handler(
       WHERE b.billing_id = ${id};
     `
 
+    // Kiểm tra xem thanh toán có tồn tại không
     if (rows.length === 0) {
       return res.status(404).json({
         success: false,
@@ -81,8 +88,10 @@ export default async function handler(
       })
     }
 
+    // Lấy thông tin từ dòng đầu tiên (thông tin chung của billing)
     const userInfo = rows[0]
 
+    // Chuyển đổi danh sách dịch vụ từ kết quả truy vấn
     const services: BillingService[] = rows.map((row: (typeof rows)[number]) => ({
       serviceId: row.serviceId,
       serviceName: row.serviceName,
@@ -91,11 +100,14 @@ export default async function handler(
       tax: Number(row.tax),
     }))
 
+    // Tính tổng giá trị hóa đơn (bao gồm cả thuế)
+    // Duyệt qua tất cả các dịch vụ và tính tổng: giá + (giá * thuế / 100)
     const totalPrice = services.reduce((sum, service) => {
       const taxAmount = (service.price * service.tax) / 100
       return sum + service.price + taxAmount
     }, 0)
 
+    // Tạo đối tượng BillingDetail từ dữ liệu
     const billing: BillingDetail = {
       billingId: userInfo.billingId,
       userId: userInfo.userId,
@@ -109,14 +121,20 @@ export default async function handler(
       paidAt: userInfo.paidAt,
     }
 
+    // Tạo tên file PDF tạm thời
+    // Sử dụng userId và timestamp để đảm bảo tính duy nhất
     const tmpFileName = `invoice-${billing.userId}-${Date.now()}.pdf`
     const tmpFilePath = path.join(os.tmpdir(), tmpFileName)
 
+    // Xử lý ngày tháng cho hóa đơn
     const invoiceDate = new Date()
     const dueDate = billing.dueDate ? new Date(billing.dueDate) : new Date(invoiceDate)
 
+    // Tạo payload cho PDF invoice
+    // Bao gồm thông tin công ty, khách hàng, hóa đơn, các mục dịch vụ, QR code và ghi chú
     const invoicePayload = {
       company: {
+        // Logo công ty dưới dạng SVG
         logo: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="102px" height="68px" viewBox="0 0 101 68" version="1.1">
           <g id="surface1">
           <path style=" stroke:none;fill-rule:nonzero;fill:rgb(97.647059%,97.647059%,97.647059%);fill-opacity:1;" d="M 0.0429688 0 C 33.34375 0 66.648438 0 100.957031 0 C 100.957031 22.441406 100.957031 44.878906 100.957031 68 C 67.65625 68 34.351562 68 0.0429688 68 C 0.0429688 45.558594 0.0429688 23.121094 0.0429688 0 Z M 0.0429688 0 "/>
@@ -312,9 +330,11 @@ export default async function handler(
         phone: "Tel: (+84) 245 543 903",
         address: "SOICT, Hust, Hanoi, Vietnam",
       },
+      // Thông tin khách hàng
       customer: {
         name: billing.fullName,
       },
+      // Thông tin hóa đơn
       invoice: {
         number: billing.billingId,
         date: invoiceDate.toISOString().slice(0, 10),
@@ -324,6 +344,7 @@ export default async function handler(
         currency: "USD",
         locale: "en-US",
       },
+      // Danh sách các dịch vụ trong hóa đơn
       items: billing.services.map((s) => ({
         name: s.serviceName,
         description: s.description ?? "",
@@ -331,24 +352,29 @@ export default async function handler(
         price: s.price,
         tax: s.tax,
       })),
+      // QR code chứa billing ID
       qr: {
         data: billing.billingId,
       },
       note: "Thank you for your payment.",
     }
 
+    // Import và tạo PDF invoice
     const { PDFInvoice } = await import("@h1dd3nsn1p3r/pdf-invoice")
     const invoice = new PDFInvoice(invoicePayload)
     const generatedPath = await invoice.create()
     
-    // Collect the PDF stream properly into a buffer
+    // Đọc file PDF đã tạo và chuyển đổi thành buffer
+    // Sử dụng stream để đọc file và thu thập các chunks thành buffer
     const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
       const chunks: Buffer[] = []
       const stream = createReadStream(generatedPath)
       
+      // Thu thập các chunks khi stream đọc dữ liệu
       stream.on("data", (chunk: Buffer | string) => {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
       })
+      // Khi stream kết thúc, nối tất cả chunks thành một buffer
       stream.on("end", () => {
         const buffer = Buffer.concat(chunks)
         resolve(buffer)
@@ -356,9 +382,12 @@ export default async function handler(
       stream.on("error", (err) => reject(err))
     })
     
+    // Xóa file PDF tạm thời sau khi đã đọc vào buffer
     await fs.unlink(generatedPath).catch(() => {})
+    // Chuyển đổi buffer sang base64 để có thể trả về qua API
     const fileBase64 = pdfBuffer.toString("base64")
 
+    // Tạo payload response bao gồm thông tin billing và file PDF dưới dạng base64
     const payload: BillingFileDetail = {
       ...billing,
       file: fileBase64,
@@ -370,6 +399,7 @@ export default async function handler(
       data: payload,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error generating billing PDF:", error)
     return res.status(500).json({
       success: false,

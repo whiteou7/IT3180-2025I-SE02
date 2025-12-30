@@ -4,15 +4,18 @@ import type { APIBody } from "@/types/api"
 import { Property } from "@/types/properties"
 
 /**
- * GET /api/properties/available - Get properties available for reporting
- * Returns properties that are either "found" or have never been reported
+ * API lấy danh sách tài sản có thể báo cáo
+ * GET /api/properties/available - Lấy các tài sản có thể báo cáo
+ * Trả về các tài sản có trạng thái "found" hoặc chưa từng được báo cáo
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Property[]>>
 ) {
+  // Lấy userId từ query parameters
   const { userId } = req.query
 
+  // Kiểm tra userId có tồn tại không
   if (!userId) {
     return res.status(400).json({
       success: false,
@@ -21,10 +24,11 @@ export default async function handler(
   }
 
   try {
+    // Xử lý yêu cầu lấy danh sách tài sản có thể báo cáo
     if (req.method === "GET") {
-      // Get all properties for the user that are either:
-      // 1. Have no reports (never reported as lost)
-      // 2. Have their latest report with status 'found'
+      // Lấy tất cả tài sản của người dùng thỏa mãn một trong hai điều kiện:
+      // 1. Chưa có báo cáo nào (chưa từng được báo cáo là mất)
+      // 2. Báo cáo mới nhất có trạng thái 'found' hoặc 'deleted'
       const properties = await db<Property[]>`
         SELECT DISTINCT
           p.property_id,
@@ -37,13 +41,13 @@ export default async function handler(
         FROM properties p
         WHERE p.user_id = ${userId as string}
           AND (
-            -- Property has no reports
+            -- Tài sản chưa có báo cáo nào
             NOT EXISTS (
               SELECT 1 
               FROM property_reports pr 
               WHERE pr.property_id = p.property_id
             )
-            -- OR the most recent report has status 'found' or 'deleted'
+            -- HOẶC báo cáo mới nhất có trạng thái 'found' hoặc 'deleted'
             OR EXISTS (
               SELECT 1 
               FROM property_reports pr 
@@ -66,12 +70,14 @@ export default async function handler(
       })
     }
 
+    // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
     res.setHeader("Allow", ["GET"])
     return res.status(405).json({
       success: false,
       message: `Phương thức ${req.method} không được phép`,
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/properties/available:", error)
     return res.status(500).json({
       success: false,

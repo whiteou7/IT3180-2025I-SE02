@@ -32,26 +32,33 @@ type RawBillingFromDB = {
 }
 
 /**
- * GET /api/billings - Retrieve billing summaries with optional filtering
+ * API quản lý thanh toán (billing)
+ * GET /api/billings - Lấy danh sách tổng hợp thanh toán với bộ lọc tùy chọn
  *   Query params:
- *     - userId: Filter by user ID (optional)
- *     - status: Filter by billing status (optional)
- * POST /api/billings - Create a new billing record for a user with specified services
+ *     - userId: Lọc theo ID người dùng (tùy chọn)
+ *     - status: Lọc theo trạng thái thanh toán (tùy chọn)
+ * POST /api/billings - Tạo bản ghi thanh toán mới cho người dùng với các dịch vụ được chỉ định
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ billingId: string } | BillingSummary[] | null>>
 ) {
+  // Xử lý yêu cầu lấy danh sách thanh toán
   if (req.method === "GET") {
     try {
+      // Lấy các tham số query, xử lý trường hợp mảng (Next.js có thể trả về mảng)
       const userIdParam = Array.isArray(req.query.userId) ? req.query.userId[0] : req.query.userId
       const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status
 
-      // Build query with conditional WHERE clauses using template literals
+      // Xây dựng truy vấn với điều kiện WHERE có điều kiện
+      // Sử dụng template literals để tạo truy vấn động
       let result: RawBillingFromDB[]
 
+      // Trường hợp có cả hai bộ lọc: userId và status
       if (userIdParam && statusParam) {
-        // Both filters
+        // Truy vấn với cả hai điều kiện lọc
+        // Sử dụng GROUP BY để nhóm các dịch vụ cùng một billing_id
+        // Sử dụng json_agg để tổng hợp thông tin dịch vụ thành mảng JSON
         result = await db<RawBillingFromDB[]>`
           SELECT 
             b.billing_id,
@@ -81,8 +88,9 @@ export default async function handler(
           GROUP BY b.billing_id, b.user_id, u.full_name
           ORDER BY MAX(b.used_at) DESC
         `
+      // Trường hợp chỉ lọc theo userId
       } else if (userIdParam) {
-        // User filter only
+        // Truy vấn chỉ với điều kiện lọc theo người dùng
         result = await db<RawBillingFromDB[]>`
           SELECT 
             b.billing_id,
@@ -112,8 +120,9 @@ export default async function handler(
           GROUP BY b.billing_id, b.user_id, u.full_name
           ORDER BY MAX(b.used_at) DESC
         `
+      // Trường hợp chỉ lọc theo status
       } else if (statusParam) {
-        // Status filter only
+        // Truy vấn chỉ với điều kiện lọc theo trạng thái thanh toán
         result = await db<RawBillingFromDB[]>`
           SELECT 
             b.billing_id,
@@ -143,8 +152,9 @@ export default async function handler(
           GROUP BY b.billing_id, b.user_id, u.full_name
           ORDER BY MAX(b.used_at) DESC
         `
+      // Trường hợp không có bộ lọc nào
       } else {
-        // No filters
+        // Truy vấn tất cả các bản ghi thanh toán
         result = await db<RawBillingFromDB[]>`
           SELECT 
             b.billing_id,
@@ -175,6 +185,8 @@ export default async function handler(
         `
       }
 
+      // Chuyển đổi dữ liệu từ database sang định dạng BillingSummary
+      // Xử lý các trường có thể là string hoặc number từ database
       const payload: BillingSummary[] = result.map((row) => ({
         billingId: row.billingId,
         userId: row.userId,
@@ -195,6 +207,7 @@ export default async function handler(
         data: payload,
       })
     } catch (error) {
+      // Xử lý lỗi khi lấy danh sách thanh toán
       console.error("Error fetching billings:", error)
       return res.status(500).json({
         success: false,
@@ -203,11 +216,13 @@ export default async function handler(
     }
   }
 
+  // Xử lý yêu cầu tạo thanh toán mới
   if (req.method !== "POST") {
     res.setHeader("Allow", ["GET", "POST"])
     return res.status(405).json({ success: false, message: "Phương thức không được phép" })
   }
 
+  // Lấy thông tin từ request body
   const { userId, serviceIds, dueDate, periodStart, periodEnd } = req.body as {
     userId: string
     serviceIds: number[]
@@ -216,6 +231,7 @@ export default async function handler(
     periodEnd?: string
   }
 
+  // Kiểm tra tính hợp lệ của userId (phải là UUID)
   const userIdValidation = validateUUID(userId, "Mã người dùng")
   if (!userIdValidation.isValid) {
     return res.status(400).json({
@@ -224,6 +240,7 @@ export default async function handler(
     })
   }
 
+  // Kiểm tra tính hợp lệ của danh sách dịch vụ (phải là mảng số)
   const serviceIdsValidation = validateNumberArray(serviceIds, "Danh sách dịch vụ")
   if (!serviceIdsValidation.isValid) {
     return res.status(400).json({
@@ -232,7 +249,8 @@ export default async function handler(
     })
   }
 
-  // Validate optional date fields
+  // Kiểm tra tính hợp lệ của các trường ngày tháng tùy chọn
+  // Kiểm tra ngày đến hạn nếu có cung cấp
   if (dueDate !== undefined && dueDate !== null && dueDate !== "") {
     const dueDateValidation = validateDate(dueDate, "Ngày đến hạn")
     if (!dueDateValidation.isValid) {
@@ -243,6 +261,7 @@ export default async function handler(
     }
   }
 
+  // Kiểm tra ngày bắt đầu kỳ nếu có cung cấp
   if (periodStart !== undefined && periodStart !== null && periodStart !== "") {
     const periodStartValidation = validateDate(periodStart, "Ngày bắt đầu kỳ")
     if (!periodStartValidation.isValid) {
@@ -253,6 +272,7 @@ export default async function handler(
     }
   }
 
+  // Kiểm tra ngày kết thúc kỳ nếu có cung cấp
   if (periodEnd !== undefined && periodEnd !== null && periodEnd !== "") {
     const periodEndValidation = validateDate(periodEnd, "Ngày kết thúc kỳ")
     if (!periodEndValidation.isValid) {
@@ -264,35 +284,49 @@ export default async function handler(
   }
 
   try {
+    // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
+    // Nếu có lỗi xảy ra, tất cả thay đổi sẽ được rollback
     const newBillingId = await db.begin(async (sql) => {
+      // Tạo UUID mới cho billing_id
       const billingId = randomUUID()
+      // Loại bỏ các service_id trùng lặp
       const uniqueServiceIds = [...new Set(serviceIds)]
+      
+      // Kiểm tra xem tất cả các dịch vụ có tồn tại trong database không
       const services = await sql`
         SELECT service_id FROM services WHERE service_id IN ${sql(uniqueServiceIds)}
       `
 
+      // Nếu số lượng dịch vụ tìm được khác với số lượng yêu cầu, có dịch vụ không hợp lệ
       if (services.length !== uniqueServiceIds.length) {
         throw new Error("Một hoặc nhiều dịch vụ không hợp lệ.")
       }
 
+      // Xử lý các giá trị ngày tháng
+      // Nếu không có ngày đến hạn, mặc định là 15 ngày kể từ bây giờ
       const now = new Date()
       const parsedDueDate = dueDate ? new Date(dueDate) : new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000)
+      // Nếu không có ngày bắt đầu kỳ, mặc định là bây giờ
       const parsedPeriodStart = periodStart ? new Date(periodStart) : now
+      // Nếu không có ngày kết thúc kỳ, mặc định là 30 ngày sau ngày bắt đầu
       const parsedPeriodEnd = periodEnd
         ? new Date(periodEnd)
         : new Date(parsedPeriodStart.getTime() + 30 * 24 * 60 * 60 * 1000)
 
+      // Tạo các bản ghi billing cho từng dịch vụ
+      // Mỗi dịch vụ sẽ có một bản ghi riêng nhưng cùng billing_id
       const billingRecords = serviceIds.map((sid) => ({
         billing_id: billingId,
         user_id: userId,
         service_id: sid,
-        billing_status: "unpaid",
+        billing_status: "unpaid", // Trạng thái mặc định là chưa thanh toán
         used_at: now,
         due_date: parsedDueDate,
         period_start: parsedPeriodStart,
         period_end: parsedPeriodEnd,
       }))
 
+      // Chèn tất cả các bản ghi vào database
       await sql`
         INSERT INTO billings ${sql(billingRecords)}
       `
@@ -300,12 +334,14 @@ export default async function handler(
       return billingId
     })
 
+    // Trả về ID của billing vừa tạo
     return res.status(201).json({
       success: true,
       message: "Tạo thanh toán thành công.",
       data: { billingId: newBillingId },
     })
   } catch (error) {
+    // Xử lý lỗi khi tạo thanh toán
     console.error("Error creating billing:", error)
     return res.status(500).json({
       success: false,

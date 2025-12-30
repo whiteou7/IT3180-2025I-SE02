@@ -9,13 +9,15 @@ type DumpOptions = {
 }
 
 /**
- * POST /api/system/dump - Generate database dump bash command
- * Admin only
+ * API tạo lệnh dump database
+ * POST /api/system/dump - Tạo lệnh bash để dump database
+ * Chỉ dành cho Admin
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<{ command: string; filename: string }>>
 ) {
+  // Chỉ chấp nhận phương thức POST
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"])
     return res.status(405).json({
@@ -25,8 +27,10 @@ export default async function handler(
   }
 
   try {
+    // Lấy các tùy chọn dump từ request body
     const options = req.body as DumpOptions
 
+    // Kiểm tra ít nhất một trong hai tùy chọn (schema hoặc data) phải được chọn
     if (!options.includeSchema && !options.includeData) {
       return res.status(400).json({
         success: false,
@@ -34,9 +38,10 @@ export default async function handler(
       })
     }
 
-    // Get database URL from environment
+    // Lấy URL database từ biến môi trường
     const databaseUrl = process.env.DATABASE_URL || process.env.NEXT_PUBLIC_DATABASE_URL || ""
     
+    // Kiểm tra database URL có tồn tại không
     if (!databaseUrl) {
       return res.status(400).json({
         success: false,
@@ -44,7 +49,7 @@ export default async function handler(
       })
     }
 
-    // Parse database URL to extract connection details
+    // Phân tích URL database để lấy thông tin kết nối
     let dbUrl: URL
     try {
       dbUrl = new URL(databaseUrl)
@@ -55,58 +60,60 @@ export default async function handler(
       })
     }
 
-    // Extract connection parameters
+    // Trích xuất các tham số kết nối từ URL
     const username = dbUrl.username || "postgres"
     const password = dbUrl.password || ""
     const host = dbUrl.hostname || "localhost"
     const port = dbUrl.port || "5432"
-    const database = dbUrl.pathname?.slice(1) || "postgres" // Remove leading /
+    const database = dbUrl.pathname?.slice(1) || "postgres" // Xóa dấu / ở đầu
 
-    // Escape password for shell (replace single quotes with '\'')
+    // Escape mật khẩu cho shell (thay dấu nháy đơn bằng '\'')
     const escapedPassword = password.replace(/'/g, "'\\''")
 
-    // Generate filename with timestamp
+    // Tạo tên file với timestamp
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-").split("T")[0]
-    const filename = `dump-${timestamp}.${options.format === "sql" ? "sql" : "sql"}` // pg_dump outputs SQL format
+    const filename = `dump-${timestamp}.${options.format === "sql" ? "sql" : "sql"}` // pg_dump xuất ra định dạng SQL
 
-    // Build pg_dump command
+    // Xây dựng lệnh pg_dump
     const commandParts: string[] = []
 
-    // Add connection options
-    // Use PGPASSWORD environment variable to avoid password in command history
+    // Thêm các tùy chọn kết nối
+    // Sử dụng biến môi trường PGPASSWORD để tránh mật khẩu xuất hiện trong lịch sử lệnh
     commandParts.push(`PGPASSWORD='${escapedPassword}' pg_dump`)
     commandParts.push(`-h ${host}`)
     commandParts.push(`-p ${port}`)
     commandParts.push(`-U ${username}`)
     commandParts.push(`-d ${database}`)
 
-    // Add dump options
+    // Thêm các tùy chọn dump
     if (options.includeSchema && !options.includeData) {
+      // Chỉ xuất cấu trúc (schema)
       commandParts.push("--schema-only")
     } else if (!options.includeSchema && options.includeData) {
+      // Chỉ xuất dữ liệu
       commandParts.push("--data-only")
     }
 
-    // Add table filters if specified
+    // Thêm bộ lọc bảng nếu được chỉ định
     if (options.tables && options.tables.length > 0) {
       options.tables.forEach((table) => {
         commandParts.push(`-t ${table}`)
       })
     }
 
-    // Add format option (custom format for better compression)
+    // Thêm tùy chọn định dạng (custom format để nén tốt hơn)
     if (options.format === "json" || options.format === "csv") {
-      // Note: pg_dump doesn't directly output JSON/CSV, but we can use custom format
-      // For CSV/JSON, users would need to use psql or other tools
-      commandParts.push("-Fc") // Custom format (compressed)
+      // Lưu ý: pg_dump không trực tiếp xuất JSON/CSV, nhưng có thể dùng custom format
+      // Đối với CSV/JSON, người dùng cần sử dụng psql hoặc các công cụ khác
+      commandParts.push("-Fc") // Custom format (đã nén)
     } else {
       commandParts.push("-Fp") // Plain SQL format
     }
 
-    // Add verbose flag for better output
+    // Thêm cờ verbose để có output chi tiết hơn
     commandParts.push("-v")
 
-    // Redirect output to file
+    // Chuyển hướng output vào file
     const fullCommand = `${commandParts.join(" \\\n  ")} > ${filename}`
 
     return res.status(200).json({
@@ -118,6 +125,7 @@ export default async function handler(
       },
     })
   } catch (error) {
+    // Xử lý lỗi chung
     console.error("Error in /api/system/dump:", error)
     return res.status(500).json({
       success: false,

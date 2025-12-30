@@ -8,8 +8,9 @@ import {
 } from "@/lib/validation"
 
 /**
- * POST /api/apartments - Create a new apartment
- * GET /api/apartments - Get all apartments
+ * API quản lý căn hộ
+ * POST /api/apartments - Tạo căn hộ mới
+ * GET /api/apartments - Lấy danh sách tất cả căn hộ kèm thông tin thành viên
  */
 export default async function handler(
   req: NextApiRequest,
@@ -18,8 +19,10 @@ export default async function handler(
     | APIBody<Apartment[]>
   >
 ) {
+  // Xử lý yêu cầu tạo căn hộ mới
   if (req.method === "POST") {
     try {
+      // Lấy thông tin từ request body
       const { buildingId, floor, apartmentNumber, monthlyFee } = req.body as {
         buildingId: number;
         floor: number;
@@ -27,6 +30,7 @@ export default async function handler(
         monthlyFee: number;
       }
 
+      // Kiểm tra tính hợp lệ của mã tòa nhà (phải là số nguyên dương)
       const buildingIdValidation = validatePositiveInteger(buildingId, "Mã tòa nhà")
       if (!buildingIdValidation.isValid) {
         return res.status(400).json({
@@ -35,6 +39,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra tính hợp lệ của tầng (phải là số nguyên dương)
       const floorValidation = validatePositiveInteger(floor, "Tầng")
       if (!floorValidation.isValid) {
         return res.status(400).json({
@@ -43,6 +48,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra tính hợp lệ của số căn hộ (phải là số nguyên dương)
       const apartmentNumberValidation = validatePositiveInteger(apartmentNumber, "Số căn hộ")
       if (!apartmentNumberValidation.isValid) {
         return res.status(400).json({
@@ -51,6 +57,7 @@ export default async function handler(
         })
       }
 
+      // Kiểm tra tính hợp lệ của phí hàng tháng (phải là số không âm)
       const monthlyFeeValidation = validateNonNegativeNumber(monthlyFee, "Phí hàng tháng")
       if (!monthlyFeeValidation.isValid) {
         return res.status(400).json({
@@ -59,6 +66,7 @@ export default async function handler(
         })
       }
 
+      // Thêm căn hộ mới vào database và trả về ID của căn hộ vừa tạo
       const [newApartment] = await db`
         INSERT INTO apartments (building_id, floor, apartment_number, monthly_fee)
         VALUES (${buildingId}, ${floor}, ${apartmentNumber}, ${monthlyFee})
@@ -72,6 +80,7 @@ export default async function handler(
       })
 
     } catch (error) {
+      // Xử lý lỗi khi tạo căn hộ
       console.error("Error creating apartment:", error)
       return res.status(500).json({
         success: false,
@@ -80,8 +89,10 @@ export default async function handler(
     }
   }
 
+  // Xử lý yêu cầu lấy danh sách căn hộ
   if (req.method === "GET") {
     try {
+      // Lấy danh sách tất cả căn hộ từ database, sắp xếp theo tòa nhà, tầng và số căn hộ
       const apartments = await db<Apartment[]>`
         SELECT 
           apartment_id,
@@ -93,9 +104,11 @@ export default async function handler(
         ORDER BY building_id, floor, apartment_number;
       `
 
-      // Fetch members for each apartment
+      // Lấy thông tin thành viên cho từng căn hộ
+      // Sử dụng Promise.all để thực hiện song song các truy vấn, tăng hiệu suất
       const apartmentsWithMembers = await Promise.all(
         apartments.map(async (apartment) => {
+          // Tìm tất cả người dùng thuộc căn hộ này
           const members = await db<{userId: string, fullName: string, email: string}[]>`
             SELECT 
               user_id,
@@ -104,6 +117,7 @@ export default async function handler(
             FROM users
             WHERE apartment_id = ${apartment.apartmentId}
           `
+          // Trả về thông tin căn hộ kèm danh sách thành viên
           return {
             ...apartment,
             members: members
@@ -117,6 +131,7 @@ export default async function handler(
         data: apartmentsWithMembers,
       })
     } catch (error) {
+      // Xử lý lỗi khi lấy danh sách căn hộ
       console.error("Error fetching apartments:", error)
       return res.status(500).json({
         success: false,
@@ -125,6 +140,7 @@ export default async function handler(
     }
   }
 
+  // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
   res.setHeader("Allow", ["POST", "GET"])
   return res.status(405).json({
     success: false,

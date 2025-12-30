@@ -5,6 +5,10 @@ import type { Post } from "@/types/posts"
 import type { PostCategory } from "@/types/enum"
 import { validateUUID, validateString } from "@/lib/validation"
 
+/**
+ * Hàm helper để parse post ID từ query parameters
+ * Xử lý các trường hợp: undefined, string, hoặc array
+ */
 function parsePostId(idParam: string | string[] | undefined): string | null {
   if (!idParam) return null
   if (typeof idParam === "string") return idParam
@@ -13,22 +17,27 @@ function parsePostId(idParam: string | string[] | undefined): string | null {
 }
 
 /**
- * GET /api/posts/[id] - Get a specific post
- * PATCH /api/posts/[id] - Update a post (only by owner)
- * DELETE /api/posts/[id] - Delete a post (only by owner)
+ * API quản lý bài viết theo ID
+ * GET /api/posts/[id] - Lấy thông tin một bài viết cụ thể
+ * PATCH /api/posts/[id] - Cập nhật bài viết (chỉ người sở hữu)
+ * DELETE /api/posts/[id] - Xóa bài viết (chỉ người sở hữu)
  */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<APIBody<Post | null>>
 ) {
   try {
+    // Parse post ID từ query parameters
     const postId = parsePostId(req.query.id)
 
+    // Kiểm tra post ID có tồn tại không
     if (!postId) {
       return res.status(400).json({ success: false, message: "Thiếu mã bài viết" })
     }
 
+    // Xử lý yêu cầu lấy thông tin bài viết
     if (req.method === "GET") {
+      // Tìm bài viết theo ID, kết hợp với bảng users để lấy tên người dùng
       const [post] = await db<Post[]>`
         SELECT post_id, p.user_id, content, created_at, full_name, category, title
         FROM posts p
@@ -37,6 +46,7 @@ export default async function handler(
         LIMIT 1;
       `
 
+      // Kiểm tra xem bài viết có tồn tại không
       if (!post) {
         return res.status(404).json({ success: false, message: "Không tìm thấy bài viết" })
       }
@@ -46,7 +56,10 @@ export default async function handler(
         message: "Tải bài viết thành công",
         data: post,
       })
-    } else if (req.method === "PATCH") {
+    } 
+    // Xử lý yêu cầu cập nhật bài viết
+    else if (req.method === "PATCH") {
+      // Lấy thông tin cập nhật từ request body
       const { userId, title, content, category } = req.body as {
         userId: string;
         title?: string;
@@ -54,6 +67,7 @@ export default async function handler(
         category?: PostCategory;
       }
 
+      // Kiểm tra tính hợp lệ của userId (phải là UUID)
       const userIdValidation = validateUUID(userId, "Mã người dùng")
       if (!userIdValidation.isValid) {
         return res.status(400).json({
@@ -62,7 +76,8 @@ export default async function handler(
         })
       }
 
-      // Validate optional fields if provided
+      // Kiểm tra tính hợp lệ của các trường tùy chọn nếu có cung cấp
+      // Kiểm tra nội dung nếu có cung cấp
       if (content !== undefined && content !== null && content !== "") {
         const contentValidation = validateString(content, "Nội dung bài viết")
         if (!contentValidation.isValid) {
@@ -73,6 +88,7 @@ export default async function handler(
         }
       }
 
+      // Kiểm tra tiêu đề nếu có cung cấp
       if (title !== undefined && title !== null && title !== "") {
         const titleValidation = validateString(title, "Tiêu đề")
         if (!titleValidation.isValid) {
@@ -83,7 +99,7 @@ export default async function handler(
         }
       }
 
-      // Check if post exists and user owns it
+      // Kiểm tra xem bài viết có tồn tại và người dùng có sở hữu nó không
       const [existing] = await db<{ userId: string }[]>`
         SELECT user_id FROM posts WHERE post_id = ${postId} LIMIT 1;
       `
@@ -92,12 +108,13 @@ export default async function handler(
         return res.status(404).json({ success: false, message: "Không tìm thấy bài viết" })
       }
 
+      // Kiểm tra quyền sở hữu: chỉ người tạo bài viết mới có thể chỉnh sửa
       if (existing.userId !== userId) {
         return res.status(403).json({ success: false, message: "Bạn chỉ có thể chỉnh sửa bài viết của chính mình" })
       }
 
-      // Build update query - update all provided fields
-      // Use COALESCE to only update fields that are provided (non-null)
+      // Xây dựng truy vấn cập nhật - chỉ cập nhật các trường được cung cấp
+      // Sử dụng COALESCE để chỉ cập nhật các trường có giá trị (không null)
       await db`
         UPDATE posts 
         SET 
@@ -107,7 +124,7 @@ export default async function handler(
         WHERE post_id = ${postId}
       `
 
-      // Fetch updated post
+      // Lấy lại bài viết đã cập nhật
       const [updated] = await db<Post[]>`
         SELECT post_id, p.user_id, content, created_at, full_name, category, title
         FROM posts p
@@ -121,11 +138,15 @@ export default async function handler(
         message: "Cập nhật bài viết thành công",
         data: updated,
       })
-    } else if (req.method === "DELETE") {
+    } 
+    // Xử lý yêu cầu xóa bài viết
+    else if (req.method === "DELETE") {
+      // Lấy userId từ request body
       const { userId } = req.body as {
         userId: string;
       }
 
+      // Kiểm tra tính hợp lệ của userId (phải là UUID)
       const userIdValidation = validateUUID(userId, "Mã người dùng")
       if (!userIdValidation.isValid) {
         return res.status(400).json({
@@ -134,7 +155,7 @@ export default async function handler(
         })
       }
 
-      // Check if post exists and user owns it
+      // Kiểm tra xem bài viết có tồn tại và người dùng có sở hữu nó không
       const [existing] = await db<{ userId: string }[]>`
         SELECT user_id FROM posts WHERE post_id = ${postId} LIMIT 1;
       `
@@ -143,14 +164,18 @@ export default async function handler(
         return res.status(404).json({ success: false, message: "Không tìm thấy bài viết" })
       }
 
+      // Kiểm tra quyền sở hữu: chỉ người tạo bài viết mới có thể xóa
       if (existing.userId !== userId) {
         return res.status(403).json({ success: false, message: "Bạn chỉ có thể xóa bài viết của chính mình" })
       }
 
+      // Xóa bài viết khỏi database
       await db`DELETE FROM posts WHERE post_id = ${postId}`
 
       return res.status(200).json({ success: true, message: "Xóa bài viết thành công", data: null })
-    } else {
+    } 
+    // Trả về lỗi nếu phương thức HTTP không được hỗ trợ
+    else {
       res.setHeader("Allow", ["GET", "PATCH", "DELETE"])
       return res.status(405).json({ success: false, message: `Phương thức ${req.method} không được phép` })
     }
