@@ -159,14 +159,13 @@ export default function ResidentProfilesPage() {
   const residentsPagination = usePagination(filteredResidents, { itemsPerPage: 10 })
   const specialAccountsPagination = usePagination(filteredSpecialAccounts, { itemsPerPage: 10 })
   
-  const assignmentStats = useMemo(() => {
-    const assigned = residents.filter((resident) => resident.status === "assigned").length
+  const stats = useMemo(() => {
     return {
-      total: residents.length,
-      assigned,
-      unassigned: residents.length - assigned,
+      totalUsers: residents.length + specialAccounts.length,
+      residents: residents.length,
+      specialAccounts: specialAccounts.length,
     }
-  }, [residents])
+  }, [residents, specialAccounts])
 
   const handleRowClick = (resident: ResidentProfile) => {
     setSelectedResident(resident)
@@ -360,29 +359,29 @@ export default function ResidentProfilesPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Tổng số cư dân</CardDescription>
-                <CardTitle className="text-2xl">{assignmentStats.total}</CardTitle>
+                <CardDescription>Tổng số người dùng</CardDescription>
+                <CardTitle className="text-2xl">{stats.totalUsers}</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-foreground text-xs">
-                Tổng số cư dân trong hệ thống.
+                Tổng số người dùng trong hệ thống.
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Đã gán</CardDescription>
-                <CardTitle className="text-2xl">{assignmentStats.assigned}</CardTitle>
+                <CardDescription>Số cư dân</CardDescription>
+                <CardTitle className="text-2xl">{stats.residents}</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-foreground text-xs">
-                Cư dân đã được gán căn hộ.
+                Số lượng cư dân (người thuê và quản trị).
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardDescription>Chưa gán</CardDescription>
-                <CardTitle className="text-2xl">{assignmentStats.unassigned}</CardTitle>
+                <CardDescription>Tài khoản đặc biệt</CardDescription>
+                <CardTitle className="text-2xl">{stats.specialAccounts}</CardTitle>
               </CardHeader>
               <CardContent className="text-muted-foreground text-xs">
-                Cư dân chưa được gán căn hộ.
+                Số lượng tài khoản đặc biệt (công an và kế toán).
               </CardContent>
             </Card>
           </div>

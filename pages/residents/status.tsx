@@ -73,9 +73,9 @@ export default function ResidenceStatusPage() {
         const apartmentLookup = new Map(
           apartmentsPayload.map((apartment) => [apartment.apartmentId, apartment])
         )
-        const dataset = (usersResponse.data as User[]).map((user) =>
-          buildStatusRecord(user, apartmentLookup)
-        )
+        const dataset = (usersResponse.data as User[])
+          .filter((user) => user.role !== "police" && user.role !== "accountant")
+          .map((user) => buildStatusRecord(user, apartmentLookup))
         if (active) {
           setApartments(apartmentsPayload)
           setRecords(dataset)

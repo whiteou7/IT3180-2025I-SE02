@@ -90,7 +90,7 @@ export default async function handler(
           apartment_number,
           monthly_fee
         FROM apartments
-        ORDER BY building_id, apartment_number;
+        ORDER BY building_id, floor, apartment_number;
       `
 
       // Fetch members for each apartment
