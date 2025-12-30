@@ -187,72 +187,70 @@ function MergedAccessLogTable({
   }
 
   return (
-    <ScrollArea className="max-h-[520px]">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Cư dân</TableHead>
-            <TableHead>Căn hộ</TableHead>
-            <TableHead>Biển số</TableHead>
-            <TableHead>Vào</TableHead>
-            <TableHead>Ra</TableHead>
-            <TableHead>Thời lượng</TableHead>
-            <TableHead>Trạng thái</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {logs.map((log) => {
-            const entryDate = log.entranceTime
-              ? new Date(log.entranceTime)
-              : null
-            const exitDate = log.exitTime ? new Date(log.exitTime) : null
-            const status: AccessFiltersState["status"] = log.exitTime
-              ? "exited"
-              : "inside"
-            const apartmentLabel =
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Cư dân</TableHead>
+          <TableHead>Căn hộ</TableHead>
+          <TableHead>Biển số</TableHead>
+          <TableHead>Vào</TableHead>
+          <TableHead>Ra</TableHead>
+          <TableHead>Thời lượng</TableHead>
+          <TableHead>Trạng thái</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {logs.map((log) => {
+          const entryDate = log.entranceTime
+            ? new Date(log.entranceTime)
+            : null
+          const exitDate = log.exitTime ? new Date(log.exitTime) : null
+          const status: AccessFiltersState["status"] = log.exitTime
+            ? "exited"
+            : "inside"
+          const apartmentLabel =
               log.apartmentNumber && log.buildingId
                 ? `B${log.buildingId} • #${log.apartmentNumber}`
                 : log.apartmentNumber
                   ? `#${log.apartmentNumber}`
                   : "Chưa gán"
-            const duration =
+          const duration =
               entryDate && exitDate
                 ? `${Math.round(
                   (exitDate.getTime() - entryDate.getTime()) / (1000 * 60)
                 )} phút`
                 : "Đang diễn ra"
-            return (
-              <TableRow key={log.vehicleLogId}>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-medium">
-                      {log.fullName ?? "Chưa rõ cư dân"}
+          return (
+            <TableRow key={log.vehicleLogId}>
+              <TableCell>
+                <div className="flex flex-col">
+                  <span className="font-medium">
+                    {log.fullName ?? "Chưa rõ cư dân"}
+                  </span>
+                  {log.userId ? (
+                    <span className="text-muted-foreground text-xs">
+                      {log.userId}
                     </span>
-                    {log.userId ? (
-                      <span className="text-muted-foreground text-xs">
-                        {log.userId}
-                      </span>
-                    ) : null}
-                  </div>
-                </TableCell>
-                <TableCell>{apartmentLabel}</TableCell>
-                <TableCell className="font-mono text-xs">
-                  {log.licensePlate ?? "—"}
-                </TableCell>
-                <TableCell>{entryDate ? entryDate.toLocaleString() : "—"}</TableCell>
-                <TableCell>{exitDate ? exitDate.toLocaleString() : "—"}</TableCell>
-                <TableCell>{duration}</TableCell>
-                <TableCell>
-                  <Badge variant={statusBadgeVariant[status]}>
-                    {statusLabel[status]}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-    </ScrollArea>
+                  ) : null}
+                </div>
+              </TableCell>
+              <TableCell>{apartmentLabel}</TableCell>
+              <TableCell className="font-mono text-xs">
+                {log.licensePlate ?? "—"}
+              </TableCell>
+              <TableCell>{entryDate ? entryDate.toLocaleString() : "—"}</TableCell>
+              <TableCell>{exitDate ? exitDate.toLocaleString() : "—"}</TableCell>
+              <TableCell>{duration}</TableCell>
+              <TableCell>
+                <Badge variant={statusBadgeVariant[status]}>
+                  {statusLabel[status]}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
   )
 }
 

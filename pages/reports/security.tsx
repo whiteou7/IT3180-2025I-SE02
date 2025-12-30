@@ -435,46 +435,44 @@ export default function SecurityReportsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ScrollArea className="max-h-[400px]">
-                      <Table>
-                        <TableHeader>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Tài sản</TableHead>
+                          <TableHead>Chủ sở hữu</TableHead>
+                          <TableHead>Trạng thái</TableHead>
+                          <TableHead>Thời gian báo</TableHead>
+                          <TableHead>Nội dung</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {reportData.incidents.length === 0 ? (
                           <TableRow>
-                            <TableHead>Tài sản</TableHead>
-                            <TableHead>Chủ sở hữu</TableHead>
-                            <TableHead>Trạng thái</TableHead>
-                            <TableHead>Thời gian báo</TableHead>
-                            <TableHead>Nội dung</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {reportData.incidents.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center text-muted-foreground">
+                            <TableCell colSpan={5} className="text-center text-muted-foreground">
                                 Không có sự cố nào
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          reportData.incidents.map((incident) => (
+                            <TableRow key={incident.propertyReportId}>
+                              <TableCell className="font-medium">{incident.propertyName}</TableCell>
+                              <TableCell>{incident.ownerFullName}</TableCell>
+                              <TableCell>
+                                <Badge className={statusColors[incident.status]}>
+                                  {incident.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {new Date(incident.createdAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell className="max-w-xs truncate">
+                                {incident.content || "—"}
                               </TableCell>
                             </TableRow>
-                          ) : (
-                            reportData.incidents.map((incident) => (
-                              <TableRow key={incident.propertyReportId}>
-                                <TableCell className="font-medium">{incident.propertyName}</TableCell>
-                                <TableCell>{incident.ownerFullName}</TableCell>
-                                <TableCell>
-                                  <Badge className={statusColors[incident.status]}>
-                                    {incident.status}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell>
-                                  {new Date(incident.createdAt).toLocaleDateString()}
-                                </TableCell>
-                                <TableCell className="max-w-xs truncate">
-                                  {incident.content || "—"}
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </ScrollArea>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
                   </CardContent>
                 </Card>
               )}

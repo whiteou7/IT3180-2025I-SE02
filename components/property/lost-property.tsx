@@ -206,59 +206,58 @@ export function LostPropertyTable({
         <CardDescription>Cập nhật từ cư dân và bộ phận an ninh.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="max-h-[540px] pr-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tài sản</TableHead>
-                <TableHead>Người báo</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Phê duyệt</TableHead>
-                <TableHead>Thời gian</TableHead>
-                <TableHead>Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reports.map((report) => {
-                const isDeleted = report.status === "deleted"
-                const allowStatusChanges = Boolean(
-                  !isDeleted && canChangeStatus?.(report) && onStatusChange
-                )
-                const canToggleApproval = Boolean(
-                  !isDeleted && report.issuerId && canApprove?.(report) && onApprove
-                )
-                const allowDelete = Boolean(!isDeleted && canDelete?.(report) && onDelete)
-                const statusOptions = propertyStatuses.filter((status) => status !== "deleted")
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Tài sản</TableHead>
+              <TableHead>Người báo</TableHead>
+              <TableHead>Trạng thái</TableHead>
+              <TableHead>Phê duyệt</TableHead>
+              <TableHead>Thời gian</TableHead>
+              <TableHead>Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {reports.map((report) => {
+              const isDeleted = report.status === "deleted"
+              const allowStatusChanges = Boolean(
+                !isDeleted && canChangeStatus?.(report) && onStatusChange
+              )
+              const canToggleApproval = Boolean(
+                !isDeleted && report.issuerId && canApprove?.(report) && onApprove
+              )
+              const allowDelete = Boolean(!isDeleted && canDelete?.(report) && onDelete)
+              const statusOptions = propertyStatuses.filter((status) => status !== "deleted")
 
-                return (
-                  <TableRow key={report.propertyReportId}>
-                    <TableCell className="font-medium">{report.propertyName}</TableCell>
-                    <TableCell>{report.ownerFullName}</TableCell>
-                    <TableCell>
-                      <PropertyStatusBadge status={report.status} />
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={report.approved ? "secondary" : "outline"}>
-                        {report.status === "deleted"
-                          ? "Đã xóa"
-                          : report.approved
-                            ? "Đã duyệt"
-                            : "Chờ duyệt"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{format(new Date(report.createdAt), "dd MMM yyyy")}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm">
+              return (
+                <TableRow key={report.propertyReportId}>
+                  <TableCell className="font-medium">{report.propertyName}</TableCell>
+                  <TableCell>{report.ownerFullName}</TableCell>
+                  <TableCell>
+                    <PropertyStatusBadge status={report.status} />
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={report.approved ? "secondary" : "outline"}>
+                      {report.status === "deleted"
+                        ? "Đã xóa"
+                        : report.approved
+                          ? "Đã duyệt"
+                          : "Chờ duyệt"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{format(new Date(report.createdAt), "dd MMM yyyy")}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
                             Quản lý
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onSelect={() => onView(report)}>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onSelect={() => onView(report)}>
                             Xem chi tiết
-                          </DropdownMenuItem>
-                          {allowStatusChanges &&
+                        </DropdownMenuItem>
+                        {allowStatusChanges &&
                             statusOptions.map((statusOption) => (
                               <DropdownMenuItem
                                 key={`${report.propertyReportId}-${statusOption}`}
@@ -267,28 +266,27 @@ export function LostPropertyTable({
                                 Chuyển sang: {formatStatusLabel(statusOption)}
                               </DropdownMenuItem>
                             ))}
-                          {canToggleApproval && (
-                            <DropdownMenuItem onSelect={() => onApprove?.(report, !report.approved)}>
-                              {report.approved ? "Bỏ duyệt" : "Duyệt"}
-                            </DropdownMenuItem>
-                          )}
-                          {allowDelete && (
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onSelect={() => onDelete?.(report)}
-                            >
+                        {canToggleApproval && (
+                          <DropdownMenuItem onSelect={() => onApprove?.(report, !report.approved)}>
+                            {report.approved ? "Bỏ duyệt" : "Duyệt"}
+                          </DropdownMenuItem>
+                        )}
+                        {allowDelete && (
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onSelect={() => onDelete?.(report)}
+                          >
                               Xóa báo cáo
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </ScrollArea>
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   )
