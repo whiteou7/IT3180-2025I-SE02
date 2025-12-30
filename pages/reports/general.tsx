@@ -250,7 +250,6 @@ export default function GeneralReportsPage() {
                       <SelectItem value="residents">Cư dân</SelectItem>
                       <SelectItem value="apartments">Căn hộ</SelectItem>
                       <SelectItem value="services">Dịch vụ</SelectItem>
-                      <SelectItem value="documents">Tài liệu</SelectItem>
                       <SelectItem value="billings">Hóa đơn</SelectItem>
                     </SelectContent>
                   </Select>
